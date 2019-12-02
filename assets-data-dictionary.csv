@@ -1,0 +1,33 @@
+field_name,type,description,example,notes
+asset_type,text,Asset category (should be a controlled vocabulary),library,This value is a foreign key to the asset_types table.
+name,text,Asset name,ALLEGHENY LIBRARY,asset_type + name can be the primary key.
+parent_location,float,The location enclosing the asset (like the park that contains a playground); optional,Able Long Park,
+organization_name,text,Organization that oversees the asset,Carnegie Library of Pittsburgh,
+organization_email,text,E-mail address for contacting the organization,andrew.cardnegie@carnegielibrary.org,
+organization_phone,text,Phone number for contacting the organization,(412) 622-3114,
+localizability,text,"fixed, mobile, or virtual/cyber",fixed,
+street_address,text,Street address,1230 FEDERAL ST,
+city,text,City,Pittsburgh,
+state,text,State,PA,
+zip_code,text,ZIP Code,15212-4704,
+latitude,float,Latitude of asset,40.456392,
+longitude,float,Longitude of asset,-80.006613,
+location_transportation,text,"Transportation options (bus routes, parking, bike)",Has a parking lot | Street parking | On the 61B bus route,Can be a pipe-delimited list of options
+url,text,URL for asset,https://blueslidepark.org,
+email,text,E-mail address associated with the asset itself,hi@blueslidepark.org,
+phone,text,Phone number associated with the asset itself,(412) 237-1890,
+hours_of_operation,text,Hours of operation of the asset,"M-Sat 10-5, Sun 12-5",
+holiday_hours_of_operation,text,Holiday hours of operation of the asset,Closed,Inspired by OpenReferral. Might eliminate.
+child_friendly,bool,Is the location well-suited for kids?,True,Maybe move to events schema.
+capacity,int4,Number of people that can fit into the asset,57,Sourcing these values may be hard.
+accessibility,text,ADA/1st-floor accessibility,,It remains to be seen whether this should be a boolean or a description of the availability of ramps. See http://docs.openreferral.org/en/latest/hsda/hsda/#get--locations-location_id-accessibility-accessibility_id- for ideas.
+internet_access,bool,Internet access is available?,True,
+wifi_network,text,Name of WiFi network,No More Mister Wifi,
+computers_available,bool,Public computers are available?,True,
+services,text,What services are available here,,Unclear how to fill this out. Move to events schema?
+open_to_public,bool,Is the location open to the public?,True,Move to events schema?
+hard_to_count_population,text,"Hard to Count focus population (e.g., families, people of color, students)",families | senior citizens,Can be a pipe-delimited list. Move to Census-specific table?
+sensitive,bool,(Location?) sensitive in nature,False,
+date_entered,datetime,When record was created,2019-09-16,
+last_updated,datetime,Date of last update,2019-09-16,
+data_source,text,Dataset URL or volunteer providing the data,https://data.wprdc.org/dataset/bigburgh-social-service-listings/resource/5a05b9ec-2fbf-43f2-bfff-1de2555ff7d4,"If data from multiple sources is used to form one record, all sources can be listed in this field in pipe-delimited form: ""https://cool-assets.org | https://wprdc.org/somedataset"""

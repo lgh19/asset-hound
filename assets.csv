@@ -1,0 +1,10 @@
+asset_type,name,parent_location,organization_name,organization_email,organization_phone,localizability,street_address,city,state,zip_code,latitude,longitude,location_transportation,url,email,phone,hours_of_operation,holiday_hours_of_operation,child_friendly,capacity,accessibility,internet_access,wifi_network,computers_available,services,open_to_public,hard_to_count_population,sensitive,date_entered,last_updated,data_source
+library,ALLEGHENY LIBRARY,,Carnegie Library of Pittsburgh,,,fixed,1230 FEDERAL ST,Pittsburgh,PA,15212-4704,40.456392,-80.006613,,,,(412) 237-1890,"M-Sat 10-5, Sun 12-5",,True,,,True,,True,,True,,False,,,
+library,MAIN (OAKLAND) LIBRARY,,Carnegie Library of Pittsburgh,,,fixed,4400 FORBES AVENUE,Pittsburgh,PA,15213-4080,40.443458,-79.949011,,,,(412) 237-1890,"M-Th 10-8, F-Sat 10-5:30, Sun 12-5",,True,,,True,,True,,True,,False,,,
+school,Allderdice High School,,Pittsburgh Public Schools,,,fixed,2409 SHADY AVE,Pittsburgh,PA,15217,40.42941584,-79.91937003,,,,,,,True,,,,,,,,,False,,,
+playground,Able Long Playground,Able Long Park,City of Pittsburgh,,,fixed,COAST AVE,Pittsburgh,PA,,40.40836491,-80.02844525,,,,,,,True,,,,,,,,,,,,
+park,Alton Park,,City of Pittsburgh,,,fixed,,Pittsburgh,PA,,,,,,,,,,True,,,,,,,,,,,,
+senior center,Allegheny Northside Senior Center and Hazlett Theater,,Allegheny County,,,fixed,5 ALLEGHENY SQ E,Pittsburgh,PA,15212,40.45309128,-80.00533934,,,,,,,,,,,,,,,,,,,
+recreation center,Ammon Recreation Center,,City of Pittsburgh,,,fixed,2217 BEDFORD AVE,Pittsburgh,PA,15219,40.44872698,-79.97785314,,,,,,,,,,,,,,,,,,,
+faith-based asset,Brown Chapel Church,,,,,fixed,1400 Boyle St,Pittsburgh,PA,15212,40.4576012,-80.0061756,,,,,,,True,,,,,,,,,,,,https://data.wprdc.org/dataset/bigburgh-social-service-listings/resource/5a05b9ec-2fbf-43f2-bfff-1de2555ff7d4
+library,Wilkinsburg Public Library,,Allegheny County Library Association (ACLA),,,fixed,605 Ross Avenue,Wilkinsburg,PA,15221,40.443206,-79.885941,,,,412-244-2940,"M, W 10am-8pm; T, Th 10am-6pm; F, Sat 10am-5pm",,True,,,,,,,True,,False,2019-09-16,2019-09-16,https://data.wprdc.org/dataset/bigburgh-social-service-listings/resource/5a05b9ec-2fbf-43f2-bfff-1de2555ff7d4
