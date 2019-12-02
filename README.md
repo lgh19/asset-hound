@@ -1,3 +1,3 @@
 # asset-hound
-Schema for asset map
+Version 0.1 of a schema for asset-map data
 
