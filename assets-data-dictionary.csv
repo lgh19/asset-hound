@@ -12,7 +12,7 @@ state,text,State,PA,
 zip_code,text,ZIP Code,15212-4704,
 latitude,float,Latitude of asset,40.456392,
 longitude,float,Longitude of asset,-80.006613,
-location_transportation,text,"Transportation options (bus routes, parking, bike)",Has a parking lot | Street parking | On the 61B bus route,Can be a pipe-delimited list of options
+location_transportation,text,"Transportation options (bus routes, parking, bike)",Has a parking lot|Street parking|On the 61B bus route,Can be a pipe-delimited list of options
 url,text,URL for asset,https://blueslidepark.org,
 email,text,E-mail address associated with the asset itself,hi@blueslidepark.org,
 phone,text,Phone number associated with the asset itself,(412) 237-1890,
@@ -26,8 +26,8 @@ wifi_network,text,Name of WiFi network,No More Mister Wifi,
 computers_available,bool,Public computers are available?,True,
 services,text,What services are available here,,Unclear how to fill this out. Move to events schema?
 open_to_public,bool,Is the location open to the public?,True,Move to events schema?
-hard_to_count_population,text,"Hard to Count focus population (e.g., families, people of color, students)",families | senior citizens,Can be a pipe-delimited list. Move to Census-specific table?
+hard_to_count_population,text,"Hard to Count focus population (e.g., families, people of color, students)",families|senior citizens,Can be a pipe-delimited list. Move to Census-specific table?
 sensitive,bool,(Location?) sensitive in nature,False,
 date_entered,datetime,When record was created,2019-09-16,
 last_updated,datetime,Date of last update,2019-09-16,
-data_source,text,Dataset URL or volunteer providing the data,https://data.wprdc.org/dataset/bigburgh-social-service-listings/resource/5a05b9ec-2fbf-43f2-bfff-1de2555ff7d4,"If data from multiple sources is used to form one record, all sources can be listed in this field in pipe-delimited form: ""https://cool-assets.org | https://wprdc.org/somedataset"""
+data_source,text,Dataset URL or volunteer providing the data,https://data.wprdc.org/dataset/bigburgh-social-service-listings/resource/5a05b9ec-2fbf-43f2-bfff-1de2555ff7d4,"If data from multiple sources is used to form one record, all sources can be listed in this field in pipe-delimited form: ""https://cool-assets.org|https://wprdc.org/somedataset"""
