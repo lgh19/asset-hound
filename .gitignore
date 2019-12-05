@@ -1,0 +1,5 @@
+.idea/
+venv
+__pycache__/
+
+asset_hound/local_settings.py

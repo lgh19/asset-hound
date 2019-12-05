@@ -1,0 +1,8 @@
+
+# Secret key used by django for cryptographic signing
+# can generate one here: https://miniwebtool.com/django-secret-key-generator/
+SUPER_SECRET_KEY = 'SOME_CRAZY_LONG_STRING_SECRET_KEY'
+
+DB_NAME = 'dbname'
+DB_USER = 'dbuser'
+DB_PASS = 'dbpass'
