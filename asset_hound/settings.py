@@ -11,7 +11,14 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-from asset_hound.local_settings import SUPER_SECRET_KEY
+
+from asset_hound.local_settings import (
+    SUPER_SECRET_KEY,
+    DB_NAME,
+    DB_USER,
+    DB_PASS
+)
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -70,15 +77,17 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'asset_backend.wsgi.application'
+WSGI_APPLICATION = 'asset_hound.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASS
     }
 }
 

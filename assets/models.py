@@ -10,6 +10,8 @@ class Location(models.Model):
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     available_transportation = models.TextField()
+    parent_location = models.ForeignKey('Location', on_delete=models.PROTECT, null=True, blank=True)
+
 
 
 class Organization(models.Model):
@@ -46,10 +48,9 @@ class Asset(models.Model):
     )
     name = models.CharField(max_length=255)
     asset_type = models.ManyToManyField('AssetType')
-    parent_location = models.ForeignKey('Location', on_delete=models.PROTECT)
-    organization = models.ForeignKey('Organization')
+    organization = models.ForeignKey('Organization', on_delete=models.PROTECT)
     localizability = models.CharField(max_length=3, choices=LOCALIZABILITY_CHOICES)
-    location = models.ForeignKey('Location', on_delete=models.SET_NULL)
+    location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True)
     url = models.URLField()
     email = models.EmailField()
     phone = PhoneNumberField()
