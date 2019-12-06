@@ -1,0 +1,17 @@
+# local_settings.py example
+# -----------------------------------------------------------------------------
+# This file has all of the variables imported into the primary settings file
+# that one will want to keep out of public version control history.
+# When deploying a copy of this project, be sure to rename this file
+# to `local_settings.py` and update the values to fit your environment.
+# -----------------------------------------------------------------------------
+
+# Secret key used by django for cryptographic signing
+# can generate one here: https://miniwebtool.com/django-secret-key-generator/
+SUPER_SECRET_KEY = 'SOME_CRAZY_LONG_STRING_SECRET_KEY'
+
+# Database fields.
+DB_NAME = 'dbname'
+DB_USER = 'dbuser'
+DB_PASS = 'dbpass'
+
