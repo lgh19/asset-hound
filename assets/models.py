@@ -1,8 +1,16 @@
 from django.contrib.gis.db import models
+from django.contrib.gis.geos import Point
 from phonenumber_field.modelfields import PhoneNumberField
+
+from assets.utils import geocode_address
+
+address_field_mappings = (
+    ()
+)
 
 
 class AssetType(models.Model):
+    """ Asset types """
     name = models.CharField(max_length=255)
 
 
@@ -10,8 +18,19 @@ class Location(models.Model):
     name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     available_transportation = models.TextField()
-    parent_location = models.ForeignKey('Location', on_delete=models.PROTECT, null=True, blank=True)
+    parent_location = models.ForeignKey(
+        'Location',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+    )
+    geom = models.PointField(null=True)
 
+    def save(self, *args, **kwargs):
+        """ When the model is saved, attempt to geocode it based on address """
+        lat, lng = geocode_address(self.address)
+        self.geom = Point(lng, lat)
+        super(Location, self).save(*args, **kwargs)
 
 class Organization(models.Model):
     name = models.CharField(max_length=255)
