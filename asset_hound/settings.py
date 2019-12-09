@@ -16,7 +16,8 @@ from asset_hound.local_settings import (
     SUPER_SECRET_KEY,
     DB_NAME,
     DB_USER,
-    DB_PASS
+    DB_PASS,
+    GEOCODIO_API_KEY,
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -43,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    'django_extensions',
+    'reversion',
     'rest_framework',
     'phonenumber_field',
     'assets'
@@ -126,3 +129,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+GEOCODER_API_KEY = GEOCODIO_API_KEY
