@@ -4,10 +4,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from assets.utils import geocode_address
 
-address_field_mappings = (
-    ()
-)
-
 
 class AssetType(models.Model):
     """ Asset types """
@@ -31,6 +27,7 @@ class Location(models.Model):
         lat, lng = geocode_address(self.address)
         self.geom = Point(lng, lat)
         super(Location, self).save(*args, **kwargs)
+
 
 class Organization(models.Model):
     name = models.CharField(max_length=255)

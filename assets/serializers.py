@@ -24,6 +24,7 @@ class LocationSerializer(GeoFeatureModelSerializer):
 
     class Meta:
         model = Location
+        geo_field = 'geom'
         fields = ['name', 'address', 'available_transportation', 'parent_location']
 
 

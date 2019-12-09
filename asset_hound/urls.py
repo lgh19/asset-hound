@@ -15,7 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from rest_framework import routers
+
+from assets.views import AssetViewSet
+
+# register DRF Views and ViewSets
+router = routers.DefaultRouter()
+router.register(r'assets', AssetViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 ]
+
+# appends registered API urls to `urlpatterns`
+urlpatterns += router.urls
