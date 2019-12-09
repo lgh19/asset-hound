@@ -13,7 +13,6 @@ class Location(models.Model):
     parent_location = models.ForeignKey('Location', on_delete=models.PROTECT, null=True, blank=True)
 
 
-
 class Organization(models.Model):
     name = models.CharField(max_length=255)
     location = models.ForeignKey('Location', on_delete=models.CASCADE)
@@ -36,6 +35,7 @@ class TargetPopulation(models.Model):
 class DataSource(models.Model):
     name = models.CharField(max_length=255)
     url = models.URLField()
+
 
 class Asset(models.Model):
     FIXED_LOCALE = 'FIX'
