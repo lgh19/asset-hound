@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'reversion',
     'rest_framework',
+    'rest_framework_gis',
     'phonenumber_field',
     'assets'
 ]

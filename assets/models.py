@@ -4,10 +4,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from assets.utils import geocode_address
 
-address_field_mappings = (
-    ()
-)
-
 
 class AssetType(models.Model):
     """ Asset types """
