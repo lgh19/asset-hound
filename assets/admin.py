@@ -22,7 +22,6 @@ class LocationAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'name',
-        'address',
         'available_transportation',
         'parent_location',
         'geom',
@@ -99,8 +98,8 @@ class AssetAdmin(admin.ModelAdmin):
         'data_source',
     )
     autocomplete_fields = (
-        'asset_type',
-        'accessibility',
+        'asset_types',
+        'accessibility_features',
         'services',
         'hard_to_count_population',
     )
