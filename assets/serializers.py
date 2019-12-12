@@ -25,7 +25,7 @@ class LocationSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Location
         geo_field = 'geom'
-        fields = ['name', 'address', 'available_transportation', 'parent_location']
+        fields = ['name', 'available_transportation', 'parent_location']
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
@@ -63,16 +63,17 @@ class DataSourceSerializer(serializers.ModelSerializer):
 class AssetSerializer(serializers.ModelSerializer):
     organization = OrganizationSerializer()
     location = LocationSerializer()
-    accessibility = AccessibilityFeatureSerializer()
+    accessibility_features = AccessibilityFeatureSerializer(many=True)
     services = ProvidedServiceSerializer(many=True)
     hard_to_count_population = TargetPopulationSerializer(many=True)
     data_source = DataSourceSerializer()
+    asset_types = AssetTypeSerializer(many=True)
 
     class Meta:
         model = Asset
         fields = [
             "name",
-            "asset_type",
+            'asset_types',
             "organization",
             "localizability",
             "location",
@@ -83,7 +84,7 @@ class AssetSerializer(serializers.ModelSerializer):
             "holiday_hours_of_operation",
             "child_friendly",
             "capacity",
-            "accessibility",
+            "accessibility_features",
             "internet_access",
             "wifi_network",
             "computers_available",
