@@ -91,12 +91,8 @@ class Command(BaseCommand):
                     open_to_public=boolify(row['open_to_public']),
                     sensitive=boolify(row['sensitive']),
 
-                    # asset_types=asset_types,
                     location=location,
                     organization=organization,
-                    # services=services,
-                    # accessibility_features=accessibility_features,
-                    # hard_to_count_population=hard_to_count_pops,
                     data_source=data_source
                 )
                 asset.asset_types.set(asset_types)
