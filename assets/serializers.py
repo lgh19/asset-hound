@@ -96,3 +96,4 @@ class AssetSerializer(serializers.ModelSerializer):
             "last_updated",
             "data_source",
         ]
+
