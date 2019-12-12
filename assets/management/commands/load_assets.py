@@ -68,9 +68,10 @@ class Command(BaseCommand):
                                       parse_cell(row['hard_to_count_population'])] \
                     if row['hard_to_count_population'] else []
 
-                data_source = DataSource.objects.get_or_create(name=row['data_source'])[0] \
-                    if row['data_source'] else None
-                print(data_source)
+                data_source = DataSource.objects.get_or_create(
+                    name=row['data_source_name'],
+                    defaults={'url': row['data_source_url']})[0] if row['data_source_name'] else None
+
                 asset = Asset.objects.create(
                     name=row['name'],
                     localizability=get_localizability(row['localizability']),
@@ -103,3 +104,4 @@ class Command(BaseCommand):
                 asset.accessibility_features.set(accessibility_features)
                 asset.hard_to_count_population.set(hard_to_count_pops)
                 asset.save()
+                print('Created', asset)
