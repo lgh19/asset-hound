@@ -1,8 +1,19 @@
 from rest_framework import serializers
-from rest_framework_gis.serializers import GeoFeatureModelSerializer
+from rest_framework_gis.serializers import (
+    GeoFeatureModelSerializer,
+GeometrySerializerMethodField
+)
 
-from assets.models import (Asset, Location, AssetType, Organization, AccessibilityFeature, ProvidedService,
-                           TargetPopulation, DataSource)
+from assets.models import (
+    Asset,
+    Location,
+    AssetType,
+    Organization,
+    AccessibilityFeature,
+    ProvidedService,
+    TargetPopulation,
+    DataSource
+)
 
 
 class RecursiveField(serializers.Serializer):
@@ -97,3 +108,18 @@ class AssetSerializer(serializers.ModelSerializer):
             "data_source",
         ]
 
+
+class AssetGeoJsonSerializer(GeoFeatureModelSerializer):
+    geom = GeometrySerializerMethodField()
+    asset_types = AssetTypeSerializer(many=True)
+
+    def get_geom(self, obj):
+        return obj.location.geom
+
+    class Meta:
+        model = Asset
+        geo_field = 'geom'
+        fields = [
+            'name',
+            'asset_types'
+        ]
