@@ -12,8 +12,8 @@ def geocode_address(address):
     try:
         r = requests.get(url, params={'q': address, 'api_key': GEOCODER_API_KEY})
         response_data = r.json()
-        lat = response_data['results']['location']['lat']
-        lng = response_data['results']['location']['lng']
+        lat = response_data['results'][0]['location']['lat']
+        lng = response_data['results'][0]['location']['lng']
         return lat, lng
     except Exception as e:
         # todo: handle different exceptions differently
