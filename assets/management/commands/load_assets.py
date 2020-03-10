@@ -24,8 +24,26 @@ def get_localizability(l):
 
 
 def boolify(x):
-    return x.lower == 'true'
+    if x in [None, '']:
+        return None
+    return x.lower() == 'true'
 
+def value_or_none(row, field):
+    return row[field] if field in row else None
+
+def type_or_none(row, field, desired_type):
+    """This function tries to cast the value of row[field] to
+    the passed desired type (e.g, float or int). If it fails,
+    it returns None.
+
+    Note that this does not yet support fields like
+    PhoneNumberField, URLField, and EmailField."""
+    if field in row:
+        try:
+            return desired_type(row[field])
+        except ValueError:
+            return None
+    return None
 
 class Command(BaseCommand):
     help = 'Loads assets from csv'
@@ -37,21 +55,21 @@ class Command(BaseCommand):
             for row in dr:
                 # get or create a new org
                 organization = Organization.objects.get_or_create(
-                    name=row['organization_name'],
+                    name=value_or_none(row, 'organization_name'),
                     defaults={
-                        'email': row['organization_email'],
-                        'phone': row['organization_phone']
+                        'email': value_or_none(row, 'organization_email'),
+                        'phone': value_or_none(row, 'organization_phone')
                     }
                 )[0]
                 location = Location.objects.get_or_create(
-                    street_address=row['street_address'],
-                    city=row['city'],
-                    state=row['state'],
-                    zip_code=row['zip_code'],
+                    street_address=value_or_none(row, 'street_address'),
+                    city=value_or_none(row, 'city'),
+                    state=value_or_none(row, 'state'),
+                    zip_code=value_or_none(row, 'zip_code'),
                     defaults={
-                        'available_transportation': row['location_transportation'],
-                        'latitude': row['latitude'],
-                        'longitude': row['longitude']
+                        'available_transportation': value_or_none(row, 'location_transportation'),
+                        'latitude': type_or_none(row, 'latitude', float),
+                        'longitude': type_or_none(row, 'longitude', float)
                     }
                 )[0]
 
@@ -62,39 +80,40 @@ class Command(BaseCommand):
                                           parse_cell(row['accessibility'])] if row['accessibility'] else []
 
                 services = [ProvidedService.objects.get_or_create(name=service)[0] for service in
-                            parse_cell(row['services'])] if row['services'] else []
+                            parse_cell(row['services'])] if ('services' in row and row['services']) else []
 
                 hard_to_count_pops = [TargetPopulation.objects.get_or_create(name=pop)[0] for pop in
                                       parse_cell(row['hard_to_count_population'])] \
                     if row['hard_to_count_population'] else []
 
                 data_source = DataSource.objects.get_or_create(
-                    name=row['data_source_name'],
+                    name=value_or_none(row, 'data_source_name'),
                     defaults={'url': row['data_source_url']})[0] if row['data_source_name'] else None
 
                 asset = Asset.objects.create(
-                    name=row['name'],
-                    localizability=get_localizability(row['localizability']),
+                    name=value_or_none(row, 'name'),
+                    localizability=get_localizability(value_or_none(row, 'localizability')),
 
-                    url=row['url'],
-                    email=row['email'],
+                    url=value_or_none(row, 'url'),
+                    email=value_or_none(row, 'email'),
                     phone='+1' + re.sub(r'\D', '', row['phone']) if row['phone'] else None,
 
-                    hours_of_operation=row['hours_of_operation'],
-                    holiday_hours_of_operation=row['holiday_hours_of_operation'],
-                    capacity=row['capacity'] if row['capacity'] else None,
-                    wifi_network=row['wifi_network'],
+                    hours_of_operation=value_or_none(row, 'hours_of_operation'),
+                    holiday_hours_of_operation=value_or_none(row, 'holiday_hours_of_operation'),
+                    capacity=type_or_none(row, 'capacity', int),
+                    wifi_network=value_or_none(row, 'wifi_network'),
 
-                    child_friendly=boolify(row['child_friendly']),
-                    internet_access=boolify(row['internet_access']),
-                    computers_available=boolify(row['computers_available']),
-                    open_to_public=boolify(row['open_to_public']),
-                    sensitive=boolify(row['sensitive']),
+                    child_friendly=boolify(value_or_none(row, 'child_friendly')),
+                    internet_access=boolify(value_or_none(row, 'internet_access')),
+                    computers_available=boolify(value_or_none(row, 'computers_available')),
+                    open_to_public=boolify(value_or_none(row, 'open_to_public')),
+                    sensitive=boolify(value_or_none(row, 'sensitive')),
 
                     location=location,
                     organization=organization,
                     data_source=data_source
                 )
+
                 asset.asset_types.set(asset_types)
                 asset.services.set(services)
                 asset.accessibility_features.set(accessibility_features)
