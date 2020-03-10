@@ -12,6 +12,12 @@ class AssetType(models.Model):
     def __str__(self):
         return self.name
 
+class Tag(models.Model):
+    """ Tags """
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
 
 class Location(models.Model):
     name = models.CharField(max_length=255, editable=False)
@@ -120,6 +126,7 @@ class Asset(models.Model):
     hard_to_count_population = models.ManyToManyField('TargetPopulation', blank=True)
     data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True)
 
+    tags = models.ManyToManyField('Tag', blank=True)
     date_entered = models.DateTimeField(editable=False, auto_now_add=True)
     last_updated = models.DateTimeField(editable=False, auto_now=True)
 

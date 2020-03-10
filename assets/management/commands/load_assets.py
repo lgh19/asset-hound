@@ -10,6 +10,7 @@ from assets.models import (Asset,
                            Organization,
                            Location,
                            AssetType,
+                           Tag,
                            AccessibilityFeature,
                            ProvidedService,
                            TargetPopulation,
@@ -95,6 +96,9 @@ class Command(BaseCommand):
                 asset_types = [AssetType.objects.get_or_create(name=asset_type)[0] for asset_type in
                                parse_cell(row['asset_type'])] if row['asset_type'] else []
 
+                tags = [Tag.objects.get_or_create(name=tag)[0] for tag in
+                               parse_cell(row['tags'])] if row['tags'] else []
+
                 accessibility_features = [AccessibilityFeature.objects.get_or_create(name=access)[0] for access in
                                           parse_cell(row['accessibility'])] if row['accessibility'] else []
 
@@ -134,6 +138,7 @@ class Command(BaseCommand):
                 )
 
                 asset.asset_types.set(asset_types)
+                asset.tags.set(tags)
                 asset.services.set(services)
                 asset.accessibility_features.set(accessibility_features)
                 asset.hard_to_count_population.set(hard_to_count_pops)
