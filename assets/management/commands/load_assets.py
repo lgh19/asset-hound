@@ -1,6 +1,7 @@
 import csv
 import os
 import re
+import phonenumbers
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -45,6 +46,21 @@ def type_or_none(row, field, desired_type):
             return None
     return None
 
+def standardize_phone(phone):
+    if (phone and len(phone) > 0):
+        candidate_phone = '+1' + re.sub(r'\D', '', phone)
+        try:
+            standardized = str(phonenumbers.parse(candidate_phone).national_number)
+        except phonenumbers.phonenumberutil.NumberParseException:
+            print(f'    phonenumbers failed to parse {candidate_phone}.')
+            candidate_phone = None
+    else:
+        candidate_phone = None
+    if candidate_phone is not None and len(candidate_phone) > 12:
+        print(f'    phonenumbers is probably going to reject {candidate_phone} because of its length {len(candidate_phone)}, so coerce it to None.')
+        candidate_phone = None
+    return candidate_phone
+
 class Command(BaseCommand):
     help = 'Loads assets from csv'
 
@@ -58,7 +74,7 @@ class Command(BaseCommand):
                     name=value_or_none(row, 'organization_name'),
                     defaults={
                         'email': value_or_none(row, 'organization_email'),
-                        'phone': value_or_none(row, 'organization_phone')
+                        'phone': standardize_phone(row['organization_phone'])
                     }
                 )[0]
                 location = Location.objects.get_or_create(
@@ -96,7 +112,7 @@ class Command(BaseCommand):
 
                     url=value_or_none(row, 'url'),
                     email=value_or_none(row, 'email'),
-                    phone='+1' + re.sub(r'\D', '', row['phone']) if row['phone'] else None,
+                    phone=standardize_phone(row['phone']),
 
                     hours_of_operation=value_or_none(row, 'hours_of_operation'),
                     holiday_hours_of_operation=value_or_none(row, 'holiday_hours_of_operation'),
