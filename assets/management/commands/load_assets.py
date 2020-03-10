@@ -15,6 +15,9 @@ from assets.models import (Asset,
                            TargetPopulation,
                            DataSource)
 
+import sys # This is a workaround for an error that
+csv.field_size_limit(sys.maxsize) # looks like this:
+# _csv.Error: field larger than field limit (131072)
 
 def parse_cell(cell):
     return cell.split('|')
