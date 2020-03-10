@@ -25,6 +25,8 @@ class Location(models.Model):
     city = models.CharField(max_length=50, null=True, blank=True)
     state = models.CharField(max_length=50, null=True, blank=True)
     zip_code = models.CharField(max_length=10, null=True, blank=True)
+    parcel_id = models.CharField(max_length=50, null=True, blank=True)
+    residence = models.BooleanField(null=True, blank=True)
 
     available_transportation = models.TextField(null=True, blank=True)
     parent_location = models.ForeignKey(
@@ -109,6 +111,7 @@ class Asset(models.Model):
 
     hours_of_operation = models.TextField(null=True, blank=True)
     holiday_hours_of_operation = models.TextField(null=True, blank=True)
+    periodicity = models.CharField(max_length=100, null=True, blank=True)
     capacity = models.IntegerField(null=True, blank=True)
     wifi_network = models.CharField(max_length=100, null=True, blank=True)
 
@@ -117,6 +120,7 @@ class Asset(models.Model):
     computers_available = models.BooleanField(null=True, blank=True)
     open_to_public = models.BooleanField(null=True, blank=True)
     sensitive = models.BooleanField(null=True, blank=True)
+    do_not_display = models.BooleanField(null=True, blank=True)
 
     asset_types = models.ManyToManyField('AssetType')
     location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, blank=True)
@@ -127,6 +131,9 @@ class Asset(models.Model):
     data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True)
 
     tags = models.ManyToManyField('Tag', blank=True)
+    etl_notes = models.TextField(null=True, blank=True) # notes from Rocket
+    notes = models.TextField(null=True, blank=True)
+    primary_key_from_rocket = models.TextField(null=True, blank=True)
     date_entered = models.DateTimeField(editable=False, auto_now_add=True)
     last_updated = models.DateTimeField(editable=False, auto_now=True)
 

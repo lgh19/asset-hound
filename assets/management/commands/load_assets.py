@@ -89,7 +89,9 @@ class Command(BaseCommand):
                     defaults={
                         'available_transportation': value_or_none(row, 'location_transportation'),
                         'latitude': type_or_none(row, 'latitude', float),
-                        'longitude': type_or_none(row, 'longitude', float)
+                        'longitude': type_or_none(row, 'longitude', float),
+                        'parcel_id': value_or_none(row, 'parcel_id'),
+                        'residence': boolify(value_or_none(row, 'residence')),
                     }
                 )[0]
 
@@ -123,18 +125,23 @@ class Command(BaseCommand):
 
                     hours_of_operation=value_or_none(row, 'hours_of_operation'),
                     holiday_hours_of_operation=value_or_none(row, 'holiday_hours_of_operation'),
+                    periodicity=value_or_none(row, 'periodicity'),
                     capacity=type_or_none(row, 'capacity', int),
                     wifi_network=value_or_none(row, 'wifi_network'),
+
+                    etl_notes=value_or_none(row, 'notes'),
 
                     child_friendly=boolify(value_or_none(row, 'child_friendly')),
                     internet_access=boolify(value_or_none(row, 'internet_access')),
                     computers_available=boolify(value_or_none(row, 'computers_available')),
                     open_to_public=boolify(value_or_none(row, 'open_to_public')),
                     sensitive=boolify(value_or_none(row, 'sensitive')),
+                    do_not_display=boolify(value_or_none(row, 'do_not_display')),
 
                     location=location,
                     organization=organization,
-                    data_source=data_source
+                    data_source=data_source,
+                    primary_key_from_rocket=value_or_none(row, 'primary_key_from_rocket')
                 )
 
                 asset.asset_types.set(asset_types)
