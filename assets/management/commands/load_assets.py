@@ -99,11 +99,11 @@ class Command(BaseCommand):
                                           parse_cell(row['accessibility'])] if row['accessibility'] else []
 
                 services = [ProvidedService.objects.get_or_create(name=service)[0] for service in
-                            parse_cell(row['services'])] if ('services' in row and row['services']) else []
+                            parse_cell(row['services'])] if 'services' in row else []
 
                 hard_to_count_pops = [TargetPopulation.objects.get_or_create(name=pop)[0] for pop in
                                       parse_cell(row['hard_to_count_population'])] \
-                    if row['hard_to_count_population'] else []
+                    if 'hard_to_count_population' in row else []
 
                 data_source = DataSource.objects.get_or_create(
                     name=value_or_none(row, 'data_source_name'),
