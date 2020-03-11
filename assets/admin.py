@@ -1,19 +1,24 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
-from .models import (
-    AssetType,
-    Location,
-    Organization,
-    AccessibilityFeature,
-    ProvidedService,
-    TargetPopulation,
-    DataSource,
-    Asset)
+from .models import (AssetType,
+                     Tag,
+                     Location,
+                     Organization,
+                     AccessibilityFeature,
+                     ProvidedService,
+                     TargetPopulation,
+                     DataSource,
+                     Asset)
 
 
 @admin.register(AssetType)
 class AssetTypeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    search_fields = ('name',)
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     search_fields = ('name',)
 
@@ -100,6 +105,7 @@ class AssetAdmin(admin.ModelAdmin):
     )
     autocomplete_fields = (
         'asset_types',
+        'tags',
         'accessibility_features',
         'services',
         'hard_to_count_population',

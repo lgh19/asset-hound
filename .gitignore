@@ -4,3 +4,7 @@ env/
 __pycache__/
 
 asset_hound/local_settings.py
+*.swp
+*.pyc
+TODO
+notes.txt
