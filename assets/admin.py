@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
-from .models import (AssetType,
-                     Location,
-                     Organization,
-                     AccessibilityFeature,
-                     ProvidedService,
-                     TargetPopulation,
-                     DataSource,
-                     Asset)
+from .models import (
+    AssetType,
+    Location,
+    Organization,
+    AccessibilityFeature,
+    ProvidedService,
+    TargetPopulation,
+    DataSource,
+    Asset)
 
 
 @admin.register(AssetType)

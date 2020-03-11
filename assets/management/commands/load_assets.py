@@ -39,7 +39,7 @@ class Command(BaseCommand):
                 organization = Organization.objects.get_or_create(
                     name=row['organization_name'],
                     defaults={
-                        'email': row['organization_email'],
+                        'email': row['organization_email'] if 'organization_email' in row else '',
                         'phone': row['organization_phone']
                     }
                 )[0]

@@ -89,11 +89,13 @@ class Asset(models.Model):
     FIXED_LOCALE = 'FIX'
     MOBILE_LOCALE = 'MOB'
     VIRTUAL_LOCALE = 'VIR'
+
     LOCALIZABILITY_CHOICES = (
         (FIXED_LOCALE, 'Fixed'),
         (MOBILE_LOCALE, 'Mobile'),
         (VIRTUAL_LOCALE, 'Cyber'),
     )
+
     name = models.CharField(max_length=255)
     localizability = models.CharField(max_length=3, choices=LOCALIZABILITY_CHOICES)
 

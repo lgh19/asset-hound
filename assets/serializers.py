@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_gis.serializers import (
     GeoFeatureModelSerializer,
-GeometrySerializerMethodField
+    GeometrySerializerMethodField,
 )
 
 from assets.models import (
@@ -83,29 +83,39 @@ class AssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = [
-            "name",
+            'name',
             'asset_types',
-            "organization",
-            "localizability",
-            "location",
-            "url",
-            "email",
-            "phone",
-            "hours_of_operation",
-            "holiday_hours_of_operation",
-            "child_friendly",
-            "capacity",
-            "accessibility_features",
-            "internet_access",
-            "wifi_network",
-            "computers_available",
-            "services",
-            "open_to_public",
-            "hard_to_count_population",
-            "sensitive",
-            "date_entered",
-            "last_updated",
-            "data_source",
+            'organization',
+            'localizability',
+            'location',
+            'url',
+            'email',
+            'phone',
+            'hours_of_operation',
+            'holiday_hours_of_operation',
+            'child_friendly',
+            'capacity',
+            'accessibility_features',
+            'internet_access',
+            'wifi_network',
+            'computers_available',
+            'services',
+            'open_to_public',
+            'hard_to_count_population',
+            'sensitive',
+            'date_entered',
+            'last_updated',
+            'data_source',
+        ]
+
+
+class AssetListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Asset
+        fields = [
+            'name',
+            'asset_types',
+            'organization',
         ]
 
 

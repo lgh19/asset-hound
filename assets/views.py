@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
 from assets.models import Asset
-from assets.serializers import AssetSerializer, AssetGeoJsonSerializer
+from assets.serializers import AssetSerializer, AssetGeoJsonSerializer, AssetListSerializer
 
 
 class AssetViewSet(viewsets.ModelViewSet):
@@ -12,4 +12,6 @@ class AssetViewSet(viewsets.ModelViewSet):
         fmt = self.request.GET.get('fmt', None)
         if fmt in ('geojson', 'geo'):
             return AssetGeoJsonSerializer
+        if self.action == 'list':
+            return AssetListSerializer
         return AssetSerializer
