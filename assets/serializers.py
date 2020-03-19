@@ -12,7 +12,7 @@ from assets.models import (
     AccessibilityFeature,
     ProvidedService,
     TargetPopulation,
-    DataSource
+    DataSource, Category
 )
 
 
@@ -27,7 +27,13 @@ class RecursiveField(serializers.Serializer):
 class AssetTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetType
-        fields = ['name', ]
+        fields = ['name', 'title']
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['name', 'title']
 
 
 class LocationSerializer(GeoFeatureModelSerializer):
@@ -79,12 +85,14 @@ class AssetSerializer(serializers.ModelSerializer):
     hard_to_count_population = TargetPopulationSerializer(many=True)
     data_source = DataSourceSerializer()
     asset_types = AssetTypeSerializer(many=True)
+    category = CategorySerializer()
 
     class Meta:
         model = Asset
         fields = [
             'name',
             'asset_types',
+            'category',
             'organization',
             'localizability',
             'location',
@@ -110,10 +118,14 @@ class AssetSerializer(serializers.ModelSerializer):
 
 
 class AssetListSerializer(serializers.ModelSerializer):
+    asset_types = AssetTypeSerializer(many=True)
+    category = CategorySerializer()
     class Meta:
         model = Asset
         fields = [
+            'id',
             'name',
+            'category',
             'asset_types',
             'organization',
         ]

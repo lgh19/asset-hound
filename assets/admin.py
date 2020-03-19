@@ -9,13 +9,14 @@ from .models import (AssetType,
                      ProvidedService,
                      TargetPopulation,
                      DataSource,
-                     Asset)
+                     Asset, Category)
 
 
 @admin.register(AssetType)
 class AssetTypeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
+    list_display = ('id', 'name', 'title', 'category')
     search_fields = ('name',)
+
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -75,34 +76,34 @@ class AssetAdmin(admin.ModelAdmin):
         'organization',
         'localizability',
         'location',
-        'url',
-        'email',
-        'phone',
-        'hours_of_operation',
-        'holiday_hours_of_operation',
-        'child_friendly',
-        'capacity',
-        'internet_access',
-        'wifi_network',
-        'computers_available',
-        'open_to_public',
+        # 'url',
+        # 'email',
+        # 'phone',
+        # 'hours_of_operation',
+        # 'holiday_hours_of_operation',
+        # 'child_friendly',
+        # 'capacity',
+        # 'internet_access',
+        # 'wifi_network',
+        # 'computers_available',
+        # 'open_to_public',
         'sensitive',
         'date_entered',
         'last_updated',
         'data_source',
     )
-    list_filter = (
-        'organization',
-        'location',
-        'child_friendly',
-        'internet_access',
-        'computers_available',
-        'open_to_public',
-        'sensitive',
-        'date_entered',
-        'last_updated',
-        'data_source',
-    )
+    # list_filter = (
+    #     'organization',
+    #     'location',
+    #     'child_friendly',
+    #     'internet_access',
+    #     'computers_available',
+    #     'open_to_public',
+    #     'sensitive',
+    #     'date_entered',
+    #     'last_updated',
+    #     'data_source',
+    # )
     autocomplete_fields = (
         'asset_types',
         'tags',
@@ -111,3 +112,11 @@ class AssetAdmin(admin.ModelAdmin):
         'hard_to_count_population',
     )
     search_fields = ('name',)
+
+class AssetTypeInline(admin.TabularInline):
+    model = AssetType
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', ]
+    search_fields = ['name', ]

@@ -55,28 +55,25 @@ def type_or_none(row, field, desired_type):
     return None
 
 
-def standardize_phone(phone):
-    if (phone and len(phone) > 0):
+def standardize_phone(phone: str):
+    result_number = None
+    try:
         candidate_phone = '+1' + re.sub(r'\D', '', phone)
-        try:
-            standardized = str(phonenumbers.parse(candidate_phone).national_number)
-        except phonenumbers.phonenumberutil.NumberParseException:
-            print(f'    phonenumbers failed to parse {candidate_phone}.')
-            candidate_phone = None
-    else:
-        candidate_phone = None
-    if candidate_phone is not None and len(candidate_phone) > 12:
-        print(
-            f'    phonenumbers is probably going to reject {candidate_phone} because of its length {len(candidate_phone)}, so coerce it to None.')
-        candidate_phone = None
-    return candidate_phone
+        phone_number = phonenumbers.parse(candidate_phone)
+        if phonenumbers.is_valid_number(phone_number):
+            result_number = f'+{phone_number.country_code}{phone_number.national_number}'
+    except Exception as e:
+        print(e)
+    print(result_number)
+    return result_number
 
 
 class Command(BaseCommand):
     help = 'Loads assets from csv'
 
     def handle(self, *args, **options):
-        file_name = os.path.join(settings.BASE_DIR, 'assets.csv');
+
+        file_name = os.path.join(settings.BASE_DIR, 'update.csv')
         with open(file_name) as f:
             dr = csv.DictReader(f)
             for row in dr:

@@ -17,6 +17,7 @@ from asset_hound.local_settings import (
     DB_NAME,
     DB_USER,
     DB_PASS,
+    DB_HOST,
     GEOCODIO_API_KEY,
 )
 
@@ -32,7 +33,7 @@ SECRET_KEY = SUPER_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -95,6 +96,7 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': DB_NAME,
         'USER': DB_USER,
+        'HOST': DB_HOST,
         'PASSWORD': DB_PASS
     }
 }

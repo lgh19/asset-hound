@@ -8,9 +8,24 @@ from assets.utils import geocode_address
 class AssetType(models.Model):
     """ Asset types """
     name = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
+    category = models.ForeignKey('Category', on_delete=models.PROTECT, related_name='asset_types', null=True)
 
     def __str__(self):
         return self.name
+
+
+class Category(models.Model):
+    """ Categories """
+    name = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
+
+    class Meta:
+        verbose_name_plural = 'categories'
+
+    def __str__(self):
+        return self.name
+
 
 class Tag(models.Model):
     """ Tags """
@@ -18,6 +33,7 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Location(models.Model):
     name = models.CharField(max_length=255, editable=False)
@@ -50,7 +66,9 @@ class Location(models.Model):
             self.latitude, self.longitude = geocode_address(self.name)
         if not self.geom:
             print(self.latitude, self.longitude)
-            self.geom = Point((float(self.longitude), float(self.latitude)))
+            self.geom = Point(
+                (float(self.longitude), float(self.latitude))
+            ) if self.latitude and self.longitude else None
         super(Location, self).save(*args, **kwargs)
 
 
@@ -87,7 +105,7 @@ class TargetPopulation(models.Model):
 
 class DataSource(models.Model):
     name = models.CharField(max_length=255)
-    url = models.URLField(null=True, blank=True)
+    url = models.URLField(max_length=500, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -107,7 +125,7 @@ class Asset(models.Model):
     name = models.CharField(max_length=255)
     localizability = models.CharField(max_length=3, choices=LOCALIZABILITY_CHOICES, null=True, blank=True)
 
-    url = models.URLField(null=True, blank=True)
+    url = models.URLField(max_length=500, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     phone = PhoneNumberField(null=True, blank=True)
 
@@ -125,6 +143,7 @@ class Asset(models.Model):
     do_not_display = models.BooleanField(null=True, blank=True)
 
     asset_types = models.ManyToManyField('AssetType')
+    category = models.ManyToManyField('Category')
     location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, blank=True)
     organization = models.ForeignKey('Organization', on_delete=models.PROTECT, null=True, blank=True)
     services = models.ManyToManyField('ProvidedService', blank=True)
@@ -133,11 +152,15 @@ class Asset(models.Model):
     data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True)
 
     tags = models.ManyToManyField('Tag', blank=True)
-    etl_notes = models.TextField(null=True, blank=True) # notes from Rocket
-    notes = models.TextField(null=True, blank=True)
+    etl_notes = models.TextField(null=True, blank=True)  # notes from Rocket
+    notes = models.TextField(max_length=1000, null=True, blank=True)
     primary_key_from_rocket = models.TextField(null=True, blank=True)
     date_entered = models.DateTimeField(editable=False, auto_now_add=True)
     last_updated = models.DateTimeField(editable=False, auto_now=True)
+
+    @property
+    def category(self):
+        return self.asset_types.all()[0].category
 
     def __str__(self):
         return self.name
