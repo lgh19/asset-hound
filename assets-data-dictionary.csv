@@ -14,6 +14,8 @@ zip_code,text,ZIP Code,15212-4704,
 latitude,float,Latitude of asset,40.456392,
 longitude,float,Longitude of asset,-80.006613,
 location_transportation,text,"Transportation options (bus routes, parking, bike)",Has a parking lot|Street parking|On the 61B bus route,Can be a pipe-delimited list of options
+residence,bool,Is this location a residence?,False,
+parcel_id,text,Parcel ID,0086L00260000000,This should be a 16-character string.
 url,text,URL for asset,https://blueslidepark.org,
 email,text,E-mail address associated with the asset itself,hi@blueslidepark.org,
 phone,text,Phone number associated with the asset itself,(412) 237-1890,
@@ -29,7 +31,12 @@ services,text,What services are available here,,Unclear how to fill this out. Mo
 open_to_public,bool,Is the location open to the public?,True,Move to events schema?
 hard_to_count_population,text,"Hard to Count focus population (e.g., families, people of color, students)",families|senior citizens,Can be a pipe-delimited list. Move to Census-specific table?
 sensitive,bool,(Location?) sensitive in nature,False,
+do_not_display,bool,Indicates whether the asset should be excluded from the map,False,"This may be considered a stronger exception than the ""sensitive"" field, which just masks the location but not the existence of the asset (in case assets are ever listed rather than mapped)."
 date_entered,datetime,When record was created,2019-09-16,
 last_updated,datetime,Date of last update,2019-09-16,
+periodicity,text,An indication of how often the asset is available,seasonal,"The default is for an asset to always be available (subject to hours_of_operation and holiday_hours_of_operation), but in the absence of a proper event data type, we're cramming fish fries in as seasonal ""assets"". Pools and ice rinks might also be considered ""seasonal""."
+primary_key_from_rocket,text,Possible primary key,clp_libraries::CLP07,An attempt at generating a reusable primary key that will not change when the data source updates
 data_source_name,text,Dataset name or volunteer providing the data,BigBurgh Social Service Listings,
 data_source_url,text,Dataset URL,https://data.wprdc.org/dataset/bigburgh-social-service-listings/resource/5a05b9ec-2fbf-43f2-bfff-1de2555ff7d4,"If data from multiple sources is used to form one record, all sources can be listed in this field in pipe-delimited form: ""https://cool-assets.org|https://wprdc.org/somedataset"""
+tags,text,Tags to further describe the asset,social club,A pipe-delimited list of tags for the asset
+notes,text,Any additional information,Off-Leash Dog Area,"This should eventually be as controlled and standardized as possible. There are already 46 tags, mostly derived from useful category columns in a few data sources."
