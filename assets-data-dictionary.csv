@@ -1,5 +1,6 @@
 field_name,type,description,example,notes
-asset_type,text,Asset category (should be a controlled vocabulary),library,This value is a foreign key to the asset_types table.
+category,Asset category (should be a controlled vocabulary),This groups the ~40 asset types into more like 10 categories.,Health,
+asset_type,text,Asset type (should be a controlled vocabulary),library,This value is a foreign key to the asset_types table.
 name,text,Asset name,ALLEGHENY LIBRARY,asset_type + name can be the primary key.
 parent_location,float,The location enclosing the asset (like the park that contains a playground); optional,Able Long Park,
 organization_name,text,Organization that oversees the asset,Carnegie Library of Pittsburgh,
