@@ -17,6 +17,7 @@ from asset_hound.local_settings import (
     DB_NAME,
     DB_USER,
     DB_PASS,
+    DB_HOST,
     GEOCODIO_API_KEY,
 )
 
@@ -32,7 +33,7 @@ SECRET_KEY = SUPER_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'django_extensions',
+    'corsheaders',
     'reversion',
     'rest_framework',
     'rest_framework_gis',
@@ -55,11 +57,14 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'asset_hound.urls'
@@ -91,6 +96,7 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': DB_NAME,
         'USER': DB_USER,
+        'HOST': DB_HOST,
         'PASSWORD': DB_PASS
     }
 }
@@ -131,4 +137,27 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Rest framework settings
+# https://www.django-rest-framework.org/api-guide/settings/
+#   we're using https://github.com/vbabiy/djangorestframework-camel-case
+#   to make it easy to use camelcase on the front end
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
+        'djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'djangorestframework_camel_case.parser.CamelCaseFormParser',
+        'djangorestframework_camel_case.parser.CamelCaseMultiPartParser',
+        'djangorestframework_camel_case.parser.CamelCaseJSONParser',
+    ),
+    'JSON_UNDERSCOREIZE': {
+        'no_underscore_before_number': True,
+    },
+}
+
+# Extra stuff
 GEOCODER_API_KEY = GEOCODIO_API_KEY
+
+CORS_ORIGIN_ALLOW_ALL = True

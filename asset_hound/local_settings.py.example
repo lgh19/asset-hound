@@ -14,6 +14,7 @@ SUPER_SECRET_KEY = 'SOME_CRAZY_LONG_STRING_SECRET_KEY'
 DB_NAME = 'dbname'
 DB_USER = 'dbuser'
 DB_PASS = 'dbpass'
+DB_HOST = 'localhost'
 
 GEOCODIO_API_KEY = 'api-key-goes-here'
 

@@ -1,8 +1,9 @@
 import csv
 import os
 import re
-import phonenumbers
+import sys  # This is a workaround for an error that
 
+import phonenumbers
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -16,8 +17,9 @@ from assets.models import (Asset,
                            TargetPopulation,
                            DataSource)
 
-import sys # This is a workaround for an error that
-csv.field_size_limit(sys.maxsize) # looks like this:
+csv.field_size_limit(sys.maxsize)  # looks like this:
+
+
 # _csv.Error: field larger than field limit (131072)
 
 def parse_cell(cell):
@@ -33,8 +35,10 @@ def boolify(x):
         return None
     return x.lower() == 'true'
 
+
 def value_or_none(row, field):
     return row[field] if field in row else None
+
 
 def type_or_none(row, field, desired_type):
     """This function tries to cast the value of row[field] to
@@ -50,26 +54,26 @@ def type_or_none(row, field, desired_type):
             return None
     return None
 
-def standardize_phone(phone):
-    if (phone and len(phone) > 0):
+
+def standardize_phone(phone: str):
+    result_number = None
+    try:
         candidate_phone = '+1' + re.sub(r'\D', '', phone)
-        try:
-            standardized = str(phonenumbers.parse(candidate_phone).national_number)
-        except phonenumbers.phonenumberutil.NumberParseException:
-            print(f'    phonenumbers failed to parse {candidate_phone}.')
-            candidate_phone = None
-    else:
-        candidate_phone = None
-    if candidate_phone is not None and len(candidate_phone) > 12:
-        print(f'    phonenumbers is probably going to reject {candidate_phone} because of its length {len(candidate_phone)}, so coerce it to None.')
-        candidate_phone = None
-    return candidate_phone
+        phone_number = phonenumbers.parse(candidate_phone)
+        if phonenumbers.is_valid_number(phone_number):
+            result_number = f'+{phone_number.country_code}{phone_number.national_number}'
+    except Exception as e:
+        print(e)
+    print(result_number)
+    return result_number
+
 
 class Command(BaseCommand):
     help = 'Loads assets from csv'
 
     def handle(self, *args, **options):
-        file_name = os.path.join(settings.BASE_DIR, 'assets.csv');
+
+        file_name = os.path.join(settings.BASE_DIR, 'update.csv')
         with open(file_name) as f:
             dr = csv.DictReader(f)
             for row in dr:
@@ -99,7 +103,7 @@ class Command(BaseCommand):
                                parse_cell(row['asset_type'])] if row['asset_type'] else []
 
                 tags = [Tag.objects.get_or_create(name=tag)[0] for tag in
-                               parse_cell(row['tags'])] if row['tags'] else []
+                        parse_cell(row['tags'])] if row['tags'] else []
 
                 accessibility_features = [AccessibilityFeature.objects.get_or_create(name=access)[0] for access in
                                           parse_cell(row['accessibility'])] if row['accessibility'] else []

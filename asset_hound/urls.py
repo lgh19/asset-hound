@@ -17,11 +17,13 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
 
-from assets.views import AssetViewSet
+from assets.views import AssetViewSet, AssetTypeViewSet, CategoryViewSet
 
 # register DRF Views and ViewSets
 router = routers.DefaultRouter()
 router.register(r'assets', AssetViewSet)
+router.register(r'asset-types', AssetTypeViewSet)
+router.register(r'categories', CategoryViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

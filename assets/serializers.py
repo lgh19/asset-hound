@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_gis.serializers import (
     GeoFeatureModelSerializer,
-GeometrySerializerMethodField
+    GeometrySerializerMethodField,
 )
 
 from assets.models import (
@@ -12,7 +12,7 @@ from assets.models import (
     AccessibilityFeature,
     ProvidedService,
     TargetPopulation,
-    DataSource
+    DataSource, Category
 )
 
 
@@ -27,7 +27,13 @@ class RecursiveField(serializers.Serializer):
 class AssetTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetType
-        fields = ['name', ]
+        fields = ['name', 'title']
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['name', 'title']
 
 
 class LocationSerializer(GeoFeatureModelSerializer):
@@ -79,33 +85,49 @@ class AssetSerializer(serializers.ModelSerializer):
     hard_to_count_population = TargetPopulationSerializer(many=True)
     data_source = DataSourceSerializer()
     asset_types = AssetTypeSerializer(many=True)
+    category = CategorySerializer()
 
     class Meta:
         model = Asset
         fields = [
-            "name",
+            'name',
             'asset_types',
-            "organization",
-            "localizability",
-            "location",
-            "url",
-            "email",
-            "phone",
-            "hours_of_operation",
-            "holiday_hours_of_operation",
-            "child_friendly",
-            "capacity",
-            "accessibility_features",
-            "internet_access",
-            "wifi_network",
-            "computers_available",
-            "services",
-            "open_to_public",
-            "hard_to_count_population",
-            "sensitive",
-            "date_entered",
-            "last_updated",
-            "data_source",
+            'category',
+            'organization',
+            'localizability',
+            'location',
+            'url',
+            'email',
+            'phone',
+            'hours_of_operation',
+            'holiday_hours_of_operation',
+            'child_friendly',
+            'capacity',
+            'accessibility_features',
+            'internet_access',
+            'wifi_network',
+            'computers_available',
+            'services',
+            'open_to_public',
+            'hard_to_count_population',
+            'sensitive',
+            'date_entered',
+            'last_updated',
+            'data_source',
+        ]
+
+
+class AssetListSerializer(serializers.ModelSerializer):
+    asset_types = AssetTypeSerializer(many=True)
+    category = CategorySerializer()
+    class Meta:
+        model = Asset
+        fields = [
+            'id',
+            'name',
+            'category',
+            'asset_types',
+            'organization',
         ]
 
 
