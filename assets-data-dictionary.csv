@@ -13,6 +13,7 @@ state,text,State,PA,
 zip_code,text,ZIP Code,15212-4704,
 latitude,float,Latitude of asset,40.456392,
 longitude,float,Longitude of asset,-80.006613,
+additional_directions,text,Directions (beyond address) to help someone find the asset,"St. Mary's Church parking lot, near Do It Best",*This one has not yet been added to the asset_hound model or asset map.
 location_transportation,text,"Transportation options (bus routes, parking, bike)",Has a parking lot|Street parking|On the 61B bus route,Can be a pipe-delimited list of options
 residence,bool,Is this location a residence?,False,
 parcel_id,text,Parcel ID,0086L00260000000,This should be a 16-character string.
