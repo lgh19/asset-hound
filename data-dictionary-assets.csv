@@ -24,7 +24,7 @@ hours_of_operation,text,Hours of operation of the asset,"M-Sat 10-5, Sun 12-5",
 holiday_hours_of_operation,text,Holiday hours of operation of the asset,Closed,Inspired by OpenReferral. Might eliminate.
 child_friendly,bool,Is the location well-suited for kids?,True,Maybe move to events schema.
 capacity,int4,Number of people that can fit into the asset,57,Sourcing these values may be hard.
-accessibility,text,ADA/1st-floor accessibility,,It remains to be seen whether this should be a boolean or a description of the availability of ramps. See http://docs.openreferral.org/en/latest/hsda/hsda/#get--locations-location_id-accessibility-accessibility_id- for ideas.
+accessibility,text,ADA/1st-floor accessibility,,Something either conforms with the corresponding ADA specifications or it doesn't.
 internet_access,bool,Internet access is available?,True,
 wifi_network,text,Name of WiFi network,No More Mister Wifi,
 computers_available,bool,Public computers are available?,True,
