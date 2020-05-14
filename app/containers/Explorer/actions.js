@@ -1,6 +1,6 @@
 /*
  *
- * AssetExplorer actions
+ * Explorer actions
  *
  */
 
@@ -17,6 +17,9 @@ import {
   GET_NEXT_ASSET_LIST_PAGE_FAILURE,
   GET_NEXT_ASSET_LIST_PAGE_REQUEST,
   GET_NEXT_ASSET_LIST_PAGE_SUCCESS,
+  CLEAR_SEARCH_TERM,
+  SET_SEARCH_TERM,
+  SEARCH_SUCCESS,
 } from './constants';
 
 export function getAllAssetsRequest() {
@@ -59,7 +62,6 @@ export function getAssetDetailsFailure(errorMsg) {
 }
 
 export function getNextAssetPageRequest(offset) {
-  console.log('action ', offset);
   return {
     type: GET_NEXT_ASSET_LIST_PAGE_REQUEST,
     payload: {
@@ -99,5 +101,18 @@ export function getCategoriesSuccess(data) {
   return {
     type: GET_CATEGORIES_SUCCESS,
     payload: { data },
+  };
+}
+
+export function setSearchTerm(term) {
+  return {
+    type: SET_SEARCH_TERM,
+    payload: { term },
+  };
+}
+
+export function clearSearchTerm() {
+  return {
+    type: CLEAR_SEARCH_TERM,
   };
 }

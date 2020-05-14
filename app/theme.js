@@ -27,6 +27,7 @@ const switchableTheme = darkMode =>
     headerHeight: 8,
     footerHeight: 2,
     drawerWidth: 50,
+    navWidth: 38,
     surfacePadding: 2,
     itemSpacing: 1,
   });

@@ -17,7 +17,6 @@ import StatusIconList from '../StatusIconList';
 // import messages from './messages';
 
 function InfoHeading({ name, address, assetTypes, statuses }) {
-  console.log(statuses);
   return (
     <PanelDiv>
       <Typography variant="h5" component="h2">

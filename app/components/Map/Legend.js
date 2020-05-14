@@ -21,20 +21,15 @@ const List = styled.ul`
   padding: 0;
 `;
 
-function Legend({ colors, filters }) {
+function Legend({ colors, categories }) {
   return (
     <Wrapper>
       <List>
-        {Object.entries(colors).map(([cat, color]) => {
-          if (filters[cat]) {
-            return (
-              <li key={cat} style={{ color }}>
-                {cat}
-              </li>
-            );
-          }
-          return null;
-        })}
+        {categories.map(category => (
+          <li key={category.name} style={{ color: colors[category.name] }}>
+            {category.name}
+          </li>
+        ))}
       </List>
     </Wrapper>
   );

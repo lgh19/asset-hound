@@ -14,15 +14,11 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import { Paper } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 import { categorySchema } from '../../schemas';
 import messages from './messages';
 
 const Wrapper = styled(Paper)`
-  position: absolute;
-  right: 64px;
-
-  top: 16px;
-  max-width: max-content;
   ${({ theme }) => css`
     padding: ${theme.spacing(2, 2)};
   `}
@@ -43,12 +39,21 @@ function MapFilter({ categories, filters, onChange }) {
         ...newFilter,
         [cat]: !value,
       }),
+      {},
     );
     onChange(newFilters);
   }
 
+  if (!categories || !filters) {
+    return <div />;
+  }
+
+  // console.log(categories);
+  // console.log(filters);
+
   return (
     <Wrapper>
+      <Typography variant="subtitle1">Filter by Category</Typography>
       <FormGroup>
         <Button variant="outlined" onClick={handleToggleAll}>
           Toggle All

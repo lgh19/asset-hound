@@ -21,7 +21,6 @@ const globalReducer = (state = initialState, action) =>
   produce(state, draft => {
     switch (action.type) {
       case SET_DARK_MODE:
-        console.log(action.payload);
         draft.darkMode = action.payload.on;
         break;
     }

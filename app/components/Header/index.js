@@ -18,6 +18,7 @@ import DarkModeIcon from '@material-ui/icons/Brightness3';
 import LightModeIcon from '@material-ui/icons/BrightnessHigh';
 import Tooltip from '@material-ui/core/Tooltip';
 import Button from '../Button';
+import Link from '../Link';
 
 const AppBar = styled(MuiAppBar)`
   //border: 2px solid red;
@@ -61,6 +62,17 @@ function Header({ darkMode, onDarkModeChange }) {
       <Toolbar>
         <TitleSection>
           <Typography variant="h6">Asset Map</Typography>
+        </TitleSection>
+        <TitleSection>
+          <Typography variant="body1">
+            <Link
+              href="https://data.wprdc.org/dataset/allegheny-county-assets"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              💾 Get the Data Here!
+            </Link>
+          </Typography>
         </TitleSection>
         <MenuSection>
           <IconButton onClick={() => onDarkModeChange(!darkMode)}>

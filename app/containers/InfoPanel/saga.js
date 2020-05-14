@@ -2,5 +2,5 @@
 
 // Individual exports for testing
 export default function* infoPanelSaga() {
-  // See example in containers/AssetExplorer/saga.js
+  // See example in containers/Explorer/saga.js
 }

@@ -25,7 +25,6 @@ import {
 } from './settings';
 import { extractFeatureFromEvent, fetchCartoVectorSource } from './utils';
 import { categorySchema } from '../../schemas';
-import MapFilter from '../MapFilter';
 import PopUp from './PopUp';
 import Legend from './Legend';
 
@@ -38,18 +37,6 @@ const ControlDiv = styled.div`
   right: 1rem;
 `;
 
-function reduceDefaultCategories(acc, cur) {
-  return { ...acc, [cur.name]: true };
-}
-
-function makeAssetFilter(newFilters) {
-  const filterCats = Object.entries(newFilters)
-    .filter(([filter, value]) => value)
-    .map(([filter, value]) => filter);
-
-  return ['in', ['get', 'category'], ['literal', filterCats]];
-}
-
 function Map({
   defaultViewport,
   sources,
@@ -59,6 +46,8 @@ function Map({
   children,
   onAssetClick,
   categories,
+  filter,
+  searchTerm,
 }) {
   const ReactMapGL = isStatic ? StaticMap : InteractiveMap;
 
@@ -70,19 +59,7 @@ function Map({
   const [popup, setPopup] = useState(undefined);
   const [popupFeature, setPopupFeature] = useState(undefined);
 
-  const [filters, setFilters] = useState(
-    categories ? categories.reduce(reduceDefaultCategories, {}) : undefined,
-  );
-
-  const [assetFilter, setAssetFilter] = useState([]);
-
-  useEffect(() => {
-    if (categories) {
-      const newFilters = categories.reduce(reduceDefaultCategories, {});
-      setFilters(newFilters);
-      setAssetFilter(makeAssetFilter(newFilters));
-    }
-  }, [categories]);
+  const [assetLayerFilter, setAssetLayerFilter] = useState(['has', 'name']);
 
   useEffect(() => {
     fetchCartoVectorSource(
@@ -91,6 +68,14 @@ function Map({
       // eslint-disable-next-line no-console
     ).then(setAssetSource, err => console.error('CARTO', err));
   }, []);
+
+  useEffect(() => {
+    if (searchTerm) {
+      setAssetLayerFilter(['all', filter, ['in', searchTerm, ['get', 'name']]]);
+    } else {
+      setAssetLayerFilter(filter);
+    }
+  }, [searchTerm, filter]);
 
   function closePopup() {
     setPopupFeature(undefined);
@@ -125,12 +110,6 @@ function Map({
     }
   }
 
-  function handleFilterChange(newFilters) {
-    // {category.name: bool}
-    setFilters(newFilters);
-    setAssetFilter(makeAssetFilter(newFilters));
-  }
-
   return (
     <ReactMapGL
       mapboxApiAccessToken={MAPBOX_API_TOKEN}
@@ -145,7 +124,7 @@ function Map({
     >
       {!!assetSource && (
         <Source {...assetSource}>
-          <Layer {...assetLayer} filter={assetFilter} />
+          <Layer {...assetLayer} filter={assetLayerFilter} />
         </Source>
       )}
 
@@ -160,19 +139,12 @@ function Map({
       {children /* todo: ¿tightly define what goes in the map? */}
 
       {popup}
+      {!!categories && (
+        <Legend colors={categoryColors} categories={categories} />
+      )}
       <ControlDiv>
         <NavigationControl />
       </ControlDiv>
-      {!!categories && !!filters && (
-        <MapFilter
-          categories={categories}
-          onChange={handleFilterChange}
-          filters={filters}
-        />
-      )}
-      {!!categories && !!filters && (
-        <Legend colors={categoryColors} filters={filters} />
-      )}
     </ReactMapGL>
   );
 }
@@ -193,6 +165,8 @@ Map.propTypes = {
   children: PropTypes.node,
   onAssetClick: PropTypes.func,
   categories: PropTypes.arrayOf(PropTypes.shape(categorySchema)),
+  filter: PropTypes.array,
+  searchTerm: PropTypes.string,
 };
 
 Map.defaultProps = {

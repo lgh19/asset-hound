@@ -11,7 +11,7 @@ import React, { useEffect } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-import HomePage from 'containers/AssetExplorer/Loadable';
+import HomePage from 'containers/Explorer/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 
 import { CssBaseline } from '@material-ui/core';

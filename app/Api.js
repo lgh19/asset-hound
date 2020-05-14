@@ -6,7 +6,7 @@
  *
  */
 
-const HOST = 'https://wiki.wprdc.org';
+const HOST = 'https://assets.wprdc.org/api';
 
 /**
  * Enum for API endpoints.
@@ -120,8 +120,8 @@ function getAssetById(id) {
   return callApi(Endpoints.ASSETS, Methods.get, { id });
 }
 
-function getCategories(){
-  return callApi(Endpoints.CATEGORIES, Methods.get, {})
+function getCategories() {
+  return callApi(Endpoints.CATEGORIES, Methods.get, {});
 }
 
 export default { getAssets, getAssetById, getCategories };

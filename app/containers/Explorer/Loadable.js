@@ -1,5 +1,5 @@
 /**
- * Asynchronously loads the component for AssetExplorer
+ * Asynchronously loads the component for Explorer
  */
 
 import loadable from 'utils/loadable';

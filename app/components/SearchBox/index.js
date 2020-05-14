@@ -5,20 +5,52 @@
  */
 
 import React from 'react';
-// import PropTypes from 'prop-types';
-// import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
 
+import { debounce } from 'lodash';
 import { FormattedMessage } from 'react-intl';
+import { TextField } from '@material-ui/core';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import SearchIcon from '@material-ui/icons/Search';
 import messages from './messages';
 
-function SearchBox({onChange}) {
+const Wrapper = styled.div`
+  ${({ theme }) => css`
+    padding: ${theme.spacing(1, 1)};
+  `}
+`;
+
+function SearchBox({ onChange, onClear, term }) {
+  function handleChange(event) {
+    onChange(event.target.value);
+  }
+
   return (
-    <div>
-      <FormattedMessage {...messages.header} />
-    </div>
+    <Wrapper>
+      <TextField
+        value={term}
+        id="search-input"
+        // label="Search for assets"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        }}
+        fullWidth
+        onChange={handleChange}
+        placeholder="Search for assets..."
+      />
+    </Wrapper>
   );
 }
 
-SearchBox.propTypes = {};
+SearchBox.propTypes = {
+  onChange: PropTypes.func,
+  onClear: PropTypes.func,
+  term: PropTypes.string,
+};
 
 export default SearchBox;

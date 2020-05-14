@@ -29,7 +29,7 @@ import ContactCard from '../../components/ContactCard';
 import {
   makeSelectExplorerCurrentAsset,
   makeSelectExplorerLoadingCurrentAsset,
-} from '../AssetExplorer/selectors';
+} from '../Explorer/selectors';
 import { assetSchema } from '../../schemas';
 import WelcomeInfo from '../../components/WelcomeInfo';
 import InfoSection from '../../components/InfoSection';
@@ -38,33 +38,40 @@ import InfoLine from '../../components/InfoLine';
 export function InfoPanel({ isOpen, loading, asset }) {
   useInjectReducer({ key: 'infoPanel', reducer });
   useInjectSaga({ key: 'infoPanel', saga });
+  let url = '';
+  let statusList;
 
-  const statusList = asset
-    ? [
-        {
+  if (asset) {
+    if (asset.url)
+      url = asset.url.match(/^[a-zA-Z]+:\/\//)
+        ? asset.url
+        : `https://${asset.url}`;
+
+    statusList = [
+      {
         name: 'Open to the Public',
         status: asset.openToPublic,
-          icon: OpenToPublicIcon,
-        },
+        icon: OpenToPublicIcon,
+      },
       {
         name: 'Child Friendly',
         status: asset.childFriendly,
         icon: ChildFriendlyIcon,
-        },
+      },
       {
         name: 'Public Internet Access',
         status: asset.internetAccess,
-          icon: InternetAvailableIcon,
+        icon: InternetAvailableIcon,
         disabledMsg: 'No Public Internet Access',
-        },
+      },
       {
         name: 'Computers Available',
         status: asset.computersAvailable,
-          icon: ComputersAvailableIcon,
+        icon: ComputersAvailableIcon,
         disabledMsg: 'No Public Computers Available',
-        },
-    ]
-    : undefined;
+      },
+    ];
+  }
 
   return (
     <SideSheet open={isOpen}>
@@ -81,7 +88,7 @@ export function InfoPanel({ isOpen, loading, asset }) {
           <ContactCard
             email={asset.email}
             phone={asset.phone}
-            website={asset.url}
+            website={url}
             address={asset.location.properties.name}
           />
           <InfoSection title="Hours of Operation">

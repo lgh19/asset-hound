@@ -12,7 +12,7 @@
 import PropTypes from 'prop-types';
 
 /**
- * Enum of localizability types
+ * *Enum of localizability types
  * @readonly
  * @enum {string}
  */

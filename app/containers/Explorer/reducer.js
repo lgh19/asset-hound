@@ -17,6 +17,8 @@ import {
   GET_NEXT_ASSET_LIST_PAGE_FAILURE,
   GET_NEXT_ASSET_LIST_PAGE_REQUEST,
   GET_NEXT_ASSET_LIST_PAGE_SUCCESS,
+  CLEAR_SEARCH_TERM,
+  SET_SEARCH_TERM,
 } from './constants';
 
 export const initialState = {
@@ -30,6 +32,7 @@ export const initialState = {
   currentAsset: undefined,
   loadingCurrentAsset: false,
   categories: undefined,
+  searchTerm: '',
 };
 
 /* eslint-disable default-case, no-param-reassign */
@@ -67,6 +70,22 @@ const infoPanelReducer = (state = initialState, action) =>
         break;
       case GET_NEXT_ASSET_LIST_PAGE_FAILURE:
         draft.loadingAssets = false;
+        break;
+
+      case SET_SEARCH_TERM:
+        draft.allAssets = [];
+        draft.moreAssetsRemain = true;
+        draft.assetListOffset = 0;
+        draft.searchTerm = action.payload.term;
+        draft.loadingAssets = false;
+        break;
+      case CLEAR_SEARCH_TERM:
+        draft.allAssets = [];
+        draft.moreAssetsRemain = true;
+        draft.assetListOffset = 0;
+        draft.searchTerm = '';
+        draft.loadingAssets = false;
+        break;
     }
   });
 

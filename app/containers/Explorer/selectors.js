@@ -5,7 +5,7 @@ import { initialState } from './reducer';
  * Direct selector to the infoPanel state domain
  */
 
-const selectAssetExplorerDomain = state => state.assetExplorer || initialState;
+const selectAssetExplorerDomain = state => state.explorer || initialState;
 
 /**
  * Other specific selectors
@@ -63,6 +63,12 @@ const makeSelectLoadingAssets = () =>
     substate => substate.loadingAssets,
   );
 
+const makeSelectSearchTerm = () =>
+  createSelector(
+    selectAssetExplorerDomain,
+    substate => substate.searchTerm,
+  );
+
 /**
  * Default selector used by InfoPanel
  */
@@ -83,4 +89,5 @@ export {
   makeSelectAssetListOffset,
   makeSelectMoreAssetsRemain,
   makeSelectLoadingAssets,
+  makeSelectSearchTerm,
 };
