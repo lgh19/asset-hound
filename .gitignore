@@ -8,3 +8,5 @@ asset_hound/local_settings.py
 *.pyc
 TODO
 notes.txt
+
+data/

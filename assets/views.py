@@ -10,7 +10,7 @@ class AssetViewSet(viewsets.ModelViewSet):
     queryset = Asset.objects.all()
     pagination_class = LimitOffsetPagination
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name', ]
+    search_fields = ['name',]
 
     def get_serializer_class(self, *args, **kwargs):
         fmt = self.request.GET.get('fmt', None)
