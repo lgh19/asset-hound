@@ -153,7 +153,8 @@ class Command(BaseCommand):
                     location=location,
                     organization=organization,
                     data_source=data_source,
-                    primary_key_from_rocket=value_or_none(row, 'primary_key_from_rocket')
+                    primary_key_from_rocket=value_or_none(row, 'primary_key_from_rocket'),
+                    synthesized_key=value_or_none(row, 'synthesized_key'),
                 )
 
                 asset.asset_types.set(asset_types)

@@ -74,7 +74,7 @@ class AssetAdmin(admin.ModelAdmin):
         'id',
         'name',
         'organization',
-        'localizability',
+        #'localizability',
         'location',
         # 'url',
         # 'email',
