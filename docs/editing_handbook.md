@@ -51,7 +51,7 @@ We'll call this "delisting" (or maybe "unmapping"). The expected workflow should
 # Questions
 
 ## Q: Why did you say it's important to understand the Django data model?
-A: Well, currently the location information of an asset is broken off into a separate `Location` class. This may not seem important when one record represents one asset, and it's the only thing at that address, but when there are multiple different assets at the same address, if you change the Location for one asset, it will also change the Loation data for any other asset that is also at that address. It's basically a thing to keep an eye on until we get it smoothed out, at which point this documentation should be updated.
+A: Well, currently the location information of an asset is broken off into a separate `Location` class. This may not seem important when one record represents one asset, and it's the only thing at that address, but when there are multiple different assets at the same address, if you change the Location for one asset, it will also change the location data for any other asset that is also at that address. It's basically a thing to keep an eye on until we get it smoothed out, at which point this documentation should be updated.
 
 ## Q: How will we link together multiple assets that are associated but are at different locations?
 A: The `Organization` model should provide a way to do this. All of the assets can be assigned the same `Organization` instance, and we can eventually provide any necessary functionality for accessing those. (Maybe it should be possible for users to click on the name of the organization and get a map and list of all assets in that organization.)
