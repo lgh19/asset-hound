@@ -27,7 +27,6 @@ These are edits that only affect a single record. This can be any change to the 
 
    Change the address from `1 S. Dog STREET` to `1 South Dog St`.
 
-
 ### Multi-record merges
 This is a case where two or more records that represent the same asset are are combined into a single record.
 [We haven't worked out exactly how this will work yet on the backend. It might be the deletion (or hiding of all original records and the creation of a new one.]
@@ -42,6 +41,9 @@ The expected workflow in this case is that you find two or more records represen
 So if one has an asset type of "restaurants" and the other has an asset type of "bars", you could pick one or the other or both (since there are cases where the best option would be to allow a list of both values) or enter free text (as in the case of "Starbucks Coffee #754" without the space).
 
 In cases of geocoordinates, the list must be reduced to a single latitude-longitude pair.
+
+### Making entirely new asset records
+An asset that should be in the database but is not may be entered by creating a new record and filling in field values to describe it. The `data_source_name` and `data_source_url` should be filled in to describe where the data came from as best as possible. Liberal use of the `notes` field is also encouraged to document the data source.
 
 ### De-listing records
 In cases where the record represents something that is not an asset within the scope of the asset map (currently whatever we are defining "assets" to be, that are 1) in Allegheny County and 2) extant (as this is not designed to represent historical assets (yet)), it should be removed from the map.
