@@ -48,11 +48,24 @@ In cases where the record represents something that is not an asset within the s
 
 We'll call this "delisting" (or maybe "unmapping"). The expected workflow should be 1) click on a "delist" button for an asset, 2) you get prompted for a reason for delisting (where dropdown options should include "Outside Allegheny County", "Not a real place", and "Does not meet the definition of an asset"), and 3) likely the record will persist, but it will be flagged to not be displayed to end-users.
 
-# Questions
+## Questions
 
-## Q: Why did you say it's important to understand the Django data model?
+### Q: Why did you say it's important to understand the Django data model?
 A: Well, currently the location information of an asset is broken off into a separate `Location` class. This may not seem important when one record represents one asset, and it's the only thing at that address, but when there are multiple different assets at the same address, if you change the Location for one asset, it will also change the location data for any other asset that is also at that address. It's basically a thing to keep an eye on until we get it smoothed out, at which point this documentation should be updated.
 
-## Q: How will we link together multiple assets that are associated but are at different locations?
+### Q: How will we link together multiple assets that are associated but are at different locations?
 A: The `Organization` model should provide a way to do this. All of the assets can be assigned the same `Organization` instance, and we can eventually provide any necessary functionality for accessing those. (Maybe it should be possible for users to click on the name of the organization and get a map and list of all assets in that organization.)
 
+## Advanced operations
+The challenge of maintaining the assets database is that data comes in from completely different types of sources: 1) ETL (Extract-Transform-Load) processes wrangle data from various datasets (including federal, state, and local datasets) into a common schema which then can be loaded into the assets database. (These processes currently run manually, but we expect them to eventually be at least somewhat automatic.) 2) Inputs from data editors, through the provided interface on assets.wprdc.org.
+
+However, regardless of how these changes are made, any additions or deletions of assets (including merges) have to then be replicated to another database: The Carto database, which lives here:
+https://wprdc-maps.carto.com/u/wprdc/tables/assets/public?redirected=true
+
+If you click on a point on the map representing an asset, the database on assets.wprdc.org is queried to get and display the details of the corresponding asset. But the map itself is generated from the Carto database for performance reasons. This means  that periodically, it must be modified to reflect the assets.wprdc.org database. The manual process for this is as follows:
+
+1) Shell into assets.wprdc.org.
+2) `> source ~/backend/env/bin/activate`
+3) `cd backend`
+4) `python manage.py dump_assets`
+5) Take `~/backend/data/assets_dump.csv` and overwrite the Carto database with it.
