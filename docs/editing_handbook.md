@@ -1,10 +1,15 @@
 ## Operational Handbook for Data Quality Improvement
 
-All edits should be made through our editing framework to ensure that edits can be stored and replayed when fresh data from the raw sources comes in.
+### Overview
+The asset map at [assets.wprdc.org](https://assets.wprdc.org) is an attempt to present a comprehensive view of neighborhood resources in Allegheny County. It is synthesized from many different open datasets and data we have received or harvested from other sources. These different data sources have wildly different data qualities. We are working to eliminate errors and improve the data quality to make the map more useful to people.
 
 The [data dictionary](https://github.com/WPRDC/asset-hound/blob/master/assets-data-dictionary.csv) for the flat CSV versions of the assets is a good starting point for understanding the data model we're using. (This should eventually be augmented by full documentation of the Django data model, which is important to understand.)
 
-## Kinds of edits
+## Edits
+All data edits should be made through our editing framework to ensure that edits can be stored and replayed when fresh data from the raw sources comes in. 
+
+The following describes the different kinds of edits:
+
 ### Single-record edits
 These are edits that only affect a single record. This can be any change to the field values of an asset (and any number of changes can fit into one edit).
 
