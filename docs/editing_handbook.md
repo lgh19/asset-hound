@@ -61,7 +61,7 @@ A: The `Organization` model should provide a way to do this. All of the assets c
 ## Advanced operations
 The challenge of maintaining the assets database is that data comes in from completely different types of sources: 1) ETL (Extract-Transform-Load) processes wrangle data from various datasets (including federal, state, and local datasets) into a common schema which then can be loaded into the assets database. (These processes currently run manually, but we expect them to eventually be at least somewhat automatic.) 2) Inputs from data editors, through the provided interface on assets.wprdc.org.
 
-However, regardless of how these changes are made, any additions or deletions of assets (including merges) have to then be replicated to another database: The Carto database, which lives here:
+However, regardless of how these changes are made, any additions or deletions of assets (including merges) or changes to geocoordinates/geometry/name/asset type/category have to then be replicated to another database: The Carto database, which lives here:
 https://wprdc-maps.carto.com/u/wprdc/tables/assets/public?redirected=true
 
 If you click on a point on the map representing an asset, the database on assets.wprdc.org is queried to get and display the details of the corresponding asset. But the map itself is generated from the Carto database for performance reasons. This means  that periodically, it must be modified to reflect the assets.wprdc.org database. The manual process for this is as follows:
