@@ -120,6 +120,7 @@ class AssetSerializer(serializers.ModelSerializer):
 class AssetListSerializer(serializers.ModelSerializer):
     asset_types = AssetTypeSerializer(many=True)
     category = CategorySerializer()
+
     class Meta:
         model = Asset
         fields = [

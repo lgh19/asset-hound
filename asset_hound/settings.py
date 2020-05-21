@@ -18,7 +18,7 @@ from asset_hound.local_settings import (
     DB_USER,
     DB_PASS,
     DB_HOST,
-    GEOCODIO_API_KEY,
+    GEOCODIO_API_KEY, DEV_APPS,
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -45,14 +45,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
-    'django_extensions',
+
+    # dependencies
     'corsheaders',
     'reversion',
     'rest_framework',
     'rest_framework_gis',
+    'recurrence',
     'phonenumber_field',
-    'assets'
+    'ckeditor',
+
+    # asset-hound apps
+    'geo',
+    'assets',
+    'community_resources'
 ]
+
+# add any development apps if specified
+INSTALLED_APPS += DEV_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
