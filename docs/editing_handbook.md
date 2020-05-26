@@ -5,6 +5,14 @@ The asset map at [assets.wprdc.org](https://assets.wprdc.org) is an attempt to p
 
 The [data dictionary](https://github.com/WPRDC/asset-hound/blob/master/assets-data-dictionary.csv) for the flat CSV versions of the assets is a good starting point for understanding the data model we're using. (This should eventually be augmented by full documentation of the Django data model, which is important to understand.)
 
+## Ways to improve the data quality of assets
+  - Check whether assets you're familiar with appear on the map. If not, track them down in the database and manually correct their `latitude` and `longitude` fields. (Then run a yet-to-be-written push-changes-to-Carto script and verify that the assets are where they should be.)
+    * Whenever you fix the geocoordinates of a location, check the address. In some cases bad geocoordinates come from bad address data. If you can manually fix the address so that a geocoder can correctly generate latitude and longitude values for the location, it's better to fix the address. We'll need to set up a way that you can trigger a re-geocoding to refresh the latitude and longitude fields. Until that's available, just make manual changes to make the data usable. We can always go back and fix the addresses later.
+  - Associate a parcel ID with every physical asset. (A long-range goal is to ensure that each asset's location have a value in its `parcel_id` field, which should be the Allegheny County parcel identifier.) This will allow us to have a script automatically check that the geocoordinates of assets are within the boundaries of their parcels. (We should also run similar validation of geocoordinates against city/township boundaries, state boundaries, county boundaries, and maybe ZIP code boundaries.)
+  - Look for assets outside of Allegheny County and either de-list them (see below) or toggle their `do_not_display` value to True.
+  - Add tags to improve granularity of data (e.g., correctly classifying restaurants as coffee shops and categorizing places of worship by denomination). 
+    * Anything with an `asset_type` value of `community_nonprofit_orgs` should be assigned a new asset type. In some cases, this can be based on the NTEE code associated with the asset, but about 40% of those assets have no NTEE code, so we'll need to classify them manually.
+
 ## Edits
 All data edits should be made through our editing framework to ensure that edits can be stored and replayed when fresh data from the raw sources comes in. 
 
