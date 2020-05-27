@@ -6,8 +6,6 @@ from geo.models import Geography
 
 
 class GeographySerializer(GeoFeatureModelSerializer):
-    geom = GeometrySerializerMethodField()
-
     class Meta:
         model = Geography
         geo_field = 'geom'

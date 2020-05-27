@@ -2,6 +2,7 @@ from django.contrib.gis.db import models
 from django.utils import timezone
 
 from ckeditor.fields import RichTextField
+from django.utils.text import slugify
 from phonenumber_field.modelfields import PhoneNumberField
 from recurrence.fields import RecurrenceField
 
@@ -13,19 +14,36 @@ class Priority(models.IntegerChoices):
     LOW = 3
 
 
-class ResourceCategory(models.Model):
+class WithNameSlug(object):
+    name: models.CharField
+
+    @property
+    def slug(self):
+        return slugify(self.name)
+
+
+class ResourceCategory(models.Model, WithNameSlug):
     """ Resource Categories """
     name = models.CharField(max_length=100)
     description = models.TextField()
 
+    class Meta:
+        verbose_name_plural = 'Resource Categories'
 
-class Population(models.Model):
+    def __str__(self):
+        return self.name
+
+
+class Population(models.Model, WithNameSlug):
     """ Groupings of folks based on commonalities """
     name = models.CharField(max_length=100)
     description = models.TextField()
 
+    def __str__(self):
+        return self.name
 
-class Resource(models.Model):
+
+class Resource(models.Model, WithNameSlug):
     """ Individual services rendered, supplies distributed or other resources """
     name = models.CharField(max_length=500)
     description = models.TextField()
@@ -37,8 +55,8 @@ class Resource(models.Model):
     populations_served = models.ManyToManyField('Population', related_name='resources')
 
     # Locations
-    assets = models.ManyToManyField("assets.Asset", related_name='resources')
-    other_locations = models.ManyToManyField("assets.Location", related_name='resources')
+    assets = models.ManyToManyField("assets.Asset", related_name='resources', blank=True)
+    other_locations = models.ManyToManyField("assets.Location", related_name='resources', blank=True)
 
     # Timing
     recurrence = RecurrenceField()
@@ -60,11 +78,22 @@ class Resource(models.Model):
         blank=True
     )
 
+    @property
+    def virtual_only(self):
+        return not len(self.assets.all()) and not len(self.other_locations.all())
+
+    @property
+    def publishable(self):
+        return self.published and (self.start_date <= timezone.now() < self.stop_date)
+
     class Meta:
-        ordering = ('name',)
+        ordering = ('priority',)
+
+    def __str__(self):
+        return self.name
 
 
-class CategorySection(models.Model):
+class CategorySection(models.Model, WithNameSlug):
     """  Stores rich content displayed in category sections of community pages. """
     community = models.ForeignKey('Community', related_name='category_sections', on_delete=models.CASCADE)
     category = models.ForeignKey('ResourceCategory', related_name='sections_by_community', on_delete=models.CASCADE)
@@ -77,7 +106,7 @@ class CategorySection(models.Model):
         return f'{self.community}/{self.category}'
 
 
-class Community(models.Model):
+class Community(models.Model, WithNameSlug):
     """ Primary unit of organization.
 
     Communities will each have their own pages and assigned users.
@@ -91,9 +120,14 @@ class Community(models.Model):
     top_section_content = RichTextField(blank=True, default='')
     alert_content = RichTextField(blank=True, default='')
 
-    # TODO: content attached to sections
-
     resources = models.ManyToManyField('Resource', related_name='communities')
+
+    @property
+    def resource_categories(self):
+        return ResourceCategory.objects.filter(resources__in=self.resources.all()).distinct()
 
     class Meta:
         verbose_name_plural = 'Communities'
+
+    def __str__(self):
+        return f'{self.name}'

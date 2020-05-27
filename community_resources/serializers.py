@@ -8,13 +8,13 @@ from geo.serializers import GeographySerializer
 class ResourceCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ResourceCategory
-        fields = ['name', 'description']
+        fields = ['name', 'slug', 'description']
 
 
 class PopulationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Population
-        fields = ['name', 'description']
+        fields = ['name', 'slug', 'description']
 
 
 class ResourceSerializer(serializers.ModelSerializer):
@@ -27,6 +27,7 @@ class ResourceSerializer(serializers.ModelSerializer):
         model = Resource
         fields = [
             'name',
+            'slug',
             'description',
             'website',
             'phone_number',
@@ -45,12 +46,15 @@ class ResourceSerializer(serializers.ModelSerializer):
 class CommunitySerializer(serializers.ModelSerializer):
     neighborhoods = GeographySerializer(many=True)
     resources = ResourceSerializer(many=True)
+    resource_categories = ResourceCategorySerializer(many=True)
 
     class Meta:
         model = Community
         fields = [
             'name',
+            'slug',
             'neighborhoods',
+            'resource_categories',
             'top_section_content',
             'alert_content',
             'resources',
