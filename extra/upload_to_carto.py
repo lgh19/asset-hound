@@ -98,6 +98,10 @@ table_name = 'assets'
 if len(sys.argv) < 2:
     print("Please specify the filename from which to load assets.")
 else:
+    if sys.argv[1] == 'just_fix':
+        fix_carto_geofields(sql, table_name)
+        raise ValueError("Halting after attempting to fix geofields.")
+
     local_filepath = sys.argv[1]
     asset_types = None
     if len(sys.argv) > 2:
