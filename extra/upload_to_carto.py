@@ -17,17 +17,17 @@ def basic_query(sql):
 
 def delete_assets_by_type(sql, table_name, asset_type):
      results = sql.send(f"DELETE from {table_name} WHERE asset_type='{asset_type}'")
-     return results 
+     return results
 
 def values_string(row, fields):
     values = []
-    
+
     for field in fields:
         if field in ['id', 'latitude', 'longitude']:
             values.append(row[field])
         else:
             values.append(f"'{row[field]}'")
-    
+
     return ', '.join(values)
 
 def insert_new_assets(sql, table_name, records):
@@ -57,32 +57,31 @@ def check_geom_webmercator(table_name):
     results = sql.send(q)
     print(results)
 
-def fix_carto_geofields(table_name):
+def fix_carto_geofields(sql, table_name):
 
-    # Now the problem with pushing this data through SQL calls is that Carto does not rerun the 
-    # processes that add values for the_geom and the_geom_webmercator. So it kind of seems like 
+    # Now the problem with pushing this data through SQL calls is that Carto does not rerun the
+    # processes that add values for the_geom and the_geom_webmercator. So it kind of seems like
     # we have to do this ourselves as documented at
     # https://gis.stackexchange.com/a/201908
 
     q = f"UPDATE {table_name} SET the_geom = ST_SetSRID(st_makepoint(longitude, latitude),4326)"
     # This works because 'longitude' and 'latitude' are the names of the corresponding fields in the CSV file.
-    results = sql.send(q) # This takes 12 seconds to run for 100,000 rows.
+    results1 = sql.send(q) # This takes 12 seconds to run for 100,000 rows.
     # Exporting the data immediately after this is run oddly leads to the same CSV file as exporting before
     # it is run, but waiting a minute and exporting again gives something with the_geom values in the same
-    # rows as the table on the Carto site. Basically, the exported CSV file can lag the view on the Carto 
+    # rows as the table on the Carto site. Basically, the exported CSV file can lag the view on the Carto
     # web site by a minute or two.
     q = f"SELECT ST_Transform(ST_SetSRID(st_makepoint(longitude, latitude),4326),3857) as the_geom_webmercator FROM {table_name}"
-    results = sql.send(q) # This one ran much faster.
-    # One improvement is that you can replace ST_SetSRID(st_makepoint(lon, lat)) with CDB_LatLng(lat, lon) 
+    results2 = sql.send(q) # This one ran much faster.
+    # One improvement is that you can replace ST_SetSRID(st_makepoint(lon, lat)) with CDB_LatLng(lat, lon)
     # though I don't know if it leads to any performance improvement.
-    print("Tried to add values for the the_geom and the_geom_webmercator fields in {table_name}.")
+    print(f"Tried to add values for the the_geom and the_geom_webmercator fields in {table_name}. The requests completed in {results1['time']} s and {results2['time']} s.")
 
 
 sql = SQLClient(auth_client)
 
 table_name = 'assets_copy'
 table_name = 'assets'
-
 #results = sql.send(f"DELETE from {table_name} WHERE id=10106") # Ran this to delete the old Ormsby Pool and Recreation Center. # assets.wprdc.org map seemed to update immediately.
 #results = insert_new_assets(sql, table_name) # Ran this (and next line) to add the new record for Ormsby Pool and Recreation Center. # assets.wprdc.org map did not immediately update.
 #fix_carto_geofields(table_name) # It took a few minutes, but eventually the update came through. Possibly one extra zoom made the difference.
