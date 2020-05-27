@@ -120,8 +120,11 @@ else:
     reader = csv.DictReader(open(local_filepath))
     records_per_request = 3
     batch_list = []
-    for row in reader:
-        batch_list.append(row)
-        if len(batch_list) == records_per_request:
-            # push records        
-            insert_new_assets(sql, table_name, batch_list)
+    for k, row in enumerate(reader):
+        if asset_types is None or row['asset_type'] in asset_types:
+            batch_list.append(row)
+            if len(batch_list) == records_per_request:
+                # push records
+                print(f"Pushing {len(batch_list)} assets.")
+                insert_new_assets(sql, table_name, batch_list)
+                batch_list = []
