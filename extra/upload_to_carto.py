@@ -128,3 +128,5 @@ else:
                 print(f"Pushing {len(batch_list)} assets.")
                 insert_new_assets(sql, table_name, batch_list)
                 batch_list = []
+    if k > 0:
+        fix_carto_geofields(sql, table_name)
