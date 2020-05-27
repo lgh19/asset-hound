@@ -77,6 +77,10 @@ def fix_carto_geofields(sql, table_name):
     # though I don't know if it leads to any performance improvement.
     print(f"Tried to add values for the the_geom and the_geom_webmercator fields in {table_name}. The requests completed in {results1['time']} s and {results2['time']} s.")
 
+def get_carto_asset_types(sql, table_name):
+    q = f"SELECT count(asset_type), asset_type FROM {table_name} GROUP BY asset_type"
+    results = sql.send(q)
+    return [r['asset_type'] for r in results['rows']]
 
 sql = SQLClient(auth_client)
 
@@ -95,9 +99,17 @@ if len(sys.argv) < 2:
     print("Please specify the filename from which to load assets.")
 else:
     local_filepath = sys.argv[1]
+    asset_types = None
     if len(sys.argv) > 2:
         asset_types = sys.argv[2:]
         # Validate these.
+        carto_asset_types = get_carto_asset_types(sql, table_name)
+        for asset_type in asset_types:
+            if asset_type in carto_asset_types:
+                print(f"Clearing assets of type {asset_type} from Carto table.")
+                delete_assets_by_type(sql, table_name, asset_type)
+            else:
+                print(f" ** Unable to find any instances of type {asset_type} in the Carto table. ** ")
     else:
         raise ValueError("Not yet coded to handle all asset types at once.")
 
