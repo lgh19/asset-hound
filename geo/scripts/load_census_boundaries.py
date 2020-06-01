@@ -33,125 +33,124 @@ mappings = {
     #         'awater': 'AWATER',
     #     }
     # },
-    # 'tract': {
-    #     'model': models.Tract,
-    #     'file_name': 'cb_2017_42_tract_500k',
-    #     'mapping': {
-    #         'name': 'NAME',
-    #         'geom': 'MULTIPOLYGON',
-    #         'geoid': 'GEOID',
-    #         'statefp': 'STATEFP',
-    #         'countyfp': 'COUNTYFP',
-    #         'tractce': 'TRACTCE',
-    #         'affgeoid': 'AFFGEOID',
-    #         'aland': 'ALAND',
-    #         'awater': 'AWATER',
-    #     }
-    # },
-    # 'county_subdivision': {
-    #     'model': models.CountySubdivision,
-    #     'file_name': 'cb_2017_42_cousub_500k',
-    #     'mapping': {
-    #         'name': 'NAME',
-    #         'geom': 'MULTIPOLYGON',
-    #         'geoid': 'GEOID',
-    #         'statefp': 'STATEFP',
-    #         'countyfp': 'COUNTYFP',
-    #         'cousubfp': 'COUSUBFP',
-    #         'cousubns': 'COUSUBNS',
-    #         'affgeoid': 'AFFGEOID',
-    #         'aland': 'ALAND',
-    #         'awater': 'AWATER',
-    #     }
-    # },
-    # 'place': {
-    #     'model': models.Place,
-    #     'file_name': 'cb_2017_42_place_500k',
-    #     'mapping': {
-    #         'name': 'NAME',
-    #         'geom': 'MULTIPOLYGON',
-    #         'geoid': 'GEOID',
-    #         'statefp': 'STATEFP',
-    #         'placefp': 'PLACEFP',
-    #         'placens': 'PLACENS',
-    #         'affgeoid': 'AFFGEOID',
-    #         'aland': 'ALAND',
-    #         'awater': 'AWATER',
-    #     }
-    # },
-    # 'puma': {
-    #     'model': models.Puma,
-    #     'file_name': 'cb_2017_42_puma10_500k',
-    #     'mapping': {
-    #         'name': 'NAME10',
-    #         'geom': 'MULTIPOLYGON',
-    #         'geoid': 'GEOID10',
-    #         'statefp': 'STATEFP10',
-    #         'pumace': 'PUMACE10',
-    #         'affgeoid': 'AFFGEOID10',
-    #         'aland': 'ALAND10',
-    #         'awater': 'AWATER10',
-    #     }
-    # },
-    # 'school_district': {
-    #     'model': models.SchoolDistrict,
-    #     'file_name': 'cb_2017_42_unsd_500k',
-    #     'mapping': {
-    #         'name': 'NAME',
-    #         'geom': 'MULTIPOLYGON',
-    #         'geoid': 'GEOID',
-    #         'statefp': 'STATEFP',
-    #         'unsdlea': 'UNSDLEA',
-    #         'affgeoid': 'AFFGEOID',
-    #         'aland': 'ALAND',
-    #         'awater': 'AWATER',
-    #     }
-    # },
-    # 'state_house': {
-    #     'model': models.StateHouse,
-    #     'level': models.Geography.STATE_HOUSE,
-    #     'file_name': 'cb_2017_42_sldl_500k',
-    #     'mapping': {
-    #         'name': 'NAME',
-    #         'geom': 'MULTIPOLYGON',
-    #         'geoid': 'GEOID',
-    #         'statefp': 'STATEFP',
-    #         'sldlst': 'SLDLST',
-    #         'affgeoid': 'AFFGEOID',
-    #         'aland': 'ALAND',
-    #         'awater': 'AWATER',
-    #     }
-    # },
-    # 'state_senate': {
-    #     'model': models.StateSenate,
-    #     'file_name': 'cb_2017_42_sldu_500k',
-    #     'mapping': {
-    #         'name': 'NAME',
-    #         'geom': 'MULTIPOLYGON',
-    #         'geoid': 'GEOID',
-    #         'statefp': 'STATEFP',
-    #         'sldust': 'SLDUST',
-    #         'affgeoid': 'AFFGEOID',
-    #         'aland': 'ALAND',
-    #         'awater': 'AWATER',
-    #     }
-    # },
-    # 'county': {
-    #     'model': models.County,
-    #     'file_name': 'cb_2017_us_county_500k',
-    #     'mapping': {
-    #         'name': 'NAME',
-    #         'geom': 'MULTIPOLYGON',
-    #         'geoid': 'GEOID',
-    #         'statefp': 'STATEFP',
-    #         'countyfp': 'COUNTYFP',
-    #         'countyns': 'COUNTYNS',
-    #         'affgeoid': 'AFFGEOID',
-    #         'lsad': 'LSAD',
-    #         'aland': 'ALAND',
-    #         'awater': 'AWATER',
-    #     }
-    # },
+    'tract': {
+        'model': models.Tract,
+        'file_name': 'cb_2017_42_tract_500k',
+        'mapping': {
+            'name': 'NAME',
+            'geom': 'MULTIPOLYGON',
+            'geoid': 'GEOID',
+            'statefp': 'STATEFP',
+            'countyfp': 'COUNTYFP',
+            'tractce': 'TRACTCE',
+            'affgeoid': 'AFFGEOID',
+            'aland': 'ALAND',
+            'awater': 'AWATER',
+        }
+    },
+    'county_subdivision': {
+        'model': models.CountySubdivision,
+        'file_name': 'cb_2017_42_cousub_500k',
+        'mapping': {
+            'name': 'NAME',
+            'geom': 'MULTIPOLYGON',
+            'geoid': 'GEOID',
+            'statefp': 'STATEFP',
+            'countyfp': 'COUNTYFP',
+            'cousubfp': 'COUSUBFP',
+            'cousubns': 'COUSUBNS',
+            'affgeoid': 'AFFGEOID',
+            'aland': 'ALAND',
+            'awater': 'AWATER',
+        }
+    },
+    'place': {
+        'model': models.Place,
+        'file_name': 'cb_2017_42_place_500k',
+        'mapping': {
+            'name': 'NAME',
+            'geom': 'MULTIPOLYGON',
+            'geoid': 'GEOID',
+            'statefp': 'STATEFP',
+            'placefp': 'PLACEFP',
+            'placens': 'PLACENS',
+            'affgeoid': 'AFFGEOID',
+            'aland': 'ALAND',
+            'awater': 'AWATER',
+        }
+    },
+    'puma': {
+        'model': models.Puma,
+        'file_name': 'cb_2017_42_puma10_500k',
+        'mapping': {
+            'name': 'NAME10',
+            'geom': 'MULTIPOLYGON',
+            'geoid': 'GEOID10',
+            'statefp': 'STATEFP10',
+            'pumace': 'PUMACE10',
+            'affgeoid': 'AFFGEOID10',
+            'aland': 'ALAND10',
+            'awater': 'AWATER10',
+        }
+    },
+    'school_district': {
+        'model': models.SchoolDistrict,
+        'file_name': 'cb_2017_42_unsd_500k',
+        'mapping': {
+            'name': 'NAME',
+            'geom': 'MULTIPOLYGON',
+            'geoid': 'GEOID',
+            'statefp': 'STATEFP',
+            'unsdlea': 'UNSDLEA',
+            'affgeoid': 'AFFGEOID',
+            'aland': 'ALAND',
+            'awater': 'AWATER',
+        }
+    },
+    'state_house': {
+        'model': models.StateHouse,
+        'file_name': 'cb_2017_42_sldl_500k',
+        'mapping': {
+            'name': 'NAME',
+            'geom': 'MULTIPOLYGON',
+            'geoid': 'GEOID',
+            'statefp': 'STATEFP',
+            'sldlst': 'SLDLST',
+            'affgeoid': 'AFFGEOID',
+            'aland': 'ALAND',
+            'awater': 'AWATER',
+        }
+    },
+    'state_senate': {
+        'model': models.StateSenate,
+        'file_name': 'cb_2017_42_sldu_500k',
+        'mapping': {
+            'name': 'NAME',
+            'geom': 'MULTIPOLYGON',
+            'geoid': 'GEOID',
+            'statefp': 'STATEFP',
+            'sldust': 'SLDUST',
+            'affgeoid': 'AFFGEOID',
+            'aland': 'ALAND',
+            'awater': 'AWATER',
+        }
+    },
+    'county': {
+        'model': models.County,
+        'file_name': 'cb_2017_us_county_500k',
+        'mapping': {
+            'name': 'NAME',
+            'geom': 'MULTIPOLYGON',
+            'geoid': 'GEOID',
+            'statefp': 'STATEFP',
+            'countyfp': 'COUNTYFP',
+            'countyns': 'COUNTYNS',
+            'affgeoid': 'AFFGEOID',
+            'lsad': 'LSAD',
+            'aland': 'ALAND',
+            'awater': 'AWATER',
+        }
+    },
 
 }
 

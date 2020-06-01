@@ -1,14 +1,24 @@
 from rest_framework import serializers
 
 from assets.serializers import AssetSerializer, LocationSerializer
-from community_resources.models import Resource, ResourceCategory, Population, Community
+from community_resources.models import Resource, ResourceCategory, Population, Community, CategorySection
 from geo.serializers import GeographySerializer
+from geo.models import Neighborhood
 
 
 class ResourceCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ResourceCategory
-        fields = ['name', 'slug', 'description']
+        fields = ['name', 'slug', 'description', 'image']
+        
+
+class CategorySectionSerializer(serializers.ModelSerializer):
+    category = ResourceCategorySerializer()
+
+    class Meta:
+        model = CategorySection
+        fields = ['category', 'content']
+
 
 
 class PopulationSerializer(serializers.ModelSerializer):
@@ -43,10 +53,18 @@ class ResourceSerializer(serializers.ModelSerializer):
         ]
 
 
+class NeighborhoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Neighborhood
+        fields = ['name',]
+
 class CommunitySerializer(serializers.ModelSerializer):
-    neighborhoods = GeographySerializer(many=True)
+    # neighborhoods = GeographySerializer(many=True)
+    neighborhoods = NeighborhoodSerializer(many=True)
+    
     resources = ResourceSerializer(many=True)
     resource_categories = ResourceCategorySerializer(many=True)
+    category_sections = CategorySectionSerializer(many=True)
 
     class Meta:
         model = Community
@@ -57,5 +75,6 @@ class CommunitySerializer(serializers.ModelSerializer):
             'resource_categories',
             'top_section_content',
             'alert_content',
+            'category_sections',
             'resources',
         ]

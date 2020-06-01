@@ -14,8 +14,4 @@ class Migration(migrations.Migration):
             name='category',
             options={'verbose_name_plural': 'categories'},
         ),
-        migrations.RemoveField(
-            model_name='asset',
-            name='category',
-        ),
     ]

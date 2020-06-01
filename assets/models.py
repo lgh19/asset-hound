@@ -143,7 +143,7 @@ class Asset(models.Model):
     do_not_display = models.BooleanField(null=True, blank=True)
 
     asset_types = models.ManyToManyField('AssetType')
-    category = models.ManyToManyField('Category')
+    # category = models.ManyToManyField('Category')
     location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, blank=True)
     organization = models.ForeignKey('Organization', on_delete=models.PROTECT, null=True, blank=True)
     services = models.ManyToManyField('ProvidedService', blank=True)

@@ -26,6 +26,7 @@ class ResourceCategory(models.Model, WithNameSlug):
     """ Resource Categories """
     name = models.CharField(max_length=100)
     description = models.TextField()
+    image = models.ImageField(null=True, upload_to="icons")
 
     class Meta:
         verbose_name_plural = 'Resource Categories'
@@ -46,7 +47,7 @@ class Population(models.Model, WithNameSlug):
 class Resource(models.Model, WithNameSlug):
     """ Individual services rendered, supplies distributed or other resources """
     name = models.CharField(max_length=500)
-    description = models.TextField()
+    description = RichTextField()
     website = models.URLField(null=True, blank=True)
     phone_number = PhoneNumberField(null=True, blank=True)
 
@@ -59,7 +60,7 @@ class Resource(models.Model, WithNameSlug):
     other_locations = models.ManyToManyField("assets.Location", related_name='resources', blank=True)
 
     # Timing
-    recurrence = RecurrenceField()
+    recurrence = RecurrenceField(null=True, blank=True)
 
     # Publishing info
     priority = models.IntegerField(
