@@ -58,11 +58,12 @@ def type_or_none(row, field, desired_type):
 def standardize_phone(phone: str):
     result_number = None
     try:
-        candidate_phone = '+1' + re.sub(r'\D', '', phone)
-        phone_number = phonenumbers.parse(candidate_phone)
+        candidate_phone = '+1' + re.sub(r'\D', '', phone) # This actually adds a leading '+1'
+        # even if the phone number already starts with a 1, but the phonenumbers.parse function is
+        phone_number = phonenumbers.parse(candidate_phone) # able to correct this.
         if phonenumbers.is_valid_number(phone_number):
             result_number = f'+{phone_number.country_code}{phone_number.national_number}'
-    except Exception as e:
+    except Exception as e: # This is complaining for unknown reasons about what appear to be valid phone numbers.
         print(e)
     print(result_number)
     return result_number
