@@ -69,7 +69,7 @@ def standardize_phone(phone: str):
 
 
 class Command(BaseCommand):
-    help = 'Loads assets from csv'
+    help = 'Loads assets from a CSV file into the database'
 
     def handle(self, *args, **options):
 

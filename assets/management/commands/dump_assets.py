@@ -23,7 +23,7 @@ def to_dict_for_csv(asset: Asset):
 
 
 class Command(BaseCommand):
-    help = 'Loads assets from csv'
+    help = 'Dump assets from database to a CSV file'
 
     def handle(self, *args, **options):
         output_file = os.path.join(settings.BASE_DIR, 'asset_dump.csv');
