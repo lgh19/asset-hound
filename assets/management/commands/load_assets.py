@@ -101,6 +101,7 @@ class Command(BaseCommand):
                         'available_transportation': value_or_none(row, 'location_transportation'),
                         'latitude': type_or_none(row, 'latitude', float),
                         'longitude': type_or_none(row, 'longitude', float),
+                        'geocoding_properties': value_or_none(row, 'geocoding_properties'),
                         'parcel_id': value_or_none(row, 'parcel_id'),
                         'residence': boolify(value_or_none(row, 'residence')),
                     }
@@ -152,7 +153,8 @@ class Command(BaseCommand):
                     location=location,
                     organization=organization,
                     data_source=data_source,
-                    primary_key_from_rocket=value_or_none(row, 'primary_key_from_rocket')
+                    primary_key_from_rocket=value_or_none(row, 'primary_key_from_rocket'),
+                    synthesized_key=value_or_none(row, 'synthesized_key'),
                 )
 
                 asset.asset_types.set(asset_types)
