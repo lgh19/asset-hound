@@ -87,10 +87,11 @@ class AssetAdmin(admin.ModelAdmin):
         # 'wifi_network',
         # 'computers_available',
         # 'open_to_public',
-        'sensitive',
+        # 'sensitive',
         'date_entered',
         'last_updated',
         'data_source',
+        'primary_key_from_rocket',
     )
     # list_filter = (
     #     'organization',
