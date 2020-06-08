@@ -70,11 +70,16 @@ def standardize_phone(phone: str):
 
 
 class Command(BaseCommand):
-    help = 'Loads assets from a CSV file into the database'
+    help = 'Loads assets from a CSV file into the database, which may be specified by a command-line argument.'
+
+    def add_arguments(self, parser): # Necessary boilerplate for accessing args.
+        parser.add_argument('args', nargs='*')
 
     def handle(self, *args, **options):
-
-        file_name = os.path.join(settings.BASE_DIR, 'update.csv')
+        if len(args) == 0:
+            file_name = os.path.join(settings.BASE_DIR, 'update.csv')
+        else:
+            file_name = os.path.join(settings.BASE_DIR, args[0])
         with open(file_name) as f:
             dr = csv.DictReader(f)
             count = 0
