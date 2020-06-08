@@ -76,6 +76,7 @@ class Command(BaseCommand):
         file_name = os.path.join(settings.BASE_DIR, 'update.csv')
         with open(file_name) as f:
             dr = csv.DictReader(f)
+            count = 0
             for row in dr:
                 # get or create a new org
                 organization = Organization.objects.get_or_create(
@@ -154,4 +155,6 @@ class Command(BaseCommand):
                 asset.accessibility_features.set(accessibility_features)
                 asset.hard_to_count_population.set(hard_to_count_pops)
                 asset.save()
-                print('Created', asset)
+                count += 1
+                print('Loaded', asset)
+            print(f"Loaded {count} assets. (Some may have been pre-existing.)")
