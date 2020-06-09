@@ -1,0 +1,5 @@
+# Requirements for development only
+# primarily dev tool libraries and such.
+# make sure to add them to the `DEV_APPS` in `local_settings.py` to use them
+
+django-extensions==2.2.9git stat

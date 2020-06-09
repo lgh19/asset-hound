@@ -42,7 +42,7 @@ class LocationSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Location
         geo_field = 'geom'
-        fields = ['name', 'available_transportation', 'parent_location']
+        fields = ['name', 'available_transportation', 'parent_location', 'full_address']
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
@@ -120,6 +120,7 @@ class AssetSerializer(serializers.ModelSerializer):
 class AssetListSerializer(serializers.ModelSerializer):
     asset_types = AssetTypeSerializer(many=True)
     category = CategorySerializer()
+
     class Meta:
         model = Asset
         fields = [

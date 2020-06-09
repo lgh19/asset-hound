@@ -3,10 +3,19 @@ venv/
 env/
 __pycache__/
 
+.DS_Store
+
 asset_hound/local_settings.py
+asset_hound/asset_hound_uwsgi.ini
+asset_hound/uwsgi_params
+
 *.swp
 *.pyc
 TODO
 notes.txt
 
 data/
+media/
+static/
+
+extra/parameters/
