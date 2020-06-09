@@ -18,3 +18,5 @@ DB_HOST = 'localhost'
 
 GEOCODIO_API_KEY = 'api-key-goes-here'
 
+# App names that will be appended to `INSTALLED_APPS`
+DEV_APPS = []
