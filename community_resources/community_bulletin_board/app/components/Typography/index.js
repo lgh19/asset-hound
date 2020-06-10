@@ -41,10 +41,13 @@ const componentMapping = {
   h6: 'h6',
 };
 
-
-function Typography({ variant, component, children }) {
+function Typography({ variant, component, children, ...otherProps }) {
   const Elem = component || componentMapping[variant];
-  return <Elem className={`typography-${variant}`}>{children}</Elem>;
+  return (
+    <Elem className={`typography-${variant}`} {...otherProps}>
+      {children}
+    </Elem>
+  );
 }
 
 Typography.propTypes = {

@@ -6,6 +6,8 @@ from django.utils.text import slugify
 from phonenumber_field.modelfields import PhoneNumberField
 from recurrence.fields import RecurrenceField
 
+from assets.models import Location
+
 
 class Priority(models.IntegerChoices):
     TOP = 0
@@ -48,8 +50,11 @@ class Resource(models.Model, WithNameSlug):
     """ Individual services rendered, supplies distributed or other resources """
     name = models.CharField(max_length=500)
     description = RichTextField()
-    website = models.URLField(null=True, blank=True)
+
+    # Contact Info
     phone_number = PhoneNumberField(null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    website = models.URLField(null=True, blank=True)
 
     # Categorization
     categories = models.ManyToManyField('ResourceCategory', related_name='resources')
@@ -58,7 +63,7 @@ class Resource(models.Model, WithNameSlug):
     # Locations
     assets = models.ManyToManyField("assets.Asset", related_name='resources', blank=True)
     other_locations = models.ManyToManyField("assets.Location", related_name='resources', blank=True)
-
+    virtual_only = models.BooleanField()
     # Timing
     recurrence = RecurrenceField(null=True, blank=True)
 
@@ -86,6 +91,10 @@ class Resource(models.Model, WithNameSlug):
     @property
     def publishable(self):
         return self.published and (self.start_date <= timezone.now() < self.stop_date)
+
+    @property
+    def locations(self):
+        return Location.objects.filter(asset__in=self.assets.all()) | self.other_locations.all()
 
     class Meta:
         ordering = ('priority',)

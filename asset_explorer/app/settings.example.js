@@ -14,5 +14,4 @@
  * If you have a mapbox account, get one here: https://account.mapbox.com/access-tokens
  * @type {string}
  */
-// eslint-disable-next-line no-unused-vars
-const MAPBOX_API_TOKEN = 'pk.some_token_string';
+export const MAPBOX_API_TOKEN = 'pk.some_token_string';

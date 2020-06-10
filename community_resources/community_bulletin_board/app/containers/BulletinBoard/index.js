@@ -14,11 +14,15 @@ import { compose } from 'redux';
 
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
-import { makeSelectBulletinBoardCommunity } from './selectors';
+import { Layer, Source } from 'react-map-gl';
+import {
+  makeSelectBulletinBoardAllLocationsGeoJSON,
+  makeSelectBulletinBoardCommunity,
+} from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 // import messages from './messages';
-import { localPropTypes } from '../../utils';
+import { filterResourcesByCategory, localPropTypes } from '../../utils';
 // import Header from '../../components/Header';
 import Typography from '../../components/Typography';
 import { getCommunityDataRequest } from './actions';
@@ -26,8 +30,16 @@ import Board from './Board';
 import Content from '../../components/Content';
 import ResourceList from '../../components/ResourceList';
 import NavMenu from '../../components/NavMenu';
+import CategorySection from '../../components/CategorySection';
+import Map from '../../components/Map';
+import { allLocationsLayer } from './layers';
+import ResourceMap from '../../components/ResourceMap';
 
-export function BulletinBoard({ community, handleRequestCommunityData }) {
+export function BulletinBoard({
+  community,
+  allLocations,
+  handleRequestCommunityData,
+}) {
   useInjectReducer({ key: 'bulletinBoard', reducer });
   useInjectSaga({ key: 'bulletinBoard', saga });
 
@@ -36,6 +48,7 @@ export function BulletinBoard({ community, handleRequestCommunityData }) {
     handleRequestCommunityData(1);
   }, []);
 
+  // handle no data
   if (!community)
     return (
       <div>
@@ -46,24 +59,36 @@ export function BulletinBoard({ community, handleRequestCommunityData }) {
   return (
     <Board>
       <Helmet>
-        <title>Resources</title>
+        <title>{community.name} Resources</title>
         <meta name="description" content={`Listing of available resources}.`} />
       </Helmet>
       <Typography.H1>{community.name} Resources</Typography.H1>
       <Content html={community.topSectionContent} />
       <NavMenu sections={community.resourceCategories} />
-      <ResourceList resources={community.resources} />
+      <Typography.H2>Or by location</Typography.H2>
+      <ResourceMap data={allLocations} />
+
+      {community.resourceCategories.map(category => (
+        <CategorySection category={category}>
+          <ResourceList
+            category={category}
+            resources={filterResourcesByCategory(community.resources, category)}
+          />
+        </CategorySection>
+      ))}
     </Board>
   );
 }
 
 BulletinBoard.propTypes = {
   community: localPropTypes.community,
+  allLocations: localPropTypes.locations,
   handleRequestCommunityData: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
   community: makeSelectBulletinBoardCommunity(),
+  allLocations: makeSelectBulletinBoardAllLocationsGeoJSON(),
 });
 
 function mapDispatchToProps(dispatch) {

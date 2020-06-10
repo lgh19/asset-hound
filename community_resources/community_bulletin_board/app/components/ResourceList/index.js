@@ -10,26 +10,19 @@ import styled from 'styled-components';
 
 import ResourceListItem from './ResourceListItem';
 import { localPropTypes } from '../../utils';
+import Typography from '../Typography';
 
-const Wrapper = styled.ul`
+const List = styled.ul`
   list-style: none;
   padding-left: 0;
 `;
 
-const Divider = styled.hr`
-  color: dimgray;
-`;
-
 function ResourceList({ resources }) {
-  const lastIndex = resources.length - 1;
   return (
-    <Wrapper>
+    <List>
       {!!resources &&
-        resources.map((resource, i) => [
-          <ResourceListItem resource={resource} />,
-          i < lastIndex ? <Divider /> : null,
-        ])}
-    </Wrapper>
+        resources.map(resource => <ResourceListItem resource={resource} />)}
+    </List>
   );
 }
 

@@ -6,8 +6,8 @@
  *
  */
 
-// const HOST = 'https://assets.wprdc.org';
-const HOST = 'http://localhost:8000';
+const HOST = 'https://assets.wprdc.org';
+// const HOST = 'http://localhost:8000';
 
 const RESOURCE_DIR = 'resources';
 const ASSET_DIR = 'api';
@@ -91,7 +91,7 @@ function callApi(
     noBody = true;
   }
 
-  const idPath = [null, undefined].includes(id) ? '' : `${id}/`;
+  const idPath = [null, undefined].includes(id) ? '' : `${id}`;
   const urlParams = serializeParams(params);
   const url = `${HOST}/${endpoint}/${idPath}${urlParams}`;
 

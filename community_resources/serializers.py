@@ -10,7 +10,7 @@ class ResourceCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ResourceCategory
         fields = ['name', 'slug', 'description', 'image']
-        
+
 
 class CategorySectionSerializer(serializers.ModelSerializer):
     category = ResourceCategorySerializer()
@@ -18,7 +18,6 @@ class CategorySectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategorySection
         fields = ['category', 'content']
-
 
 
 class PopulationSerializer(serializers.ModelSerializer):
@@ -30,8 +29,7 @@ class PopulationSerializer(serializers.ModelSerializer):
 class ResourceSerializer(serializers.ModelSerializer):
     categories = ResourceCategorySerializer(many=True)
     populations_served = PopulationSerializer(many=True)
-    assets = AssetSerializer(many=True)
-    other_locations = LocationSerializer(many=True)
+    locations = LocationSerializer(many=True)
 
     class Meta:
         model = Resource
@@ -41,10 +39,10 @@ class ResourceSerializer(serializers.ModelSerializer):
             'description',
             'website',
             'phone_number',
+            'email',
             'categories',
             'populations_served',
-            'assets',
-            'other_locations',
+            'locations',
             'recurrence',
             'priority',
             'published',
@@ -56,12 +54,13 @@ class ResourceSerializer(serializers.ModelSerializer):
 class NeighborhoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Neighborhood
-        fields = ['name',]
+        fields = ['name', ]
+
 
 class CommunitySerializer(serializers.ModelSerializer):
     # neighborhoods = GeographySerializer(many=True)
     neighborhoods = NeighborhoodSerializer(many=True)
-    
+
     resources = ResourceSerializer(many=True)
     resource_categories = ResourceCategorySerializer(many=True)
     category_sections = CategorySectionSerializer(many=True)

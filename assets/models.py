@@ -55,6 +55,10 @@ class Location(models.Model):
     longitude = models.FloatField(null=True, blank=True)
     geom = models.PointField(null=True)
 
+    @property
+    def full_address(self):
+        return f'{self.street_address}, {self.city} {self.state} {self.zip_code}'
+
     def __str__(self):
         return self.name
 

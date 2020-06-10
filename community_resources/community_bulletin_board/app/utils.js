@@ -6,6 +6,8 @@
  *
  */
 import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
+import React from 'react';
 
 /**
  * *Enum of localizability types
@@ -61,7 +63,13 @@ const locationShape = {
     name: PropTypes.string.isRequired,
     availableTransportation: PropTypes.string,
     parentLocation: PropTypes.shape(locationShape),
+    fullAddress: PropTypes.string,
   }).isRequired,
+};
+
+const locationsShape = {
+  type: PropTypes.oneOf(['FeatureCollection']),
+  features: PropTypes.arrayOf(PropTypes.shape(locationShape)),
 };
 
 const organizationShape = {
@@ -112,10 +120,11 @@ const resourceShape = {
   description: PropTypes.string,
   website: PropTypes.string,
   phoneNumber: PropTypes.string,
+  email: PropTypes.string,
   categories: PropTypes.arrayOf(PropTypes.shape(categoryShape)),
   populationsServed: PropTypes.arrayOf(PropTypes.shape(populationShape)),
   assets: PropTypes.arrayOf(PropTypes.shape(assetShape)),
-  otherLocations: PropTypes.arrayOf(PropTypes.shape(locationShape)),
+  locations: PropTypes.shape(locationsShape),
   virtualOnly: PropTypes.bool,
   recurrence: PropTypes.string,
 };
@@ -154,6 +163,7 @@ export const localPropTypes = {
   community: PropTypes.shape(communityShape),
   category: PropTypes.shape(categoryShape),
   population: PropTypes.shape(populationShape),
+  locations: PropTypes.shape(locationsShape),
 };
 
 /**
@@ -166,4 +176,22 @@ export function parseHref(href) {
   const parser = document.createElement('a');
   parser.href = href;
   return parser;
+}
+
+/**
+ * Filters a list of resources based on a target category.
+ *
+ * Only resources that have the target category as one of their categories
+ * @param resources
+ * @param category
+ * @returns {*}
+ */
+export function filterResourcesByCategory(resources, category) {
+  return resources.filter(r =>
+    r.categories.reduce(
+      (inCategorySoFar, currentCategory) =>
+        inCategorySoFar || currentCategory.slug === category.slug,
+      false,
+    ),
+  );
 }

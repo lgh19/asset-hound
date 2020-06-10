@@ -19,8 +19,8 @@ const Button = styled.a`
 
   &:link,
   &:visited {
-    background-color: gainsboro;
-    color: white;
+    background-color: #f1faee;
+    color: #1d3557;
     padding: 14px 25px;
     text-decoration: none;
     display: inline-block;
@@ -28,7 +28,7 @@ const Button = styled.a`
 
   &:hover,
   &:active {
-    background-color: grey;
+    background-color: #a8dadc;
   }
 
   &:hover {
@@ -49,13 +49,17 @@ const TextDiv = styled.div`
   flex: 0 1;
 `;
 
+const Icon = styled.img`
+  height: 48px;
+`;
+
 function NavMenuItem({ section }) {
   return (
     <ListItem>
       <Button title={section.name} href={`#${section.slug}`}>
         <ButtonContent>
           <IconDiv>
-            <img src="https://via.placeholder.com/150" alt="test" />
+            <Icon src={section.image} alt={section.name} />
           </IconDiv>
           <TextDiv>{section.name}</TextDiv>
         </ButtonContent>
