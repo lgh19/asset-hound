@@ -78,6 +78,7 @@
     "intl": "1.2.5",
     "invariant": "2.2.4",
     "ip": "1.1.5",
+    "libphonenumber-js": "^1.7.52",
     "lodash": "^4.17.15",
     "minimist": "^1.2.5",
     "prop-types": "15.7.2",
@@ -91,6 +92,7 @@
     "redux": "4.0.1",
     "redux-saga": "1.0.2",
     "reselect": "4.0.0",
+    "rrule": "^2.6.4",
     "sanitize.css": "8.0.0",
     "styled-components": "4.2.0"
   },
@@ -143,7 +145,6 @@
     "ngrok": "3.1.1",
     "node-plop": "0.18.0",
     "null-loader": "0.1.1",
-    "offline-plugin": "5.0.6",
     "plop": "2.3.0",
     "pre-commit": "1.2.2",
     "prettier": "1.17.0",

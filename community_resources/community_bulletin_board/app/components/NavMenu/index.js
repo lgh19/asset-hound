@@ -10,12 +10,18 @@ import styled from 'styled-components';
 
 import NavMenuItem from './NavMenuitem';
 import { localPropTypes } from '../../utils';
+import Typography from '../Typography';
 
-const Wrapper = styled.nav``;
+const Wrapper = styled.div``;
+
+const Nav = styled.nav`
+  padding: 4px 8px;
+`;
 
 const MenuList = styled.ol`
+  padding-left: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   grid-gap: 10px;
   grid-auto-rows: minmax(100px, auto);
 `;
@@ -23,11 +29,14 @@ const MenuList = styled.ol`
 function NavMenu({ sections }) {
   return (
     <Wrapper>
-      <MenuList>
-        {sections.map(section => (
-          <NavMenuItem key={section.slug} section={section} />
-        ))}
-      </MenuList>
+      <Typography.H2>Find resources for a specific topic</Typography.H2>
+      <Nav>
+        <MenuList>
+          {sections.map(section => (
+            <NavMenuItem key={section.slug} section={section} />
+          ))}
+        </MenuList>
+      </Nav>
     </Wrapper>
   );
 }

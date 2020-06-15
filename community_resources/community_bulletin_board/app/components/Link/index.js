@@ -51,4 +51,4 @@ Link.propTypes = {
   children: PropTypes.node,
 };
 
-export default memo(Link);
+export default Link;

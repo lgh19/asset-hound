@@ -18,7 +18,6 @@ import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 import history from 'utils/history';
 import 'sanitize.css/sanitize.css';
-
 // Import root app
 import App from 'containers/App';
 
@@ -82,5 +81,11 @@ if (!window.Intl) {
 // it's not most important operation and if main code fails,
 // we do not want it installed
 if (process.env.NODE_ENV === 'production') {
-  require('offline-plugin/runtime').install(); // eslint-disable-line global-require
+  const OfflinePluginRuntime = require('offline-plugin/runtime')
+  OfflinePluginRuntime.install({
+    onUpdateReady: () => {
+      // Tells to new SW to take control immediately
+      OfflinePluginRuntime.applyUpdate();
+    },
+  }); // eslint-disable-line global-require
 }

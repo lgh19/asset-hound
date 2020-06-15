@@ -32,7 +32,7 @@ export const Basemaps = {
 export const DEFAULT_VIEWPORT = {
   width: '100%',
   height: '100%',
-  latitude: 40.440624,
-  longitude: -78.5,
-  zoom: 8,
+  latitude: 40.44653762202283,
+  longitude: -79.97769139287226,
+  zoom: 13.24866190262866,
 };

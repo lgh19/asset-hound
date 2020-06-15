@@ -63,7 +63,7 @@ class Resource(models.Model, WithNameSlug):
     # Locations
     assets = models.ManyToManyField("assets.Asset", related_name='resources', blank=True)
     other_locations = models.ManyToManyField("assets.Location", related_name='resources', blank=True)
-
+    virtual_only = models.BooleanField()
     # Timing
     recurrence = RecurrenceField(null=True, blank=True)
 

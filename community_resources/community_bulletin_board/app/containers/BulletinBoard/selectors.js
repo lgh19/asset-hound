@@ -7,24 +7,36 @@ import { initialState } from './reducer';
 
 const selectBulletinBoardDomain = state => state.bulletinBoard || initialState;
 
-/**
- * Other specific selectors
- */
+const reduceResourcesIntoFeatures = (features, resource) =>
+  features.concat(
+    resource.locations.features.map(({ properties, ...other }) => ({
+      ...other,
+      properties: {
+        ...properties,
+        resource: resource.name,
+        slug: resource.slug,
+      },
+    })),
+  );
+
+const makeSelectBulletinBoardAllLocationsGeoJSON = () =>
+  createSelector(
+    selectBulletinBoardDomain,
+    substate => ({
+      type: 'FeatureCollection',
+      features: substate.community
+        ? substate.community.resources.reduce(reduceResourcesIntoFeatures, [])
+        : [],
+    }),
+  );
+
 const makeSelectBulletinBoardCommunity = () =>
   createSelector(
     selectBulletinBoardDomain,
     substate => substate.community,
   );
 
-/**
- * Default selector used by BulletinBoard
- */
-
-// const makeSelectBulletinBoard = () =>
-//   createSelector(
-//     selectBulletinBoardDomain,
-//     substate => substate,
-//   );
-//
-// export default makeSelectBulletinBoard;
-export { makeSelectBulletinBoardCommunity };
+export {
+  makeSelectBulletinBoardCommunity,
+  makeSelectBulletinBoardAllLocationsGeoJSON,
+};

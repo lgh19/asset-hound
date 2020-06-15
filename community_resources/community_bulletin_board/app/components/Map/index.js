@@ -21,7 +21,6 @@ function Map({
   const [viewport, setViewport] = useState(
     Object.assign({}, startingViewport, DEFAULT_VIEWPORT),
   );
-
   return (
     <ReactMapGL
       mapboxApiAccessToken={MAPBOX_API_TOKEN}

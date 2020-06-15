@@ -15,16 +15,15 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Public Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
-  #app {
-    background-color: #fafafa;
-    min-height: 100%;
-    min-width: 100%;
-  }
-
   p,
   label {
     font-family: 'Muli', Aria, sans-serif;
     line-height: 1.5em;
+  }
+
+  .mapboxgl-popup, .mapboxgl-popup-content {
+    background: transparent;
+    box-shadow: none;
   }
 `;
 
