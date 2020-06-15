@@ -58,22 +58,30 @@ def type_or_none(row, field, desired_type):
 def standardize_phone(phone: str):
     result_number = None
     try:
-        candidate_phone = '+1' + re.sub(r'\D', '', phone)
-        phone_number = phonenumbers.parse(candidate_phone)
+        candidate_phone = '+1' + re.sub(r'\D', '', phone) # This actually adds a leading '+1'
+        # even if the phone number already starts with a 1, but the phonenumbers.parse function is
+        phone_number = phonenumbers.parse(candidate_phone) # able to correct this.
         if phonenumbers.is_valid_number(phone_number):
             result_number = f'+{phone_number.country_code}{phone_number.national_number}'
-    except Exception as e:
+    except Exception as e: # This is complaining for unknown reasons about what appear to be valid phone numbers.
         print(e)
     print(result_number)
     return result_number
 
 
 class Command(BaseCommand):
-    help = 'Loads assets from csv'
+    help = 'Loads assets from a CSV file, which may be specified by a command-line argument.'
+
+    def add_arguments(self, parser): # Necessary boilerplate for accessing args.
+        parser.add_argument('args', nargs='*')
 
     def handle(self, *args, **options):
 
-        file_name = os.path.join(settings.BASE_DIR, 'update.csv')
+        if len(args) == 0:
+            file_name = os.path.join(settings.BASE_DIR, 'update.csv')
+        else:
+            file_name = os.path.join(settings.BASE_DIR, args[0])
+
         with open(file_name) as f:
             dr = csv.DictReader(f)
             for row in dr:
@@ -145,7 +153,8 @@ class Command(BaseCommand):
                     location=location,
                     organization=organization,
                     data_source=data_source,
-                    primary_key_from_rocket=value_or_none(row, 'primary_key_from_rocket')
+                    primary_key_from_rocket=value_or_none(row, 'primary_key_from_rocket'),
+                    synthesized_key=value_or_none(row, 'synthesized_key'),
                 )
 
                 asset.asset_types.set(asset_types)

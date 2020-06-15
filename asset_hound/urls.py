@@ -18,6 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # api/<version>/<app>/<endpoints>
     path('api/dev/assets/', include('assets.urls')),
-    path('api/dev/resources/', include('community_resources.urls')),
+    path('api/dev/resources/', include('community_resources.urls'))
 ]

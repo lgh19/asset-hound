@@ -6,7 +6,7 @@
  *
  */
 
-const HOST = 'https://assets.wprdc.org/api';
+const HOST = 'https://assets.wprdc.org/api/dev/assets';
 
 /**
  * Enum for API endpoints.

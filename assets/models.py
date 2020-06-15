@@ -159,6 +159,7 @@ class Asset(models.Model):
     etl_notes = models.TextField(null=True, blank=True)  # notes from Rocket
     notes = models.TextField(max_length=1000, null=True, blank=True)
     primary_key_from_rocket = models.TextField(null=True, blank=True)
+    synthesized_key = models.TextField(null=True, blank=True)
     date_entered = models.DateTimeField(editable=False, auto_now_add=True)
     last_updated = models.DateTimeField(editable=False, auto_now=True)
 
