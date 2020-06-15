@@ -6,16 +6,17 @@
  *
  */
 
-const HOST = 'https://assets.wprdc.org';
-// const HOST = 'http://localhost:8000';
+const HOST = 'https://assets.wprdc.org/api';
 
-const RESOURCE_DIR = 'resources';
-const ASSET_DIR = 'api';
+const VERSION = 'dev';
+
+const RESOURCE_DIR = `${VERSION}/resources`;
+const ASSET_DIR = `${VERSION}/assets`;
 
 /**
  * Enum for API endpoints.
  * @readonly
- * @enum string}
+ * @enum [string}
  */
 const Endpoints = {
   COMMUNITY: `${RESOURCE_DIR}/community`,
