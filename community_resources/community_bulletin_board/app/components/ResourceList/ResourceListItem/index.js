@@ -12,6 +12,7 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { localPropTypes, withMaxWidth } from '../../../utils';
 import Link from '../../Link';
 import Content from '../../Content';
+import Recurrence from '../../Recurrence';
 
 const Wrapper = styled.li`
   padding: 4px 8px;
@@ -90,6 +91,14 @@ function ResourceListItem({ resource }) {
           </Link>
         </Subtitle>
       ))}
+      {!!resource.recurrence && (
+        <Subtitle>
+          <Emoji role="img" aria-label="recurrence">
+            🗓
+          </Emoji>
+          <Recurrence rrule={resource.recurrence} />
+        </Subtitle>
+      )}
       <Content html={resource.description} />
     </Wrapper>
   );

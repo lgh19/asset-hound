@@ -64,8 +64,20 @@ class Resource(models.Model, WithNameSlug):
     assets = models.ManyToManyField("assets.Asset", related_name='resources', blank=True)
     other_locations = models.ManyToManyField("assets.Location", related_name='resources', blank=True)
     virtual_only = models.BooleanField()
+
     # Timing
     recurrence = RecurrenceField(null=True, blank=True)
+    all_day = models.BooleanField(default=False)
+    start_time = models.TimeField(
+        help_text='If you selected "all day,"  you can leave this blank.',
+        null=True,
+        blank=True
+    )
+    end_time = models.TimeField(
+        help_text='If you selected "all day,"  you can leave this blank.',
+        null=True,
+        blank=True
+    )
 
     # Publishing info
     priority = models.IntegerField(
@@ -74,11 +86,13 @@ class Resource(models.Model, WithNameSlug):
         default=Priority.MEDIUM,
     )
     published = models.BooleanField(help_text="When checked, activity will show up on the site.", default=False)
-    start_date = models.DateField(
+    start_publish_date = models.DateField(
+        "Start displaying on",
         help_text="After this date, the resource will show up on the site (default is today)",
         default=timezone.now
     )
-    stop_date = models.DateField(
+    stop_publish_date = models.DateField(
+        "Stop displaying after",
         help_text="After this date, the resource will stop showing up on the site (leave blank to keep up indefinitely)",
         null=True,
         blank=True
