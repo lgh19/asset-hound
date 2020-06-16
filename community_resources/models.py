@@ -64,8 +64,20 @@ class Resource(models.Model, WithNameSlug):
     assets = models.ManyToManyField("assets.Asset", related_name='resources', blank=True)
     other_locations = models.ManyToManyField("assets.Location", related_name='resources', blank=True)
     virtual_only = models.BooleanField()
+
     # Timing
     recurrence = RecurrenceField(null=True, blank=True)
+    all_day = models.BooleanField(default=False)
+    start_time = models.TimeField(
+        help_text='If you selected "all day,"  you can leave this blank.',
+        null=True,
+        blank=True
+    )
+    end_time = models.TimeField(
+        help_text='If you selected "all day,"  you can leave this blank.',
+        null=True,
+        blank=True
+    )
 
     # Publishing info
     priority = models.IntegerField(
