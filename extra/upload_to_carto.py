@@ -118,15 +118,22 @@ else:
         raise ValueError("Not yet coded to handle all asset types at once.")
 
     reader = csv.DictReader(open(local_filepath))
-    records_per_request = 3
+    records_per_request = 100
     batch_list = []
+    pushed = 0
     for k, row in enumerate(reader):
         if asset_types is None or row['asset_type'] in asset_types:
             batch_list.append(row)
             if len(batch_list) == records_per_request:
                 # push records
                 print(f"Pushing {len(batch_list)} assets.")
+                pushed += len(batch_list)
                 insert_new_assets(sql, table_name, batch_list)
                 batch_list = []
-    if k > 0:
+    if len(batch_list) > 0:
+        print(f"Pushing {len(batch_list)} assets.")
+        insert_new_assets(sql, table_name, batch_list)
+        pushed += len(batch_list)
+
+    if pushed > 0:
         fix_carto_geofields(sql, table_name)
