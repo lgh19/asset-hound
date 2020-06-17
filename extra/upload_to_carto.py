@@ -1,7 +1,8 @@
-import sys, os, csv
+import sys, os, csv, time
 from carto.auth import APIKeyAuthClient
 from carto.sql import SQLClient
 from parameters.credentials import CARTO_API_KEY
+from pprint import pprint
 
 USERNAME = "wprdc"
 USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
@@ -19,11 +20,36 @@ def delete_assets_by_type(sql, table_name, asset_type):
      results = sql.send(f"DELETE from {table_name} WHERE asset_type='{asset_type}'")
      return results
 
+def boolean_string(b):
+    if b is True:
+        return "TRUE" # Valid Postgres values for a boolean true value : TRUE, 't', 'true', 'y', 'yes', 'on', '1'
+    if b is False:
+        return "FALSE"
+    raise ValueError(f"It's unclear what to do with a boolean value of {b}.")
+
 def values_string(row, fields):
     values = []
 
     for field in fields:
-        if field in ['id', 'latitude', 'longitude']:
+        if field in ['sensitive', 'do_not_display']:
+            if field in row:
+                if type(row[field]) == bool:
+                    values.append(boolean_string(row[field]))
+                elif row[field] in ['True', 'False']:
+                    values.append(row[field].upper())
+                elif row[field] in ['', None]:
+                    values.append("NULL") # What the oligatory default value should be kind of
+                    # depends on how the asset_hound front end is coded.
+                    # BUT there was an instance where NULL actually resulted in an
+                    # asset showing up on the map.
+                else:
+                    raise ValueError(f"It's unclear what to do with a boolean value of {row[field]}.")
+            else: # I theorized that there needed to be values for these fields because I thought null values
+                # caused them to not make it from the Carto dataset to the assets.wprdc.org map.
+                # This was wrong. There are records already on the map that have values of "null" for
+                # the 'sensitive' field and "" for the do_not_display field.
+                values.append("FALSE")
+        elif field in ['id', 'latitude', 'longitude']:
             values.append(row[field])
         else:
             values.append(f"'{row[field]}'")
@@ -43,12 +69,11 @@ def insert_new_assets(sql, table_name, records):
     #        (12,21,10),
     #        (78,31,27);
 
-    fields = ['id', 'name', 'asset_type', 'asset_type_title', 'category', 'category_title', 'latitude', 'longitude']
+    fields = ['id', 'name', 'asset_type', 'asset_type_title', 'category', 'category_title', 'sensitive', 'do_not_display', 'latitude', 'longitude']
     value_tuples = [f"({values_string(r, fields)})" for r in records]
     q = f"INSERT INTO {table_name} ({', '.join(fields)}) VALUES {', '.join(value_tuples)};"
     assert len(q) < 16384
     results = sql.send(q)
-
 
 def check_geom_webmercator(table_name):
     # Query to check on the normally hidden the_geom_webmercator value:
@@ -129,6 +154,7 @@ else:
                 print(f"Pushing {len(batch_list)} assets.")
                 pushed += len(batch_list)
                 insert_new_assets(sql, table_name, batch_list)
+                time.sleep(0.01)
                 batch_list = []
     if len(batch_list) > 0:
         print(f"Pushing {len(batch_list)} assets.")
