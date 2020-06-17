@@ -18,7 +18,8 @@ from asset_hound.local_settings import (
     DB_USER,
     DB_PASS,
     DB_HOST,
-    GEOCODIO_API_KEY,
+    GEOCODIO_API_KEY, 
+    DEV_APPS,
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -33,7 +34,7 @@ SECRET_KEY = SUPER_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['assets.wprdc.org']
 
 # Application definition
 
@@ -45,14 +46,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
-    'django_extensions',
+
+    # dependencies
     'corsheaders',
     'reversion',
     'rest_framework',
     'rest_framework_gis',
+    'recurrence',
     'phonenumber_field',
-    'assets'
+    'ckeditor',
+
+    # asset-hound apps
+    'geo',
+    'assets',
+    'community_resources'
 ]
+
+# add any development apps if specified
+INSTALLED_APPS += DEV_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -136,6 +147,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Rest framework settings
 # https://www.django-rest-framework.org/api-guide/settings/
@@ -161,3 +176,12 @@ REST_FRAMEWORK = {
 GEOCODER_API_KEY = GEOCODIO_API_KEY
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'uiColor': '#edf4f8',
+        'removeButtons': 'Flash,Styles,Format,Horizontal Line,Anchor'
+    }
+}
+
+PHONENUMBER_DEFAULT_REGION = 'US'

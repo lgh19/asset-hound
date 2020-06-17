@@ -56,6 +56,10 @@ class Location(models.Model):
     geom = models.PointField(null=True)
     geocoding_properties = models.TextField(null=True, blank=True)
 
+    @property
+    def full_address(self):
+        return f'{self.street_address}, {self.city} {self.state} {self.zip_code}'
+
     def __str__(self):
         return self.name
 
@@ -144,7 +148,7 @@ class Asset(models.Model):
     do_not_display = models.BooleanField(null=True, blank=True)
 
     asset_types = models.ManyToManyField('AssetType')
-    category = models.ManyToManyField('Category')
+    # category = models.ManyToManyField('Category')
     location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, blank=True)
     organization = models.ForeignKey('Organization', on_delete=models.PROTECT, null=True, blank=True)
     services = models.ManyToManyField('ProvidedService', blank=True)
