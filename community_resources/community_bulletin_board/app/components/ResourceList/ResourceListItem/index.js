@@ -96,7 +96,12 @@ function ResourceListItem({ resource }) {
           <Emoji role="img" aria-label="recurrence">
             🗓
           </Emoji>
-          <Recurrence rrule={resource.recurrence} />
+          <Recurrence
+            rrule={resource.recurrence}
+            allDay={resource.allDay}
+            startTime={resource.startTime}
+            endTime={resource.endTime}
+          />
         </Subtitle>
       )}
       <Content html={resource.description} />
