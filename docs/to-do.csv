@@ -3,3 +3,4 @@ Link from Farmer's Market assets to correspoding mini-maps: https://pittsburghpa
 "Delete 'PGH PARKING AUTHORITY' (232 BLVD OF THE ALLIES) as a laundromat",
 Delete orphaned Location/Organization/other-non-Asset instances,
 "Standardize Location.name fields (eliminating, for instance, trailing spaces)",
+Import 8 multitype assets excluded from v1 so far,
