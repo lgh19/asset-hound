@@ -44,10 +44,10 @@ class ResourceSerializer(serializers.ModelSerializer):
             'populations_served',
             'locations',
             'recurrence',
+            'all_day',
+            'start_time',
+            'end_time',
             'priority',
-            'published',
-            'start_date',
-            'stop_date',
         ]
 
 
