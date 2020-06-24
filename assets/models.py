@@ -54,6 +54,7 @@ class Location(models.Model):
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
     geom = models.PointField(null=True)
+    geocoding_properties = models.TextField(null=True, blank=True)
 
     @property
     def full_address(self):
@@ -66,8 +67,10 @@ class Location(models.Model):
         """ When the model is saved, attempt to geocode it based on address """
         if not self.pk:
             self.name = f'{self.street_address} {self.city}, {self.state} {self.zip_code}'
-        if not (self.longitude or self.latitude):
-            self.latitude, self.longitude = geocode_address(self.name)
+        #if not (self.longitude or self.latitude):
+        #    self.latitude, self.longitude = geocode_address(self.name) # This can give very
+        # bad geocoordinates to an asset (like the centroid of Pittsburgh). Currently ~0.5%
+        # of assets are ungeocoded, so this is not necessary.
         if not self.geom:
             print(self.latitude, self.longitude)
             self.geom = Point(
