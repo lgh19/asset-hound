@@ -82,5 +82,5 @@ If you click on a point on the map representing an asset, the database on assets
 1) Shell into assets.wprdc.org.
 2) `> source ~/backend/env/bin/activate`
 3) `cd backend`
-4) `python manage.py dump_assets`
+4) `python manage.py dev_dump_assets_by_type`
 5) Take `~/backend/data/assets_dump.csv` and overwrite the Carto database with it.
