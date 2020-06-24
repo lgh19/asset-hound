@@ -39,12 +39,12 @@ class ResourceAdmin(admin.ModelAdmin):
         'phone_number',
         'priority',
         'published',
-        'start_date',
-        'stop_date',
+        'start_publish_date',
+        'stop_publish_date',
     )
     list_display_links = ('name',)
 
-    list_filter = ('published', 'start_date', 'stop_date')
+    list_filter = ('published', 'start_publish_date', 'stop_publish_date')
     autocomplete_fields = (
         'assets',
         'other_locations',

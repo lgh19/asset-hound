@@ -29,11 +29,9 @@ class LocationAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'name',
-        'available_transportation',
-        'parent_location',
         'geom',
     )
-    list_filter = ('parent_location',)
+    raw_id_fields = ('parent_location',)
     search_fields = ('name',)
 
 
@@ -74,7 +72,7 @@ class AssetAdmin(admin.ModelAdmin):
         'id',
         'name',
         'organization',
-        #'localizability',
+        # 'localizability',
         'location',
         # 'url',
         # 'email',
@@ -106,6 +104,7 @@ class AssetAdmin(admin.ModelAdmin):
     #     'data_source',
     # )
     autocomplete_fields = (
+        'location',
         'asset_types',
         'tags',
         'accessibility_features',
@@ -114,8 +113,10 @@ class AssetAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
 
+
 class AssetTypeInline(admin.TabularInline):
     model = AssetType
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):

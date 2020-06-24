@@ -12,7 +12,7 @@ class AssetType(models.Model):
     category = models.ForeignKey('Category', on_delete=models.PROTECT, related_name='asset_types', null=True)
 
     def __str__(self):
-        return self.name or '<MISSING NAME>'
+        return self.title or '<MISSING NAME>'
 
 
 class Category(models.Model):
@@ -24,7 +24,7 @@ class Category(models.Model):
         verbose_name_plural = 'categories'
 
     def __str__(self):
-        return self.name or '<MISSING NAME>'
+        return self.title or '<MISSING TITLE>'
 
 
 class Tag(models.Model):
@@ -60,21 +60,23 @@ class Location(models.Model):
     def full_address(self):
         return f'{self.street_address}, {self.city} {self.state} {self.zip_code}'
 
-    def __str__(self):
-        return self.name or '<MISSING NAME>'
-
     def save(self, *args, **kwargs):
         """ When the model is saved, attempt to geocode it based on address """
         if not self.pk:
             self.name = f'{self.street_address} {self.city}, {self.state} {self.zip_code}'
-        if not (self.longitude or self.latitude):
-            self.latitude, self.longitude = geocode_address(self.name)
+        # if not (self.longitude or self.latitude):
+        #    self.latitude, self.longitude = geocode_address(self.name) # This can give very
+        # bad geocoordinates to an asset (like the centroid of Pittsburgh). Currently ~0.5%
+        # of assets are ungeocoded, so this is not necessary.
         if not self.geom:
             print(self.latitude, self.longitude)
             self.geom = Point(
                 (float(self.longitude), float(self.latitude))
             ) if self.latitude and self.longitude else None
         super(Location, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name or '<MISSING NAME>'
 
 
 class Organization(models.Model):
