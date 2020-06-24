@@ -29,12 +29,9 @@ class LocationAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'name',
-        'available_transportation',
-        'parent_location',
         'geom',
     )
-    autocomplete_fields = ('parent_location',)
-    list_filter = ('parent_location',)
+    raw_id_fields = ('parent_location',)
     search_fields = ('name',)
 
 
