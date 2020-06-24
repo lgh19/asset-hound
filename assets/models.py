@@ -12,7 +12,7 @@ class AssetType(models.Model):
     category = models.ForeignKey('Category', on_delete=models.PROTECT, related_name='asset_types', null=True)
 
     def __str__(self):
-        return self.name
+        return self.title or '<MISSING NAME>'
 
 
 class Category(models.Model):
@@ -22,17 +22,18 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = 'categories'
-
+    
     def __str__(self):
-        return self.name
+        return self.title or '<MISSING TITLE>'
 
 
 class Tag(models.Model):
     """ Tags """
     name = models.CharField(max_length=255)
-
+    
     def __str__(self):
-        return self.name
+        return self.name or ''
+
 
 
 class Location(models.Model):
@@ -60,9 +61,6 @@ class Location(models.Model):
     def full_address(self):
         return f'{self.street_address}, {self.city} {self.state} {self.zip_code}'
 
-    def __str__(self):
-        return self.name
-
     def save(self, *args, **kwargs):
         """ When the model is saved, attempt to geocode it based on address """
         if not self.pk:
@@ -77,6 +75,9 @@ class Location(models.Model):
                 (float(self.longitude), float(self.latitude))
             ) if self.latitude and self.longitude else None
         super(Location, self).save(*args, **kwargs)
+        
+    def __str__(self):
+        return self.name or '<MISSING NAME>'
 
 
 class Organization(models.Model):
@@ -84,38 +85,39 @@ class Organization(models.Model):
     location = models.ForeignKey('Location', on_delete=models.CASCADE, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     phone = PhoneNumberField(null=True, blank=True)
-
+    
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
 
 
 class AccessibilityFeature(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
-
+        return self.name or '<MISSING NAME>'
 
 class ProvidedService(models.Model):
     name = models.CharField(max_length=255)
-
+    
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
+
 
 
 class TargetPopulation(models.Model):
     name = models.CharField(max_length=255)
-
+    
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
+
 
 
 class DataSource(models.Model):
     name = models.CharField(max_length=255)
     url = models.URLField(max_length=500, null=True, blank=True)
-
+    
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
 
 
 class Asset(models.Model):
@@ -171,4 +173,4 @@ class Asset(models.Model):
         return self.asset_types.all()[0].category
 
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'

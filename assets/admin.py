@@ -33,6 +33,7 @@ class LocationAdmin(admin.ModelAdmin):
         'parent_location',
         'geom',
     )
+    autocomplete_fields = ('parent_location',)
     list_filter = ('parent_location',)
     search_fields = ('name',)
 
@@ -74,7 +75,7 @@ class AssetAdmin(admin.ModelAdmin):
         'id',
         'name',
         'organization',
-        #'localizability',
+        # 'localizability',
         'location',
         # 'url',
         # 'email',
@@ -87,10 +88,11 @@ class AssetAdmin(admin.ModelAdmin):
         # 'wifi_network',
         # 'computers_available',
         # 'open_to_public',
-        'sensitive',
+        # 'sensitive',
         'date_entered',
         'last_updated',
         'data_source',
+        'primary_key_from_rocket',
     )
     # list_filter = (
     #     'organization',
@@ -105,6 +107,7 @@ class AssetAdmin(admin.ModelAdmin):
     #     'data_source',
     # )
     autocomplete_fields = (
+        'location',
         'asset_types',
         'tags',
         'accessibility_features',
@@ -113,8 +116,10 @@ class AssetAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
 
+
 class AssetTypeInline(admin.TabularInline):
     model = AssetType
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
