@@ -6,19 +6,22 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-
+import moment from 'moment';
 import { rrulestr } from 'rrule';
-import Typography from '../Typography';
+
+const parseTime = time => moment(time, 'HH:mm:ss').format('LT');
 
 function Recurrence({ rrule, allDay, startTime, endTime }) {
   const recurrence = rrulestr(rrule);
+  const parsedStart = parseTime(startTime);
+  const parsedEnd = parseTime(endTime);
+
   let timeStatement = '';
-  if (allDay || (!startTime && !endTime)) timeStatement = 'all day.';
+  if (allDay) timeStatement = 'all day.';
   else if (startTime && endTime)
-    timeStatement = `from ${startTime} to ${endTime}.`;
-  else if (startTime) timeStatement = `at ${startTime}.`;
-  else if (endTime) timeStatement = `until ${endTime}.`;
+    timeStatement = `from ${parsedStart} to ${parsedEnd}.`;
+  else if (startTime) timeStatement = `at ${parsedStart}.`;
+  else if (endTime) timeStatement = `until ${parsedEnd}.`;
 
   return (
     <span>
