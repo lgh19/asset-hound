@@ -12,7 +12,7 @@ class AssetType(models.Model):
     category = models.ForeignKey('Category', on_delete=models.PROTECT, related_name='asset_types', null=True)
 
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
 
 
 class Category(models.Model):
@@ -24,7 +24,7 @@ class Category(models.Model):
         verbose_name_plural = 'categories'
 
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
 
 
 class Tag(models.Model):
@@ -32,7 +32,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
 
 
 class Location(models.Model):
@@ -61,7 +61,7 @@ class Location(models.Model):
         return f'{self.street_address}, {self.city} {self.state} {self.zip_code}'
 
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
 
     def save(self, *args, **kwargs):
         """ When the model is saved, attempt to geocode it based on address """
@@ -84,28 +84,28 @@ class Organization(models.Model):
     phone = PhoneNumberField(null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
 
 
 class AccessibilityFeature(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
 
 
 class ProvidedService(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
 
 
 class TargetPopulation(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
 
 
 class DataSource(models.Model):
@@ -113,7 +113,7 @@ class DataSource(models.Model):
     url = models.URLField(max_length=500, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
 
 
 class Asset(models.Model):
@@ -169,4 +169,4 @@ class Asset(models.Model):
         return self.asset_types.all()[0].category
 
     def __str__(self):
-        return self.name
+        return self.name or '<MISSING NAME>'
