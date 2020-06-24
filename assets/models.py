@@ -32,7 +32,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name or ''
+        return self.name or '<MISSING NAME>'
 
 
 class Location(models.Model):
