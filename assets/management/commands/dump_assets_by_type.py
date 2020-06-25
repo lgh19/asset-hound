@@ -65,8 +65,7 @@ class Command(BaseCommand):
                  'synthesized_key',],
             )
             writer.writeheader()
-            rows = []
-            for asset in assets_iterator:
-                rows.append(to_dict_for_csv(asset))
-
-            writer.writerows(rows)
+            for k,asset in enumerate(assets_iterator.iterator()): # Use the "iterator()" method to lazily evaluate the query in chunks (to save memory).
+                writer.writerow(to_dict_for_csv(asset))
+                if k % 2000 == 2000-1:
+                    print(f"Wrote {k+1} assets so far.")
