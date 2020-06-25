@@ -19,6 +19,8 @@ def to_dict_for_csv(asset: Asset):
         'do_not_display': asset.do_not_display,
         'latitude': asset.location.latitude,
         'longitude': asset.location.longitude,
+        'primary_key_from_rocket': asset.primary_key_from_rocket,
+        'synthesized_key': asset.synthesized_key,
     }
 
 
@@ -58,7 +60,9 @@ class Command(BaseCommand):
                  'sensitive',
                  'do_not_display',
                  'latitude',
-                 'longitude'],
+                 'longitude',
+                 'primary_key_from_rocket',
+                 'synthesized_key',],
             )
             writer.writeheader()
             rows = []
