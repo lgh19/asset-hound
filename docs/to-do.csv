@@ -6,3 +6,4 @@ Delete orphaned Location/Organization/other-non-Asset instances,
 Import 8 multitype assets excluded from v1 so far,
 Find and geocode ~164 ungeocoded assets,
 The Location model is another table that we need an update strategy for (the Django loader may change the Location data after every update),Semi-resolved (by ensuring that the loader only fill in gaps)
+Delist locations/assets outside of Allegheny County,
