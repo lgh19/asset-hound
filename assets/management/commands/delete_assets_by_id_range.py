@@ -17,7 +17,11 @@ class Command(BaseCommand):
 
         if len(args) == 2:
             assets_iterator = Asset.objects.filter(id__gte=args[0], id__lte=args[1])
+            if input(f"About to delete all assets bewteen id = {args[0]} and {args[1]}. \nAre you sure? (y/n) ") != "y":
+                print("OK, never mind.")
+                exit()
             print(f"Deleting all assets between id = {args[0]} and {args[1]}...")
+
             assets_iterator.delete()
             print(f"Done.")
         elif len(args) == 1:
