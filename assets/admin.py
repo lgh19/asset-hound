@@ -3,13 +3,14 @@ from django.contrib import admin
 
 from .models import (AssetType,
                      Tag,
-                     Location,
-                     Organization,
+                     Location, HistoricalLocation,
+                     Organization, HistoricalOrganization,
                      AccessibilityFeature,
                      ProvidedService,
                      TargetPopulation,
                      DataSource,
-                     Asset, Category)
+                     Asset, HistoricalAsset,
+                     Category)
 
 
 @admin.register(AssetType)
@@ -34,12 +35,22 @@ class LocationAdmin(admin.ModelAdmin):
     raw_id_fields = ('parent_location',)
     search_fields = ('name',)
 
+@admin.register(HistoricalLocation)
+class HistoricalLocationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'history_id', 'history_type', 'history_date', 'history_change_reason')
+    #search_fields = ('name',)
+
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'location', 'email', 'phone')
     list_filter = ('location',)
     search_fields = ('name',)
+
+@admin.register(HistoricalOrganization)
+class HistoricalOrganizationAdmin(admin.ModelAdmin):
+    list_display = ('id', 'history_id', 'history_type', 'history_date', 'history_change_reason')
+    #search_fields = ('name',)
 
 
 @admin.register(AccessibilityFeature)
@@ -112,6 +123,11 @@ class AssetAdmin(admin.ModelAdmin):
         'hard_to_count_population',
     )
     search_fields = ('name',)
+
+@admin.register(HistoricalAsset)
+class HistoricalAssetAdmin(admin.ModelAdmin):
+    list_display = ('id', 'history_id', 'history_type', 'history_date', 'history_change_reason')
+    #search_fields = ('name',)
 
 
 class AssetTypeInline(admin.TabularInline):

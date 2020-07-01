@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'recurrence',
     'phonenumber_field',
     'ckeditor',
+    'simple_history',
 
     # asset-hound apps
     'geo',
@@ -76,7 +77,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'asset_hound.urls'

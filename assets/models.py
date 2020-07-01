@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 from phonenumber_field.modelfields import PhoneNumberField
+from simple_history.models import HistoricalRecords
 
 from assets.utils import geocode_address
 
@@ -56,6 +57,8 @@ class Location(models.Model):
     geom = models.PointField(null=True)
     geocoding_properties = models.TextField(null=True, blank=True)
 
+    history = HistoricalRecords()
+
     @property
     def full_address(self):
         return f'{self.street_address}, {self.city} {self.state} {self.zip_code}'
@@ -84,6 +87,8 @@ class Organization(models.Model):
     location = models.ForeignKey('Location', on_delete=models.CASCADE, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     phone = PhoneNumberField(null=True, blank=True)
+
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name or '<MISSING NAME>'
@@ -116,7 +121,6 @@ class DataSource(models.Model):
 
     def __str__(self):
         return self.name or '<MISSING NAME>'
-
 
 class Asset(models.Model):
     FIXED_LOCALE = 'FIX'
@@ -165,6 +169,10 @@ class Asset(models.Model):
     synthesized_key = models.TextField(null=True, blank=True)
     date_entered = models.DateTimeField(editable=False, auto_now_add=True)
     last_updated = models.DateTimeField(editable=False, auto_now=True)
+
+    history = HistoricalRecords() # This adds a HistoricalAsset table to the database, which
+    # will record a new row every time a tracked change (model creation, change, or deletion)
+    # occurs.
 
     @property
     def category(self):
