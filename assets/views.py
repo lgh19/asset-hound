@@ -1,6 +1,9 @@
 from rest_framework import viewsets, filters
 from rest_framework.pagination import LimitOffsetPagination
 
+from rest_framework.settings import api_settings
+from rest_framework_csv.renderers import CSVRenderer
+
 from assets.models import Asset, AssetType, Category
 from assets.serializers import AssetSerializer, AssetGeoJsonSerializer, AssetListSerializer, AssetTypeSerializer, \
     CategorySerializer
@@ -29,3 +32,10 @@ class AssetTypeViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+class CSVAssetViewSet(viewsets.ModelViewSet):
+    queryset = Asset.objects.all()
+    http_method_names = ['get']
+    serializer_class = AssetSerializer
+    renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (CSVRenderer,)
