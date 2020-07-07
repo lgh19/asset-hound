@@ -19,7 +19,32 @@ from assets.models import (Asset,
                            TargetPopulation,
                            DataSource)
 
-from assets.management.commands.load_assets import parse_cell, get_localizability, boolify, value_or_none, type_or_none, standardize_phone
+from assets.management.commands.load_assets import parse_cell, get_localizability, boolify, standardize_phone
+
+from pprint import pprint
+
+def non_blank_value_or_none(row, field):
+    """If the field is in the row dict, return the value (unless it's an empty
+    string, which gets coerced to None).
+    Otherwise return None."""
+    return row[field] if (field in row and row[field] != '') else None
+
+def non_blank_type_or_none(row, field, desired_type):
+    """This function tries to cast the value of row[field] to
+    the passed desired type (e.g, float or int). If it fails,
+    or if the passed value is an empty string (which is how
+    None values are passed by CSVs), it returns None.
+
+    Note that this does not yet support fields like
+    PhoneNumberField, URLField, and EmailField."""
+    if field in row:
+        if row[field] == '':
+            return None
+        try:
+            return desired_type(row[field])
+        except ValueError:
+            return None
+    return None
 
 
 class Command(BaseCommand):
@@ -93,10 +118,10 @@ class Command(BaseCommand):
                     for row in dr:
                         # get or create a new org
                         if row['asset_type'] == asset_type:
-                            organization = Organization.objects.get_or_create(
-                                name=value_or_none(row, 'organization_name'),
+                            organization, organization_created = Organization.objects.get_or_create(
+                                name=non_blank_value_or_none(row, 'organization_name'),
                                 defaults={
-                                    'email': value_or_none(row, 'organization_email'),
+                                    'email': non_blank_value_or_none(row, 'organization_email'),
                                     'phone': standardize_phone(row['organization_phone'])
                                 }
                             )[0]
@@ -152,37 +177,37 @@ class Command(BaseCommand):
                                 if 'hard_to_count_population' in row else []
 
                             data_source = DataSource.objects.get_or_create(
-                                name=value_or_none(row, 'data_source_name'),
+                                name=non_blank_value_or_none(row, 'data_source_name'),
                                 defaults={'url': row['data_source_url']})[0] if row['data_source_name'] else None
 
                             asset = Asset.objects.create(
-                                name=value_or_none(row, 'name'),
-                                localizability=get_localizability(value_or_none(row, 'localizability')),
+                                name=non_blank_value_or_none(row, 'name'),
+                                localizability=get_localizability(non_blank_value_or_none(row, 'localizability')),
 
-                                url=value_or_none(row, 'url'),
-                                email=value_or_none(row, 'email'),
+                                url=non_blank_value_or_none(row, 'url'),
+                                email=non_blank_value_or_none(row, 'email'),
                                 phone=standardize_phone(row['phone']),
 
-                                hours_of_operation=value_or_none(row, 'hours_of_operation'),
-                                holiday_hours_of_operation=value_or_none(row, 'holiday_hours_of_operation'),
-                                periodicity=value_or_none(row, 'periodicity'),
-                                capacity=type_or_none(row, 'capacity', int),
-                                wifi_network=value_or_none(row, 'wifi_network'),
+                                hours_of_operation=non_blank_value_or_none(row, 'hours_of_operation'),
+                                holiday_hours_of_operation=non_blank_value_or_none(row, 'holiday_hours_of_operation'),
+                                periodicity=non_blank_value_or_none(row, 'periodicity'),
+                                capacity=non_blank_type_or_none(row, 'capacity', int),
+                                wifi_network=non_blank_value_or_none(row, 'wifi_network'),
 
-                                etl_notes=value_or_none(row, 'notes'),
+                                etl_notes=non_blank_value_or_none(row, 'notes'),
 
-                                child_friendly=boolify(value_or_none(row, 'child_friendly')),
-                                internet_access=boolify(value_or_none(row, 'internet_access')),
-                                computers_available=boolify(value_or_none(row, 'computers_available')),
-                                open_to_public=boolify(value_or_none(row, 'open_to_public')),
-                                sensitive=boolify(value_or_none(row, 'sensitive')),
-                                do_not_display=boolify(value_or_none(row, 'do_not_display')),
+                                child_friendly=boolify(non_blank_value_or_none(row, 'child_friendly')),
+                                internet_access=boolify(non_blank_value_or_none(row, 'internet_access')),
+                                computers_available=boolify(non_blank_value_or_none(row, 'computers_available')),
+                                open_to_public=boolify(non_blank_value_or_none(row, 'open_to_public')),
+                                sensitive=boolify(non_blank_value_or_none(row, 'sensitive')),
+                                do_not_display=boolify(non_blank_value_or_none(row, 'do_not_display')),
 
                                 location=location,
                                 organization=organization,
                                 data_source=data_source,
-                                primary_key_from_rocket=value_or_none(row, 'primary_key_from_rocket'),
-                                synthesized_key=value_or_none(row, 'synthesized_key'),
+                                primary_key_from_rocket=non_blank_value_or_none(row, 'primary_key_from_rocket'),
+                                synthesized_key=non_blank_value_or_none(row, 'synthesized_key'),
                             )
 
                             asset.asset_types.set(asset_types)
