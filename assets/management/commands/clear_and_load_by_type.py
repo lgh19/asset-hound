@@ -46,6 +46,178 @@ def non_blank_type_or_none(row, field, desired_type):
             return None
     return None
 
+def get_location_by_keys(row, keys):
+    # When you don't know the field names ahead of time, you can use kwargs to pass the key field names and values to the queryset.
+    #Location.objects.filter(**{'string__contains': 'search_string'})
+    kwargs = {}
+    for key in keys:
+        assert key not in ['residence']
+        kwargs[key] = non_blank_value_or_none(row, key)
+
+    #  [ ] Where is boolify used on residence?
+    #  Do I need to do something like this?
+    # (cast latitude and longitude to float)
+    # in the query here? Will that lead to problems?
+
+
+    # [ ] Think through this more carefully to see what to do in
+    # cases where some values are None but others aren't.
+    # Like city = 'Pittsburgh' and state = None and street_address = None.
+
+    # If all values are None, return None, False
+    if all([v is None for v in kwargs.values()]):
+        return None, False
+    if any([v is None for v in kwargs.values()]):
+        print(f"There are some null values in this query: {kwargs}.")
+
+    if 'latitude' not in keys and 'longitude' not in keys:
+        locations = Location.objects.filter(**kwargs).order_by('-id')
+    else: # Floating point values are not good ones to query on directly.
+        # Options include using the DecimalField or (as chosen here)
+        # filtering on ranges.
+        assert set(keys) == set(['latitude', 'longitude'])
+        latitude = non_blank_type_or_none(row, 'latitude', float)
+        longitude = non_blank_type_or_none(row, 'longitude', float)
+        if latitude is None or longitude is None:
+            return None, False
+        resolution = 10**-6 # This value should be thought through some more.
+        locations = Location.objects.filter(latitude__gte = latitude - resolution,
+                latitude__lte = latitude + resolution,
+                longitude__gte = longitude - resolution,
+                longitude__lte = longitude + resolution).order_by('-id')
+
+    if len(locations) == 0:
+        return None, False
+    if len(locations) == 1:
+        return locations[0], True
+    # Otherwise pick the one with the largest id value, which is the first
+    # one because of the order_by('-id') part of the query.
+    return locations[0], True
+
+
+def update_or_create_location(row):
+    # Try to find a pre-existing record by keys. Otherwise create it.
+    # Any other fields should be used to fill in gaps and (maybe someday used in clever updating).
+
+    keys = ['parcel_id']
+    location_created = False
+    location, location_obtained = get_location_by_keys(row, ['parcel_id'])
+    if location_obtained:
+        effective_keys = list(keys)
+    else:
+        keys = ['street_address', 'city', 'state', 'zip_code']
+        location, location_obtained = get_location_by_keys(row, keys)
+
+        if location_obtained:
+            effective_keys = list(keys)
+        else:
+            keys = ['latitude', 'longitude']
+            location, location_obtained = get_location_by_keys(row, keys)
+
+            if location_obtained:
+                effective_keys = list(keys)
+            else: # Create a location instance.
+                kwargs = {}
+                kwargs['street_address'] = non_blank_value_or_none(row, 'street_address')
+                kwargs['city'] = non_blank_value_or_none(row, 'city')
+                kwargs['state'] = non_blank_value_or_none(row, 'state')
+                kwargs['zip_code'] = non_blank_value_or_none(row, 'zip_code')
+                kwargs['available_transportation'] = non_blank_value_or_none(row, 'location_transportation')
+                kwargs['latitude'] = non_blank_type_or_none(row, 'latitude', float)
+                kwargs['longitude'] = non_blank_type_or_none(row, 'longitude', float)
+                kwargs['residence'] = boolify(non_blank_value_or_none(row, 'residence'))
+                kwargs['geocoding_properties'] = non_blank_value_or_none(row, 'geocoding_properties')
+                kwargs['parcel_id'] = non_blank_value_or_none(row, 'parcel_id')
+                location = Location(**kwargs)
+                location.save()
+                location_obtained = True
+                location_created = True
+
+    assert location_obtained
+
+    #location, location_created = Location.objects.get_or_create(
+    #    street_address=non_blank_value_or_none(row, 'street_address'),
+    #    city=non_blank_value_or_none(row, 'city'),
+    #    state=non_blank_value_or_none(row, 'state'),
+    #    zip_code=non_blank_value_or_none(row, 'zip_code'),
+    #    defaults={
+    #        'available_transportation': non_blank_value_or_none(row, 'location_transportation'),
+    #        'latitude': non_blank_type_or_none(row, 'latitude', float),
+    #        'longitude': non_blank_type_or_none(row, 'longitude', float),
+    #        'geocoding_properties': non_blank_value_or_none(row, 'geocoding_properties'),
+    #        'parcel_id': non_blank_value_or_none(row, 'parcel_id'),
+    #        'residence': boolify(non_blank_value_or_none(row, 'residence')),
+    #    }
+    #)
+
+    # How to get the value of an object based on the field name (when the field name is a variable).
+    #obj = MyModel.objects.first()
+    #field_value = getattr(obj, field_name)
+
+
+    # [ ] Eventually a more sophisticated merging approach will be needed to combine
+    # different bits of location data from different assets into one Location object.
+    # At present, this is just filling in gaps but not handling conflicts.
+    if not location_created:
+        if 'street_address' not in effective_keys and 'city' not in effective_keys and 'state' not in effective_keys and 'zip_code' not in effective_keys:
+            # Update these as a block so that these values are consistent.
+            if location.street_address is None and location.city is None and location.state is None and location.zip_code is None:
+                # We are only doing this update when ALL values are None to avoid an unstable situation
+                # where every time this script is run, the location can toggle between location data for
+                # two or more different records.
+                location.street_address = non_blank_value_or_none(row, 'street_address')
+                location.city = non_blank_value_or_none(row, 'city')
+                location.state = non_blank_value_or_none(row, 'state')
+                location.zip_code = non_blank_value_or_none(row, 'zip_code')
+
+
+        if 'latitude' not in effective_keys and 'longitude' not in effective_keys and 'geocoordinates' not in effective_keys: # OR if the intersection of these lists is empty...
+            if location.latitude is None and location.longitude is None:
+            #if True or location.latitude is None or location.longitude is None: # Delete this after one iteration. This just sets the geocoordinates # of previously automatically and badly geocoded Locations.
+            # Update these as a block so that these values are consistent.
+                location.latitude = non_blank_type_or_none(row, 'latitude', float)
+                location.longitude = non_blank_type_or_none(row, 'longitude', float)
+                location.geocoding_properties = non_blank_value_or_none(row, 'geocoding_properties')
+            #else:
+            # There may be a geocoordinates conflict, but there may be so many of these
+            # that handling these at this stage may not be feasible.
+
+        if 'available_transportation' not in effective_keys:
+            if location.available_transportation is None:
+                location.available_transportation = non_blank_value_or_none(row, 'location_transportation')
+            #else: # Append to existing list (if not already there).
+            #    extant_options = location.available_transportation.split('|')
+            #    new_available_transportation = non_blank_value_or_none(row, 'location_transportation')
+            #    if new_available_transportation not in extant_options:
+            #        location.available_transportation = f"{location.available_transportation}|{new_available_transportation}"
+            # [ ] Don't do this yet (because the field might not be big enough).
+
+        if 'parcel_id' not in effective_keys:
+            if location.parcel_id is None:
+               location.parcel_id = non_blank_value_or_none(row, 'parcel_id')
+           # else: # Append to existing list (if not already there).
+           #     extant_options = location.parcel_id.split('|')
+           #     new_option = non_blank_value_or_none(row, 'parcel_id')
+           #     if new_option not in extant_options:
+           #         location.parcel_id = f"{location.parcel_id}|{new_option}"
+           # [ ] Don't do this yet (because the field is definitely not big enough and might need to be huge).
+
+        if 'residence' not in effective_keys:
+            asset_is_residence = boolify(non_blank_value_or_none(row, 'residence'))
+            if asset_is_residence is not None:
+                if location.residence is None:
+                    location.residence = asset_is_residence
+                else: # What should we do if one data source says that the location is
+                    # not a residence and the other says that it is?
+                    # It could be that one is wrong about whether it is a residence
+                    # or about the address, or it could be an apartment on top of
+                    # a store. In any event, if there's a conflict, throw an exception.
+                    if location.residence != asset_is_residence:
+                        raise ValueError(f"The location {Location.name} has residence == {location.residence}, but this new asset ({non_blank_value_or_none(row, 'name')}) of type {row['asset_type']} has residence == {asset_is_residence}.")
+                    # Otherwise the values agree, and no update is needed.
+
+    location.save()
+    return location, location_created
 
 class Command(BaseCommand):
     help = 'Loads assets from a CSV file, which may be specified by a command-line argument.'
@@ -124,41 +296,24 @@ class Command(BaseCommand):
                                     'email': non_blank_value_or_none(row, 'organization_email'),
                                     'phone': standardize_phone(row['organization_phone'])
                                 }
-                            )[0]
-                            location = Location.objects.get_or_create(
-                                street_address=value_or_none(row, 'street_address'),
-                                city=value_or_none(row, 'city'),
-                                state=value_or_none(row, 'state'),
-                                zip_code=value_or_none(row, 'zip_code'),
-                                defaults={
-                                    'available_transportation': value_or_none(row, 'location_transportation'),
-                                    'latitude': type_or_none(row, 'latitude', float),
-                                    'longitude': type_or_none(row, 'longitude', float),
-                                    'geocoding_properties': value_or_none(row, 'geocoding_properties'),
-                                    'parcel_id': value_or_none(row, 'parcel_id'),
-                                    'residence': boolify(value_or_none(row, 'residence')),
-                                }
-                            )[0]
-                          
-                            # [ ] Eventually a more sophisticated merging approach will be need to combine
-                            # different bits of location data from different assets into one Location object.
-                            # At present, this is just filling in gaps but not handling conflicts.
-                            if location.latitude is None or location.longitude is None:
-                                location.latitude = type_or_none(row, 'latitude', float)
-                                location.longitude = type_or_none(row, 'longitude', float)
-                                location.geocoding_properties = value_or_none(row, 'geocoding_properties')
+                            )
 
-                            if location.available_transportation is None:
-                                location.available_transportation = value_or_none(row, 'location_transportation')
+                            if not organization_created:
+                                if organization.email is None:
+                                    organization.email = non_blank_value_or_none(row, 'email')
+                                #else:
+                                # Since this is an EmailField, it's not so easy to just list all the options as the new field value.
 
-                            if location.parcel_id is None:
-                               location.parcel_id = value_or_none(row, 'parcel_id')
+                                if organization.phone is None and 'organization_phone' in row:
+                                    organization.phone = standardize_phone(row['organization_phone'])
+                                #else:
+                                # Since this is a PhoneNumberField, it's not so easy to just list all the options as the new field value.
 
-                            if location.residence is None:
-                               location.residence = boolify(value_or_none(row, 'residence'))
+                            organization.save()
+                            # END primitive Organization object handling
 
-                            location.save()
-                            # END primitive Location object handling
+
+                            location, location_created = update_or_create_location(row)
 
                             asset_types = [AssetType.objects.get_or_create(name=asset_type)[0] for asset_type in
                                            parse_cell(row['asset_type'])] if row['asset_type'] else []
