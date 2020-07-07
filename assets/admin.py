@@ -174,7 +174,6 @@ class RawAssetAdmin(admin.ModelAdmin):
     #     'data_source',
     # )
     autocomplete_fields = (
-        'location',
         'asset_types',
         'tags',
         'accessibility_features',
