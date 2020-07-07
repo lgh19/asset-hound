@@ -51,7 +51,7 @@ function Typography({ variant, component, children, ...otherProps }) {
 }
 
 Typography.propTypes = {
-  variant: PropTypes.oneOf(Variants),
+  variant: PropTypes.oneOf(Object.values(Variants)),
   component: PropTypes.oneOfType([PropTypes.string, PropTypes.elementType]),
   children: PropTypes.node,
 };

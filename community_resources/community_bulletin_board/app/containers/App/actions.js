@@ -1,6 +1,6 @@
 /*
  *
- * BulletinBoard actions
+ * Global actions
  *
  */
 

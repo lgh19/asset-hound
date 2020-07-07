@@ -6,21 +6,35 @@
 
 
 
-h1 {
+.typography-h1 {
   font-size: 4rem;
   margin-top: 0;
   color: #457b9dff
 }
 
-h2 {
+.typography-h2 {
   font-size: 1.8rem;
   color: #1d3557ff;
 }
 
-h3 {
+.typography-h3 {
   display: inline-block;
   font-size: 2rem;
   margin: 0;
   color: #1d3557ff;
 }
+
+.typography-h4 {
+  font-size: 2rem;
+  margin: 0;
+  color: #1d3557ff;
+}
+
+.typography-h5 {
+  display: inline-block;
+  font-size: 2rem;
+  margin: 0;
+  color: #1d3557ff;
+}
+
 

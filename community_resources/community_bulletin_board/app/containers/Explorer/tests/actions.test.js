@@ -1,7 +1,7 @@
-import { defaultAction } from '../../App/actions';
-import { DEFAULT_ACTION } from '../../App/constants';
+import { defaultAction } from '../actions';
+import { DEFAULT_ACTION } from '../constants';
 
-describe('BulletinBoard actions', () => {
+describe('Explorer actions', () => {
   describe('Default Action', () => {
     it('has a type of DEFAULT_ACTION', () => {
       const expected = {

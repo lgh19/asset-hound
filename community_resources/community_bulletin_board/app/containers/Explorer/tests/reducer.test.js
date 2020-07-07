@@ -1,9 +1,9 @@
 // import produce from 'immer';
-import globalReducer from '../../App/reducer';
+import explorerReducer from '../reducer';
 // import { someAction } from '../actions';
 
 /* eslint-disable default-case, no-param-reassign */
-describe('bulletinBoardReducer', () => {
+describe('explorerReducer', () => {
   let state;
   beforeEach(() => {
     state = {
@@ -13,7 +13,7 @@ describe('bulletinBoardReducer', () => {
 
   it('returns the initial state', () => {
     const expectedResult = state;
-    expect(globalReducer(undefined, {})).toEqual(expectedResult);
+    expect(explorerReducer(undefined, {})).toEqual(expectedResult);
   });
 
   /**

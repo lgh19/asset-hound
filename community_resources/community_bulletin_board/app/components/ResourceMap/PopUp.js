@@ -5,6 +5,8 @@ import { Popup } from 'react-map-gl';
 import styled, { css } from 'styled-components';
 import Typography from '../Typography';
 import Link from '../Link';
+import { localPropTypes } from '../../utils';
+import ResourceListItem from '../ResourceList/ResourceListItem';
 
 const Wrapper = styled.div`
   text-align: center;
@@ -20,7 +22,7 @@ const Text = styled(Typography)`
   padding: 0;
 `;
 
-function PopUp({ name, lat, lng, onClose }) {
+function PopUp({ name, lat, lng, onClose, resource, onDetailClick }) {
   return (
     <Popup
       latitude={lat}
@@ -35,6 +37,12 @@ function PopUp({ name, lat, lng, onClose }) {
     >
       <Wrapper>
         <Text>{name}</Text>
+        {!!resource && (
+          <div>
+            <ResourceListItem map resource={resource} />
+            <button onClick={onDetailClick}>More Info</button>
+          </div>
+        )}
       </Wrapper>
     </Popup>
   );
@@ -45,6 +53,7 @@ PopUp.propTypes = {
   lat: PropTypes.number,
   lng: PropTypes.number,
   onClose: PropTypes.func,
+  resource: localPropTypes.resource,
 };
 
 export default PopUp;

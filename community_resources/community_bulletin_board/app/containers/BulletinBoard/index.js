@@ -15,17 +15,14 @@ import { compose } from 'redux';
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
 import { Layer, Source } from 'react-map-gl';
-import {
-  makeSelectBulletinBoardAllLocationsGeoJSON,
-  makeSelectBulletinBoardCommunity,
-} from './selectors';
-import reducer from './reducer';
-import saga from './saga';
+
+import reducer from '../App/reducer';
+import saga from '../App/saga';
 // import messages from './messages';
 import { filterResourcesByCategory, localPropTypes } from '../../utils';
 // import Header from '../../components/Header';
 import Typography from '../../components/Typography';
-import { getCommunityDataRequest } from './actions';
+import { getCommunityDataRequest } from '../App/actions';
 import Board from './Board';
 import Content from '../../components/Content';
 import ResourceList from '../../components/ResourceList';
@@ -66,7 +63,6 @@ export function BulletinBoard({
       <Content html={community.topSectionContent} />
       <NavMenu sections={community.resourceCategories} />
       <Typography.H2>Or by location</Typography.H2>
-      <ResourceMap data={allLocations} />
 
       {community.resourceCategories.map(category => (
         <CategorySection category={category}>
@@ -87,8 +83,8 @@ BulletinBoard.propTypes = {
 };
 
 const mapStateToProps = createStructuredSelector({
-  community: makeSelectBulletinBoardCommunity(),
-  allLocations: makeSelectBulletinBoardAllLocationsGeoJSON(),
+  community: makeSelectCommunity(),
+  allLocations: makeSelectAllLocationsGeoJSON(),
 });
 
 function mapDispatchToProps(dispatch) {
