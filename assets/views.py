@@ -32,19 +32,3 @@ class AssetTypeViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
-
-from rest_framework.views import APIView
-from rest_framework_csv import renderers as r
-
-class CSVAssetViewSet(APIView):
-    queryset = Asset.objects.all()
-    http_method_names = ['get']
-    serializer_class = AssetSerializer
-    renderer_classes = (r.CSVRenderer,) + tuple(api_settings.DEFAULT_RENDERER_CLASSES)
-
-    #def get_queryset(self):
-    #    if 'type' in self.request.GET:
-    #        asset_type = self.request.GET['type']
-    #        return Asset.objects.filter(asset_types__name=asset_type)
-    #    return Asset.objects.all()
