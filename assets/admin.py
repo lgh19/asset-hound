@@ -10,6 +10,7 @@ from .models import (AssetType,
                      TargetPopulation,
                      DataSource,
                      Asset, HistoricalAsset,
+                     RawAsset, HistoricalRawAsset,
                      Category)
 
 
@@ -129,6 +130,63 @@ class HistoricalAssetAdmin(admin.ModelAdmin):
     list_display = ('id', 'history_id', 'history_type', 'history_date', 'history_change_reason')
     #search_fields = ('name',)
 
+
+@admin.register(RawAsset)
+class RawAssetAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'name',
+        #'organization',
+        # 'localizability',
+        'street_address',
+        'city',
+        'state',
+        'zip_code',
+        'latitude',
+        'longitude',
+        # 'url',
+        # 'email',
+        # 'phone',
+        # 'hours_of_operation',
+        # 'holiday_hours_of_operation',
+        # 'child_friendly',
+        # 'capacity',
+        # 'internet_access',
+        # 'wifi_network',
+        # 'computers_available',
+        # 'open_to_public',
+        # 'sensitive',
+        'date_entered',
+        'last_updated',
+        'data_source',
+        'primary_key_from_rocket',
+    )
+    # list_filter = (
+    #     'organization',
+    #     'location',
+    #     'child_friendly',
+    #     'internet_access',
+    #     'computers_available',
+    #     'open_to_public',
+    #     'sensitive',
+    #     'date_entered',
+    #     'last_updated',
+    #     'data_source',
+    # )
+    autocomplete_fields = (
+        'location',
+        'asset_types',
+        'tags',
+        'accessibility_features',
+        'services',
+        'hard_to_count_population',
+    )
+    search_fields = ('name',)
+
+@admin.register(HistoricalRawAsset)
+class HistoricalRawAssetAdmin(admin.ModelAdmin):
+    list_display = ('id', 'history_id', 'history_type', 'history_date', 'history_change_reason')
+    #search_fields = ('name',)
 
 class AssetTypeInline(admin.TabularInline):
     model = AssetType
