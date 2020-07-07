@@ -180,7 +180,7 @@ class RawAssetAdmin(admin.ModelAdmin):
         'services',
         'hard_to_count_population',
     )
-    search_fields = ('name',)
+    search_fields = ('name', 'street_address', 'city', 'zip_code')
 
 @admin.register(HistoricalRawAsset)
 class HistoricalRawAssetAdmin(admin.ModelAdmin):
