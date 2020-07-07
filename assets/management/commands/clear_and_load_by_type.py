@@ -270,12 +270,13 @@ class Command(BaseCommand):
 
             print(f"About to start{'' if override_clearing else 'cleaning and'} uploading {chosen_asset_types}.")
 
-            with open(file_name) as f:
-                dr = csv.DictReader(f)
-                total_count = 0
+            total_count = 0
 
-                for asset_type in chosen_asset_types:
-                    type_count = 0
+            for asset_type in chosen_asset_types:
+                type_count = 0
+                with open(file_name) as f:
+                    dr = csv.DictReader(f) # This file needs to be reopened to refresh the dr iterator (used up in the loop below).
+
                     ## Clear the assets of this type if any are found in the database. ##
                     if not override_clearing:
                         if asset_type in extant_types:
@@ -374,6 +375,6 @@ class Command(BaseCommand):
                             type_count += 1
                             total_count += 1
                             print('Created', asset)
-                    print(f"Created {type_count} assets of type {asset_type}.")
-                print(f"Created a total of {total_count} assets.")
+                print(f"Created {type_count} assets of type {asset_type}.")
+            print(f"Created a total of {total_count} assets.")
 
