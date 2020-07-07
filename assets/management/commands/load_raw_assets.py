@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from assets.models import (RawAsset,
+                           Asset,
                            AssetType,
                            Tag,
                            AccessibilityFeature,
