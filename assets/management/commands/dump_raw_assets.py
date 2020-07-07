@@ -36,7 +36,7 @@ def to_dict_for_csv(asset: RawAsset):
         'computers_available': asset.computers_available,
         'open_to_public': asset.open_to_public,
         'child_friendly': asset.child_friendly,
-        'localizability', asset.localizability,
+        'localizability': asset.localizability,
         'sensitive': asset.sensitive,
         'do_not_display': asset.do_not_display,
         'services': '|'.join([s.name for s in asset.services.all()]),
@@ -119,7 +119,7 @@ class Command(BaseCommand):
                  'organization_name',
                  'organization_phone',
                  'organization_email',
-                 'etl_notes'
+                 'etl_notes',
                  'primary_key_from_rocket',
                  'synthesized_key',
                  'geocoding_properties',
