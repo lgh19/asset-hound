@@ -18,7 +18,7 @@ from assets.models import (RawAsset,
                            DataSource)
 
 from assets.management.commands.load_assets import parse_cell, get_localizability, boolify, standardize_phone
-from assets.management.commands.clear_and_load_assets_by_type import non_blank_value_or_none, non_blank_type_or_none
+from assets.management.commands.clear_and_load_by_type import non_blank_value_or_none, non_blank_type_or_none
 
 from pprint import pprint
 
