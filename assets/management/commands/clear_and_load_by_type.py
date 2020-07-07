@@ -30,6 +30,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        override_clearing = True # Sometimes we may not want to clear assets when loading assets.
+        # In fact, eventually loading based on primary_key_from_rocket/synthesized_key will be the default.
+        # Then clearing will be the exception.
+
         if len(args) == 0:
             print("Unable to load assets without knowing the source file. Try:")
             print("   > python manage.py clear_and_add_by_asset [filename] [list of asset types]")
@@ -49,7 +53,9 @@ class Command(BaseCommand):
                 chosen_asset_types = args[1:]
             else:
                 chosen_asset_types = source_asset_types
-                raise ValueError(f"Are you really sure you want to clear all these asset types ({chosen_asset_types})? If so, comment out this exception (or just list them when invoking the command).")
+                if not override_clearing:
+                    raise ValueError(f"Are you really sure you want to clear all these asset types ({chosen_asset_types})? If so, comment out this exception (or just list them when invoking the command).")
+            print(f"chosen_asset_types = {chosen_asset_types}")
 
             for t in source_asset_types:
                 if re.search('\|', t) is not None and t in chosen_asset_types:
@@ -58,15 +64,14 @@ class Command(BaseCommand):
 
             # Get existing types
             extant_types = [a.name for a in AssetType.objects.all()]
-           
+
             new_types = []
             for t in chosen_asset_types:
                 if t not in extant_types:
                     new_types.append(t)
             print(f"New types in the source file that are not currently in the database: {new_types}")
 
-            print(f"About to start clearning and uploading {chosen_asset_types}.")
-            #assert 0 == 1
+            print(f"About to start{'' if override_clearing else 'cleaning and'} uploading {chosen_asset_types}.")
 
             with open(file_name) as f:
                 dr = csv.DictReader(f)
@@ -75,13 +80,14 @@ class Command(BaseCommand):
                 for asset_type in chosen_asset_types:
                     type_count = 0
                     ## Clear the assets of this type if any are found in the database. ##
-                    if asset_type in extant_types:
-                        selected_assets = Asset.objects.filter(asset_types__name=asset_type)
-                        if len(selected_assets) > 0:
-                            print(f"Clearing all {len(selected_assets)} assets with type '{asset_type}'.")
-                            selected_assets.delete()
-                        else:
-                            print(f"No assets with type '{asset_type}' found.")
+                    if not override_clearing:
+                        if asset_type in extant_types:
+                            selected_assets = Asset.objects.filter(asset_types__name=asset_type)
+                            if len(selected_assets) > 0:
+                                print(f"Clearing all {len(selected_assets)} assets with type '{asset_type}'.")
+                                selected_assets.delete()
+                            else:
+                                print(f"No assets with type '{asset_type}' found.")
 
                     ## Upload the new assets. ##
                     for row in dr:
