@@ -154,14 +154,14 @@ class Command(BaseCommand):
                                 sensitive=boolify(non_blank_value_or_none(row, 'sensitive')),
                                 do_not_display=boolify(non_blank_value_or_none(row, 'do_not_display')),
 
-                                street_address = non_blank_value_or_none(row, 'street_address')
-                                city = non_blank_value_or_none(row, 'city')
-                                state = non_blank_value_or_none(row, 'state')
-                                zip_code = non_blank_value_or_none(row, 'zip_code')
-                                parcel_id = non_blank_value_or_none(row, 'parcel_id')
-                                residence = boolify(non_blank_value_or_none(row, 'residence'))
-                                available_transportation = non_blank_value_or_none(row, 'location_transportation')
-                                parent_location = non_blank_value_or_none(row, 'parent_location')
+                                street_address = non_blank_value_or_none(row, 'street_address'),
+                                city = non_blank_value_or_none(row, 'city'),
+                                state = non_blank_value_or_none(row, 'state'),
+                                zip_code = non_blank_value_or_none(row, 'zip_code'),
+                                parcel_id = non_blank_value_or_none(row, 'parcel_id'),
+                                residence = boolify(non_blank_value_or_none(row, 'residence')),
+                                available_transportation = non_blank_value_or_none(row, 'location_transportation'),
+                                parent_location = non_blank_value_or_none(row, 'parent_location'),
                                 # Note that parent_location has not yet been added to the Assets (since 
                                 # the original loader didn't do this), so now it's being added to RawAssets
                                 # as a string, representing the name of the location.
@@ -174,14 +174,14 @@ class Command(BaseCommand):
                                 # Location instance. It might eventually make sense to make this
                                 # association, but there's no data or wiring or front end features
                                 # to support it at this point.
-                                latitude = non_blank_type_or_none(row, 'latitude', float)
-                                longitude = non_blank_type_or_none(row, 'longitude', float)
+                                latitude = non_blank_type_or_none(row, 'latitude', float),
+                                longitude = non_blank_type_or_none(row, 'longitude', float),
                                 #geom =  We're still not uploading the geom field yet because it wasn't
                                 # in the sample_assets.csv field used to populate the Asset model.
                                 # There are only a few features with useful geom values (boundaries of 
                                 # parks mostly), and those will be handled later, once the front end
                                 # is ready to use those values.
-                                geocoding_properties = non_blank_value_or_none(row, 'geocoding_properties')
+                                geocoding_properties = non_blank_value_or_none(row, 'geocoding_properties'),
 
                                 organization_name = non_blank_value_or_none(row, 'organization_name'),
                                 organization_email = non_blank_value_or_none(row, 'organization_email'),
