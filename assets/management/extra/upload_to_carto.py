@@ -5,7 +5,7 @@ import time
 from carto.auth import APIKeyAuthClient
 from carto.sql import SQLClient
 
-CARTO_API_KEY = "MBPotVjm1uSEvsZLYI0KtQ"
+import CARTO_API_KEY from parameters.credentials
 
 USERNAME = "wprdc"
 USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
