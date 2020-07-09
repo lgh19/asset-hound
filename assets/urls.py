@@ -17,5 +17,5 @@ urlpatterns += router.urls
 
 
 urlpatterns += [
-    re_path(r'^', upload_file, name='update-assets'),
+    re_path(r'^admin/update-assets/', upload_file, name='update-assets'),
 ]
