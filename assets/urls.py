@@ -1,6 +1,8 @@
+from django.urls import re_path
+
 from rest_framework import routers
 
-from assets.views import AssetViewSet, AssetTypeViewSet, CategoryViewSet
+from assets.views import AssetViewSet, AssetTypeViewSet, CategoryViewSet, upload_file
 
 # register DRF Views and ViewSets
 router = routers.DefaultRouter()
@@ -12,3 +14,8 @@ urlpatterns = []
 
 # appends registered API urls to `urlpatterns`
 urlpatterns += router.urls
+
+
+urlpatterns += [
+    re_path(r'^', upload_file, name='update-assets'),
+]
