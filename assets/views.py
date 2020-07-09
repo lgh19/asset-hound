@@ -53,15 +53,15 @@ def handle_uploaded_file(f, mode):
 
             asset_name = row['name']
             if asset_name != destination_asset.name:
-                more_results.append(f"asset_name {'will be ' if mode == 'validate'}changed from {destination_asset.name} to {asset_name}.")
+                more_results.append(f"asset_name {'will be ' if mode == 'validate' else ''}changed from {destination_asset.name} to {asset_name}.")
                 destination_asset.asset_name = asset_name
 
             asset_types = row['asset_type'].split('|')
             old_types = list_of(destination_asset.asset_types)
             if asset_type != old_types:
-                more_results.append(f"asset_type {'will be ' if mode == 'validate'}changed from {old_types} to {asset_types}.")
+                more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {old_types} to {asset_types}.")
                 try:
-                    validated_asset_types = [AssetType.objects.get(name=asset_type)[0] for asset_type in asset_types]) # Change get to get_or_create to allow creation of new asset types.
+                    validated_asset_types = [AssetType.objects.get(name=asset_type)[0] for asset_type in asset_types] # Change get to get_or_create to allow creation of new asset types.
                 except assets.models.AssetType.DoesNotExist:
                     more_results.append("Unable to find one of these asset types: {asset_types}.\n ABORTING!!!")
                     break
