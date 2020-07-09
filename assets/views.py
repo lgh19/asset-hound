@@ -36,9 +36,9 @@ def handle_uploaded_file(f):
             primary_raw_asset = primary_raw_asset_iterator[0]
 
             ids_to_merge = row['ids_to_merge']
-            raw_assets_iterator = RawAsset.objects.filter(id = ids_to_merge)
-            assert len(raw_assets_iterator) > 0 # To ensure they exist in the database.
-            raw_assets = list(raw_assets_iterator)
+            joined_raw_assets = RawAsset.objects.filter(id = ids_to_merge)
+            raw_assets = joined_raw_assets.split('+')
+            assert len(raw_assets) > 0 # To ensure they exist in the database.
 
             asset_id = row['asset_id']
             destination_asset_iterator = Asset.objects.filter(id = asset_id)
