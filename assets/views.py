@@ -30,12 +30,17 @@ def handle_uploaded_file(f):
             assert len(primary_raw_asset_iterator) == 1 # To ensure it exists in the database.
             primary_raw_asset = primary_raw_asset_iterator[0]
 
+            ids_to_merge = row['ids_to_merge']
+            raw_assets_iterator = RawAsset.objects.filter(id = ids_to_merge)
+            assert len(raw_assets_iterator) > 0 # To ensure they exist in the database.
+            raw_assets = list(raw_assets_iterator)
+
             asset_id = row['asset_id']
             destination_asset_iterator = Asset.objects.filter(id = asset_id)
             assert len(destination_asset_iterator) == 1 # To ensure it exists in the database.
             destination_asset = destination_asset_iterator[0]
 
-            result = f"Linked raw assets with IDs {} and names {} to asset with PREVIOUS name {}."
+            result = f"Preparing to link raw assets with IDs {[r.id for r in raw_assets]} and names {r.name for r in raw_assets]} to asset with PREVIOUS name {asset_id.name}."
             results.append(result)
 
     return results
