@@ -44,11 +44,15 @@ def handle_uploaded_file(f):
             assert len(destination_asset_iterator) == 1 # To ensure it exists in the database.
             destination_asset = destination_asset_iterator[0]
 
-            more_results = [f"Preparing to link raw assets with IDs {[r.id for r in raw_assets]} and names {[r.name for r in raw_assets]} to asset with PREVIOUS name {asset_id.name}."]
+            more_results = [f"Preparing to link raw assets with IDs {[r.id for r in raw_assets]} and names {[r.name for r in raw_assets]} to asset with PREVIOUS name {destination_asset.name}."]
+
+            asset_name = row['name']
+            if asset_name != destination_asset.name:
+                more_results.append(f"asset_name will be changed from {destination_asset.name} to {asset_name}.")
 
             asset_type = row['asset_type']
             old_types = list_of(destination_asset.asset_types)
-            if asset_type != old_types
+            if asset_type != old_types:
                 more_results.append(f"asset_type will be changed from {old_types} to {asset_type}.")
 
             results += more_results
