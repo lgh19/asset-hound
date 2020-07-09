@@ -14,7 +14,7 @@ Upload a merge-instructions CSV file here to attempt to execute asset merges (sp
         <button type="submit">Upload</button>
     </form>
 
-{% if len(results) > 0 %}
+{% if results %}
     {{ results }}
     There should also be a "Yes, complete the update" button.
 {% endif %}
