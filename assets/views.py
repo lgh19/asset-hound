@@ -13,6 +13,10 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from assets.forms import UploadFileForm
 
+def list_of(named_things):
+    # This converts ManyToManyField values back to pipe-delimited lists.
+    return '|'.join([t.name for t in named_things.all()])
+
 def handle_uploaded_file(f):
     import csv
     results = []
@@ -40,8 +44,14 @@ def handle_uploaded_file(f):
             assert len(destination_asset_iterator) == 1 # To ensure it exists in the database.
             destination_asset = destination_asset_iterator[0]
 
-            result = f"Preparing to link raw assets with IDs {[r.id for r in raw_assets]} and names {r.name for r in raw_assets]} to asset with PREVIOUS name {asset_id.name}."
-            results.append(result)
+            more_results = [f"Preparing to link raw assets with IDs {[r.id for r in raw_assets]} and names {[r.name for r in raw_assets]} to asset with PREVIOUS name {asset_id.name}."]
+
+            asset_type = row['asset_type']
+            old_types = list_of(destination_asset.asset_types)
+            if asset_type != old_types
+                more_results.append(f"asset_type will be changed from {old_types} to {asset_type}.")
+
+            results += more_results
 
     return results
 
