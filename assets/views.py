@@ -27,7 +27,8 @@ def handle_uploaded_file(f):
         #    # ensures that large files don't overwhelm your system's memory.
         #    destination.write(chunk)
     else:
-        reader = csv.DictReader(f)
+        decoded_file = f.read().decode('utf-8').splitlines()
+        reader = csv.DictReader(decoded_file)
         for row in reader:
             raw_id = row['id']
             primary_raw_asset_iterator = RawAsset.objects.filter(id = raw_id)
