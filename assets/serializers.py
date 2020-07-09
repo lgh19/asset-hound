@@ -9,7 +9,6 @@ from assets.models import (
     Location,
     AssetType,
     Organization,
-    AccessibilityFeature,
     ProvidedService,
     TargetPopulation,
     DataSource, Category
@@ -53,12 +52,6 @@ class OrganizationSerializer(serializers.ModelSerializer):
         fields = ['name', 'location', 'email', 'phone']
 
 
-class AccessibilityFeatureSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AccessibilityFeature
-        fields = ['name']
-
-
 class ProvidedServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProvidedService
@@ -80,7 +73,6 @@ class DataSourceSerializer(serializers.ModelSerializer):
 class AssetSerializer(serializers.ModelSerializer):
     organization = OrganizationSerializer()
     location = LocationSerializer()
-    accessibility_features = AccessibilityFeatureSerializer(many=True)
     services = ProvidedServiceSerializer(many=True)
     hard_to_count_population = TargetPopulationSerializer(many=True)
     data_source = DataSourceSerializer()
@@ -103,7 +95,7 @@ class AssetSerializer(serializers.ModelSerializer):
             'holiday_hours_of_operation',
             'child_friendly',
             'capacity',
-            'accessibility_features',
+            'accessibility',
             'internet_access',
             'wifi_network',
             'computers_available',

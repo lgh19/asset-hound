@@ -5,7 +5,6 @@ from .models import (AssetType,
                      Tag,
                      Location, HistoricalLocation,
                      Organization, HistoricalOrganization,
-                     AccessibilityFeature,
                      ProvidedService,
                      TargetPopulation,
                      DataSource,
@@ -52,12 +51,6 @@ class OrganizationAdmin(admin.ModelAdmin):
 class HistoricalOrganizationAdmin(admin.ModelAdmin):
     list_display = ('id', 'history_id', 'history_type', 'history_date', 'history_change_reason')
     #search_fields = ('name',)
-
-
-@admin.register(AccessibilityFeature)
-class AccessibilityFeatureAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name')
-    search_fields = ('name',)
 
 
 @admin.register(ProvidedService)

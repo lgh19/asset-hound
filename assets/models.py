@@ -105,13 +105,6 @@ class Organization(models.Model):
         return self.name or '<MISSING NAME>'
 
 
-class AccessibilityFeature(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name or '<MISSING NAME>'
-
-
 class ProvidedService(models.Model):
     name = models.CharField(max_length=255)
 
@@ -158,7 +151,6 @@ class BaseAsset(models.Model):
     asset_types = models.ManyToManyField('AssetType')
     # category = models.ManyToManyField('Category')
     services = models.ManyToManyField('ProvidedService', blank=True)
-    accessibility_features = models.ManyToManyField('AccessibilityFeature', blank=True)
     hard_to_count_population = models.ManyToManyField('TargetPopulation', blank=True)
     data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True)
 
@@ -302,7 +294,6 @@ class Asset(models.Model):
     location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, blank=True)
     organization = models.ForeignKey('Organization', on_delete=models.PROTECT, null=True, blank=True)
     services = models.ManyToManyField('ProvidedService', blank=True)
-    accessibility_features = models.ManyToManyField('AccessibilityFeature', blank=True)
     hard_to_count_population = models.ManyToManyField('TargetPopulation', blank=True)
     data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True)
 
