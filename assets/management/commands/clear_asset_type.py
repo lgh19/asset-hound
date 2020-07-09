@@ -13,7 +13,6 @@ from assets.models import (Asset,
                            Location,
                            AssetType,
                            Tag,
-                           AccessibilityFeature,
                            ProvidedService,
                            TargetPopulation,
                            DataSource)

@@ -13,7 +13,6 @@ from assets.models import (RawAsset,
                            Asset,
                            AssetType,
                            Tag,
-                           AccessibilityFeature,
                            ProvidedService,
                            TargetPopulation,
                            DataSource)
@@ -117,9 +116,6 @@ class Command(BaseCommand):
                             tags = [Tag.objects.get_or_create(name=tag)[0] for tag in
                                     parse_cell(row['tags'])] if row['tags'] else []
 
-                            accessibility_features = [AccessibilityFeature.objects.get_or_create(name=access)[0] for access in
-                                                      parse_cell(row['accessibility'])] if row['accessibility'] else []
-
                             services = [ProvidedService.objects.get_or_create(name=service)[0] for service in
                                         parse_cell(row['services'])] if 'services' in row else []
 
@@ -151,6 +147,7 @@ class Command(BaseCommand):
                                 child_friendly=boolify(non_blank_value_or_none(row, 'child_friendly')),
                                 internet_access=boolify(non_blank_value_or_none(row, 'internet_access')),
                                 computers_available=boolify(non_blank_value_or_none(row, 'computers_available')),
+                                accessibility=boolify(non_blank_value_or_none(row, 'accessibility')),
                                 open_to_public=boolify(non_blank_value_or_none(row, 'open_to_public')),
                                 sensitive=boolify(non_blank_value_or_none(row, 'sensitive')),
                                 do_not_display=boolify(non_blank_value_or_none(row, 'do_not_display')),
@@ -196,7 +193,6 @@ class Command(BaseCommand):
                             raw_asset.asset_types.set(asset_types)
                             raw_asset.tags.set(tags)
                             raw_asset.services.set(services)
-                            raw_asset.accessibility_features.set(accessibility_features)
                             raw_asset.hard_to_count_population.set(hard_to_count_pops)
                             raw_asset.save()
                             type_count += 1

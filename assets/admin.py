@@ -112,7 +112,6 @@ class AssetAdmin(admin.ModelAdmin):
         'location',
         'asset_types',
         'tags',
-        'accessibility_features',
         'services',
         'hard_to_count_population',
     )
@@ -169,7 +168,6 @@ class RawAssetAdmin(admin.ModelAdmin):
     autocomplete_fields = (
         'asset_types',
         'tags',
-        'accessibility_features',
         'services',
         'hard_to_count_population',
     )
