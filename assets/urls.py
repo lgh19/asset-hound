@@ -14,8 +14,3 @@ urlpatterns = []
 
 # appends registered API urls to `urlpatterns`
 urlpatterns += router.urls
-
-
-urlpatterns += [
-    re_path(r'^admin/update-assets/', upload_file, name='update-assets'),
-]
