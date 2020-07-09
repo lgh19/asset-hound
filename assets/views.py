@@ -17,7 +17,7 @@ def list_of(named_things):
     # This converts ManyToManyField values back to pipe-delimited lists.
     return '|'.join([t.name for t in named_things.all()])
 
-def handle_uploaded_file(f):
+def handle_uploaded_file(f, mode):
     import csv
     results = []
 
@@ -48,14 +48,30 @@ def handle_uploaded_file(f):
 
             more_results = [f"Preparing to link raw assets with IDs {[r.id for r in raw_assets]} and names {[r.name for r in raw_assets]} to asset with PREVIOUS name {destination_asset.name}."]
 
+            if mode == 'validate':
+                more_results.append("(Just validating stuff here.)")
+
             asset_name = row['name']
             if asset_name != destination_asset.name:
-                more_results.append(f"asset_name will be changed from {destination_asset.name} to {asset_name}.")
+                more_results.append(f"asset_name {'will be ' if mode == 'validate'}changed from {destination_asset.name} to {asset_name}.")
+                destination_asset.asset_name = asset_name
 
-            asset_type = row['asset_type']
+            asset_types = row['asset_type'].split('|')
             old_types = list_of(destination_asset.asset_types)
             if asset_type != old_types:
-                more_results.append(f"asset_type will be changed from {old_types} to {asset_type}.")
+                more_results.append(f"asset_type {'will be ' if mode == 'validate'}changed from {old_types} to {asset_types}.")
+                try:
+                    validated_asset_types = [AssetType.objects.get(name=asset_type)[0] for asset_type in asset_types]) # Change get to get_or_create to allow creation of new asset types.
+                except assets.models.AssetType.DoesNotExist:
+                    more_results.append("Unable to find one of these asset types: {asset_types}.\n ABORTING!!!")
+                    break
+                finally:
+                    destination_asset.asset_types.set(validated_asset_types)
+
+            if mode == 'update':
+                more_results.apend("ACTUALLY ABOUT TO DO IT (after some code changes).")
+                #destination_asset.save()
+                #raw_assets.save()
 
             results += more_results
 
@@ -65,7 +81,11 @@ def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            results = handle_uploaded_file(request.FILES['file'])
+            if 'validate' in self.request.POST: # The user hit the "Validate" button:
+                mode = "validate"
+            else:
+                mode = "update"
+            results = handle_uploaded_file(request.FILES['file'], mode)
             return render(request, 'update.html', {'form': form, 'results': results})
     else:
         form = UploadFileForm()

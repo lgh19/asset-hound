@@ -10,12 +10,15 @@ Upload a merge-instructions CSV file here to attempt to execute asset merges (sp
 
     <form method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
-        {{ form }}
-        <button type="submit">Upload</button>
+        {{ form }}<P>
+        <button type="submit" name="validate">Validate</button>
+        <button type="submit" name="update">Update assets</button>
     </form>
 
 {% if results %}
-    {{ results }}
+    {% for result in results %}
+        {{ result }}<br>
+
     There should also be a "Yes, complete the update" button.
 {% endif %}
 </body>
