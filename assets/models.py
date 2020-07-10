@@ -296,9 +296,7 @@ class Asset(models.Model):
     date_entered = models.DateTimeField(editable=False, auto_now_add=True)
     last_updated = models.DateTimeField(editable=False, auto_now=True)
 
-    history = HistoricalRecords() # This adds a HistoricalAsset table to the database, which
-    # will record a new row every time a tracked change (model creation, change, or deletion)
-    # occurs.
+    history = HistoricalRecords()
 
     @property
     def category(self):

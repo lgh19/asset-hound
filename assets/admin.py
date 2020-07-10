@@ -72,42 +72,17 @@ class OrganizationAdmin(SimpleHistoryAdmin):
 
 
 @admin.register(Asset)
-class AssetAdmin(admin.ModelAdmin):
+class AssetAdmin(SimpleHistoryAdmin):
     list_display = (
         'id',
         'name',
         'organization',
-        # 'localizability',
         'location',
-        # 'url',
-        # 'email',
-        # 'phone',
-        # 'hours_of_operation',
-        # 'holiday_hours_of_operation',
-        # 'child_friendly',
-        # 'capacity',
-        # 'internet_access',
-        # 'wifi_network',
-        # 'computers_available',
-        # 'open_to_public',
-        # 'sensitive',
         'date_entered',
         'last_updated',
         'data_source',
         'primary_key_from_rocket',
     )
-    # list_filter = (
-    #     'organization',
-    #     'location',
-    #     'child_friendly',
-    #     'internet_access',
-    #     'computers_available',
-    #     'open_to_public',
-    #     'sensitive',
-    #     'date_entered',
-    #     'last_updated',
-    #     'data_source',
-    # )
     autocomplete_fields = (
         'location',
         'asset_types',
