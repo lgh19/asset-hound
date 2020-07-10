@@ -4,7 +4,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.settings import api_settings
 #from rest_framework_csv.renderers import CSVRenderer
 
-from assets.models import RawAsset, Asset, AssetType, Category
+from assets.models import RawAsset, Asset, AssetType, Category, Tag, TargetPopulation, ProvidedService, Location, Organization
 from assets.serializers import AssetSerializer, AssetGeoJsonSerializer, AssetListSerializer, AssetTypeSerializer, \
     CategorySerializer
 
@@ -16,6 +16,22 @@ from assets.forms import UploadFileForm
 def list_of(named_things):
     # This converts ManyToManyField values back to a list.
     return [t.name for t in named_things.all()]
+
+def process_many_to_many_field(row, destination_asset, source_field_name, destination_field_name, more_results):
+    asset_types = row['asset_type'].split('|') # The tricky thing about generalizing this is that there is a source field name
+    list_of_old_types = list_of(destination_asset.asset_types) # and a table-ized field name, and these may differ.
+    #names_of_old_types = [t.name for t in destination_asset.asset_types]
+    if set(asset_types) != set(list_of_old_types):
+        more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {set(list_of_old_types)} to {set(asset_types)}.")
+        try:
+            validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in asset_types] # Change get to get_or_create to allow creation of new asset types.
+        except assets.models.AssetType.DoesNotExist:
+            more_results.append("Unable to find one of these asset types: {asset_types}.\n ABORTING!!!")
+            break
+        finally:
+            destination_asset.asset_types.set(validated_asset_types)
+    return destination_asset, more_results
+
 
 def handle_uploaded_file(f, mode):
     import csv
@@ -83,10 +99,32 @@ def handle_uploaded_file(f, mode):
                 more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                 destination_asset.location.street_address = new_value
 
+            source_field_name = 'city'
+            new_value = row[source_field_name]
+            old_value = destination_asset.location.city
+            if new_value != old_value:
+                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                destination_asset.location.city = new_value
+
+            source_field_name = 'state'
+            new_value = row[source_field_name]
+            old_value = destination_asset.location.state
+            if new_value != old_value:
+                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                destination_asset.location.state = new_value
+
+            source_field_name = 'zip_code'
+            new_value = row[source_field_name]
+            old_value = destination_asset.location.zip_code
+            if new_value != old_value:
+                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                destination_asset.location.zip_code = new_value
+
             if mode == 'update':
-                more_results.append("ACTUALLY ABOUT TO DO IT (after some code changes).")
+                more_results.append("Remember to verify that the Location updates.")
                 #destination_asset.save()
                 #raw_assets.save()
+            more_results.append("Remember to verify that the Location updates.")
 
             results += more_results
 
