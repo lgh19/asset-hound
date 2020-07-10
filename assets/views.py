@@ -122,41 +122,18 @@ def handle_uploaded_file(f, mode):
                 destination_asset.tags.set(validated_values)
 
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'city', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'state', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'zip_code', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'parcel_id', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'residence', field_type=bool)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'latitude', field_type=float)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'longitude', field_type=float)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'available_transportation', field_type=str)
+            # Ignore parent location for now.
 
-            source_field_name = 'city'
-            new_value = row[source_field_name]
-            old_value = location.city
-            if new_value != old_value:
-                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                location.city = new_value
-
-            source_field_name = 'state'
-            new_value = row[source_field_name]
-            old_value = location.state
-            if new_value != old_value:
-                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                location.state = new_value
-
-            source_field_name = 'zip_code'
-            new_value = row[source_field_name]
-            old_value = location.zip_code
-            if new_value != old_value:
-                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                location.zip_code = new_value
-
-            source_field_name = 'parcel_id'
-            new_value = row[source_field_name]
-            old_value = location.parcel_id
-            if new_value != old_value:
-                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                location.parcel_id = new_value
-
-            source_field_name = 'residence'
-            new_value = boolify(row[source_field_name])
-            old_value = location.residence
-            if new_value != old_value:
-                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                location.residence = new_value
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'url', field_type=str)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'email', field_type=str)
 
             if mode == 'update':
                 more_results.append("Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)")
