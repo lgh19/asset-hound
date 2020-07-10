@@ -20,6 +20,29 @@ def boolify(x):
         return False
     return None
 
+def non_blank_value_or_none(row, field):
+    """If the field is in the row dict, return the value (unless it's an empty
+    string, which gets coerced to None).
+    Otherwise return None."""
+    return row[field] if (field in row and row[field] != '') else None
+
+def non_blank_type_or_none(row, field, desired_type):
+    """This function tries to cast the value of row[field] to
+    the passed desired type (e.g, float or int). If it fails,
+    or if the passed value is an empty string (which is how
+    None values are passed by CSVs), it returns None.
+
+    Note that this does not yet support fields like
+    PhoneNumberField, URLField, and EmailField."""
+    if field in row:
+        if row[field] == '':
+            return None
+        try:
+            return desired_type(row[field])
+        except ValueError:
+            return None
+    return None
+
 def pipe_delimit(xs):
     return '|'.join([str(x) for x in xs])
 
@@ -28,7 +51,8 @@ def list_of(named_things):
     return [t.name for t in named_things.all()]
 
 def check_or_update_value(instance, row, mode, more_results, source_field_name, field_type=str):
-    new_value = field_type(row[source_field_name])
+    new_value = non_blank_type_or_none(row, source_field_name, field_type)
+
     old_value = getattr(instance, source_field_name)
     if new_value != old_value:
         more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
