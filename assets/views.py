@@ -86,7 +86,7 @@ def handle_uploaded_file(f, mode):
             list_of_old_values = list_of(destination_asset.tags)
             if set(new_values) != set(list_of_old_values):
                 more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                validated_values = [Tag.objects.get_or_create(name=value) for value in new_values]
+                validated_values = [Tag.objects.get_or_create(name=value)[0] for value in new_values]
                 destination_asset.tags.set(validated_values)
 
             source_field_name = 'street_address'
