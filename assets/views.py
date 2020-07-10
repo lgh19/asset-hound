@@ -8,25 +8,20 @@ from assets.models import RawAsset, Asset, AssetType, Category, Tag, TargetPopul
 from assets.serializers import AssetSerializer, AssetGeoJsonSerializer, AssetListSerializer, AssetTypeSerializer, \
     CategorySerializer
 
+from assets.management.commands.load_assets import parse_cell, standardize_phone
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from assets.forms import UploadFileForm
 
-def boolify(x):
+def boolify(x): # This differs from the assets.management.commands.load_assets versiion of boolify.
     if x.lower() in ['true', 't']:
         return True
     if x.lower() in ['false', 'f']:
         return False
     return None
 
-def non_blank_value_or_none(row, field):
-    """If the field is in the row dict, return the value (unless it's an empty
-    string, which gets coerced to None).
-    Otherwise return None."""
-    return row[field] if (field in row and row[field] != '') else None
-
-def non_blank_type_or_none(row, field, desired_type):
+def non_blank_type_or_none(row, field, desired_type): # This could be imported from elsewhere.
     """This function tries to cast the value of row[field] to
     the passed desired type (e.g, float or int). If it fails,
     or if the passed value is an empty string (which is how
@@ -121,6 +116,40 @@ def handle_uploaded_file(f, mode):
                 validated_values = [Tag.objects.get_or_create(name=value)[0] for value in new_values]
                 destination_asset.tags.set(validated_values)
 
+            source_field_name = 'services'
+            new_values = row[source_field_name].split('|')
+            list_of_old_values = list_of(destination_asset.services)
+            if set(new_values) != set(list_of_old_values):
+                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
+                validated_values = [ProvidedService.objects.get_or_create(name=value)[0] for value in new_values]
+                destination_asset.services.set(validated_values)
+
+            source_field_name = 'hard_to_count_population'
+            new_values = row[source_field_name].split('|')
+            list_of_old_values = list_of(destination_asset.hard_to_count_population)
+            if set(new_values) != set(list_of_old_values):
+                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
+                validated_values = [TargetPopulation.objects.get_or_create(name=value)[0] for value in new_values]
+                destination_asset.hard_to_count_population.set(validated_values)
+
+            # Oddball legacy conversion to be deleted:
+            source_field_name = 'accessibility_features'
+            new_value = row[source_field_name]
+            old_value = destination_asset.accessibility
+            if new_value != old_value:
+                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                destination_asset.accessibility = boolify(new_value)
+
+            organization, more_results = check_or_update_value(organization, row, mode, more_results, source_field_name = 'organization_name', field_type=str)
+            organization, more_results = check_or_update_value(organization, row, mode, more_results, source_field_name = 'organization_email', field_type=str)
+
+            source_field_name = 'organization_phone'
+            new_value = row[source_field_name]
+            old_value = organization.phone
+            if new_value != old_value:
+                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                organization.phone = standardize_phone(new_value)
+
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'city', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'state', field_type=str)
@@ -130,10 +159,33 @@ def handle_uploaded_file(f, mode):
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'latitude', field_type=float)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'longitude', field_type=float)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'available_transportation', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'geocoding_properties', field_type=str)
             # Ignore parent location for now.
 
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'url', field_type=str)
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'email', field_type=str)
+            source_field_name = 'phone'
+            new_value = row[source_field_name]
+            old_value = destination_asset.phone
+            if new_value != old_value:
+                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                destination_asset.phone = standardize_phone(new_value)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'hours_of_operation', field_type=str)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'holiday_hours_of_operation', field_type=str)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'periodicity', field_type=str)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'capacity', field_type=int)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'periodicity', field_type=str)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'wifi_network', field_type=str)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'wifi_network', field_type=str)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'internet_access', field_type=bool)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'computers_available', field_type=bool)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'accessibility', field_type=bool)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'open_to_public', field_type=bool)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'child_friendly', field_type=bool)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'do_not_display', field_type=bool)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'sensitive', field_type=bool)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'localizability', field_type=str)
+            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'etl_notes', field_type=str)
 
             if mode == 'update':
                 more_results.append("Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)")
