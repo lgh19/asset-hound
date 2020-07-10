@@ -242,7 +242,7 @@ class RawAsset(BaseAsset):
     # will be tracked.
 
 
-#class Asset(BaseAsset): # This is supposed to replace the original Asset class.
+# class Asset(BaseAsset): # This is supposed to replace the original Asset class.
 #    # [ ] After a staging server has been set up, with a duplicate database,
 #    # Check (first when making migrations) that this will not screw everything up.
 #

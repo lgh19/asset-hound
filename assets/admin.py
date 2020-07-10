@@ -1,24 +1,32 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-
-from .models import (
-    AssetType,
-    Tag,
-    Location,
-    Organization,
-    ProvidedService,
-    TargetPopulation,
-    DataSource,
-    Asset,
-    RawAsset,
-    Category
-)
+from simple_history.admin import SimpleHistoryAdmin
+from .models import (AssetType,
+                     Tag,
+                     Location,
+                     Organization,
+                     ProvidedService,
+                     TargetPopulation,
+                     DataSource,
+                     Asset,
+                     RawAsset,
+                     Category)
 
 
 @admin.register(AssetType)
 class AssetTypeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'title', 'category')
     search_fields = ('name',)
+
+
+class AssetTypeInline(admin.TabularInline):
+    model = AssetType
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', ]
+    search_fields = ['name', ]
 
 
 @admin.register(Tag)
@@ -28,20 +36,13 @@ class TagAdmin(admin.ModelAdmin):
 
 
 @admin.register(Location)
-class LocationAdmin(admin.ModelAdmin):
+class LocationAdmin(SimpleHistoryAdmin):
     list_display = (
         'id',
         'name',
         'geom',
     )
     raw_id_fields = ('parent_location',)
-    search_fields = ('name',)
-
-
-@admin.register(Organization)
-class OrganizationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'location', 'email', 'phone')
-    list_filter = ('location',)
     search_fields = ('name',)
 
 
@@ -60,6 +61,13 @@ class TargetPopulationAdmin(admin.ModelAdmin):
 @admin.register(DataSource)
 class DataSourceAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'url')
+    search_fields = ('name',)
+
+
+@admin.register(Organization)
+class OrganizationAdmin(SimpleHistoryAdmin):
+    list_display = ('id', 'name', 'location', 'email', 'phone')
+    list_filter = ('location',)
     search_fields = ('name',)
 
 
@@ -111,7 +119,7 @@ class AssetAdmin(admin.ModelAdmin):
 
 
 @admin.register(RawAsset)
-class RawAssetAdmin(admin.ModelAdmin):
+class RawAssetAdmin(SimpleHistoryAdmin):
     list_display = (
         'id',
         'name',
@@ -159,13 +167,3 @@ class RawAssetAdmin(admin.ModelAdmin):
         'hard_to_count_population',
     )
     search_fields = ('name', 'street_address', 'city', 'zip_code')
-
-
-class AssetTypeInline(admin.TabularInline):
-    model = AssetType
-
-
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', ]
-    search_fields = ['name', ]
