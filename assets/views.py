@@ -141,7 +141,7 @@ def handle_uploaded_file(f, mode):
 
             source_field_name = 'organization_name'
             destination_field_name = 'name'
-            new_value = non_blank_type_or_none(row[source_field_name])
+            new_value = non_blank_type_or_none(row[source_field_name], str)
             old_value = organization.name
             if new_value != old_value:
                 more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
@@ -149,14 +149,14 @@ def handle_uploaded_file(f, mode):
 
             source_field_name = 'organization_email'
             destination_field_name = 'email'
-            new_value = non_blank_type_or_none(row[source_field_name])
+            new_value = non_blank_type_or_none(row[source_field_name], str)
             old_value = organization.email
             if new_value != old_value:
                 more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                 organization.email = new_value
 
             source_field_name = 'organization_phone'
-            new_value = non_blank_type_or_none(row[source_field_name])
+            new_value = row[source_field_name]
             old_value = organization.phone
             if new_value != old_value:
                 more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
