@@ -58,7 +58,6 @@ def handle_uploaded_file(f, mode):
 
             asset_types = row['asset_type'].split('|')
             list_of_old_types = list_of(destination_asset.asset_types)
-            #names_of_old_types = [t.name for t in destination_asset.asset_types]
             if set(asset_types) != set(list_of_old_types):
                 more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {set(list_of_old_types)} to {set(asset_types)}.")
                 try:
@@ -68,6 +67,21 @@ def handle_uploaded_file(f, mode):
                     break
                 finally:
                     destination_asset.asset_types.set(validated_asset_types)
+
+            source_field_name = 'tags'
+            new_values = row[source_field_name].split('|')
+            list_of_old_values = list_of(destination_asset.tags)
+            if set(new_values) != set(list_of_old_values):
+                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {set(list_of_old_values)} to {set(new_values)}.")
+                validated_values = [Tag.objects.get_or_create(name=value) for value in new_values]
+                destination_asset.tags.set(validated_values)
+
+            source_field_name = 'street_address'
+            new_value = row[source_field_name]
+            old_value = destination_asset.location.street_address
+            if new_value != old_value:
+                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                destination_asset.location.street_address = new_value
 
             if mode == 'update':
                 more_results.append("ACTUALLY ABOUT TO DO IT (after some code changes).")
