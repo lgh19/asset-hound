@@ -140,14 +140,27 @@ def handle_uploaded_file(f, mode):
                 more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                 destination_asset.accessibility = boolify(new_value)
 
-            organization, more_results = check_or_update_value(organization, row, mode, more_results, source_field_name = 'organization_name', field_type=str)
-            organization, more_results = check_or_update_value(organization, row, mode, more_results, source_field_name = 'organization_email', field_type=str)
+            source_field_name = 'organization_name'
+            destination_field_name = 'name'
+            new_value = row[source_field_name]
+            old_value = organization.name
+            if new_value != old_value:
+                more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                organization.name = new_value
+
+            source_field_name = 'organization_email'
+            destination_field_name = 'email'
+            new_value = row[source_field_name]
+            old_value = organization.email
+            if new_value != old_value:
+                more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                organization.email = new_value
 
             source_field_name = 'organization_phone'
             new_value = row[source_field_name]
             old_value = organization.phone
             if new_value != old_value:
-                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                 organization.phone = standardize_phone(new_value)
 
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
