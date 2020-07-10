@@ -27,6 +27,14 @@ def list_of(named_things):
     # This converts ManyToManyField values back to a list.
     return [t.name for t in named_things.all()]
 
+def check_or_update_value(instance, source_field_name, row, mode, more_results):
+    new_value = row[source_field_name]
+    old_value = getattr(instance, source_field_name)
+    if new_value != old_value:
+        more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+        setattr(instance, source_field_name, new_value)
+    return instance, more_results
+
 def handle_uploaded_file(f, mode):
     import csv
     results = []
@@ -89,12 +97,7 @@ def handle_uploaded_file(f, mode):
                 validated_values = [Tag.objects.get_or_create(name=value)[0] for value in new_values]
                 destination_asset.tags.set(validated_values)
 
-            source_field_name = 'street_address'
-            new_value = row[source_field_name]
-            old_value = location.street_address
-            if new_value != old_value:
-                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                location.street_address = new_value
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address')
 
             source_field_name = 'city'
             new_value = row[source_field_name]
