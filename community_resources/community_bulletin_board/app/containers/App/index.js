@@ -32,6 +32,7 @@ import {
 import { getCommunityDataRequest } from './actions';
 
 import theme from '../../theme';
+import BulletinBoard from '../BulletinBoard';
 
 function App({ community, allLocations, handleRequestCommunityData }) {
   useInjectReducer({ key: 'global', reducer });
@@ -39,7 +40,6 @@ function App({ community, allLocations, handleRequestCommunityData }) {
 
   // Init
   useEffect(() => {
-    console.log('hello');
     handleRequestCommunityData(1);
   }, []);
 
@@ -55,7 +55,8 @@ function App({ community, allLocations, handleRequestCommunityData }) {
     <ThemeProvider theme={theme} style={{ height: '100%' }}>
       <div style={{ height: '100%', display: 'flex' }}>
         <Switch>
-          <Route exact path="/" component={Explorer} />
+          <Route exact path="/" component={BulletinBoard} />
+          <Route exact path="/map" component={Explorer} />
           <Route component={NotFoundPage} />
         </Switch>
         <GlobalStyle />

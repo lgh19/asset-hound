@@ -31,6 +31,10 @@ import CategorySection from '../../components/CategorySection';
 import Map from '../../components/Map';
 import { allLocationsLayer } from './layers';
 import ResourceMap from '../../components/ResourceMap';
+import {
+  makeSelectAllLocationsGeoJSON,
+  makeSelectCommunity,
+} from '../App/selectors';
 
 export function BulletinBoard({
   community,
