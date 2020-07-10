@@ -20,6 +20,9 @@ def boolify(x):
         return False
     return None
 
+def pipe_delimit(xs):
+    return '|'.join([str(x) for x in xs])
+
 def list_of(named_things):
     # This converts ManyToManyField values back to a list.
     return [t.name for t in named_things.all()]
@@ -69,7 +72,7 @@ def handle_uploaded_file(f, mode):
             asset_types = row['asset_type'].split('|')
             list_of_old_types = list_of(destination_asset.asset_types)
             if set(asset_types) != set(list_of_old_types):
-                more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {set(list_of_old_types)} to {set(asset_types)}.")
+                more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_types)} to {pipe_delimit(asset_types)}.")
                 try:
                     validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in asset_types] # Change get to get_or_create to allow creation of new asset types.
                 except assets.models.AssetType.DoesNotExist:
@@ -82,7 +85,7 @@ def handle_uploaded_file(f, mode):
             new_values = row[source_field_name].split('|')
             list_of_old_values = list_of(destination_asset.tags)
             if set(new_values) != set(list_of_old_values):
-                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {set(list_of_old_values)} to {set(new_values)}.")
+                more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
                 validated_values = [Tag.objects.get_or_create(name=value) for value in new_values]
                 destination_asset.tags.set(validated_values)
 
