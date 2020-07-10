@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
-from .models import (AssetType,
-                     Tag,
-                     Location, HistoricalLocation,
-                     Organization, HistoricalOrganization,
-                     ProvidedService,
-                     TargetPopulation,
-                     DataSource,
-                     Asset, HistoricalAsset,
-                     RawAsset, HistoricalRawAsset,
-                     Category)
+from .models import (
+    AssetType,
+    Tag,
+    Location,
+    Organization,
+    ProvidedService,
+    TargetPopulation,
+    DataSource,
+    Asset,
+    RawAsset,
+    Category
+)
 
 
 @admin.register(AssetType)
@@ -35,22 +37,12 @@ class LocationAdmin(admin.ModelAdmin):
     raw_id_fields = ('parent_location',)
     search_fields = ('name',)
 
-@admin.register(HistoricalLocation)
-class HistoricalLocationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'history_id', 'history_type', 'history_date', 'history_change_reason')
-    #search_fields = ('name',)
-
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'location', 'email', 'phone')
     list_filter = ('location',)
     search_fields = ('name',)
-
-@admin.register(HistoricalOrganization)
-class HistoricalOrganizationAdmin(admin.ModelAdmin):
-    list_display = ('id', 'history_id', 'history_type', 'history_date', 'history_change_reason')
-    #search_fields = ('name',)
 
 
 @admin.register(ProvidedService)
@@ -117,18 +109,13 @@ class AssetAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
 
-@admin.register(HistoricalAsset)
-class HistoricalAssetAdmin(admin.ModelAdmin):
-    list_display = ('id', 'history_id', 'history_type', 'history_date', 'history_change_reason')
-    #search_fields = ('name',)
-
 
 @admin.register(RawAsset)
 class RawAssetAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'name',
-        #'organization',
+        # 'organization',
         # 'localizability',
         'street_address',
         'city',
@@ -173,10 +160,6 @@ class RawAssetAdmin(admin.ModelAdmin):
     )
     search_fields = ('name', 'street_address', 'city', 'zip_code')
 
-@admin.register(HistoricalRawAsset)
-class HistoricalRawAssetAdmin(admin.ModelAdmin):
-    list_display = ('id', 'history_id', 'history_type', 'history_date', 'history_change_reason')
-    #search_fields = ('name',)
 
 class AssetTypeInline(admin.TabularInline):
     model = AssetType

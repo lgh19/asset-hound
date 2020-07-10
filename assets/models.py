@@ -5,8 +5,6 @@ from simple_history.models import HistoricalRecords
 
 from assets.utils import geocode_address
 
-# These constant defintitions (put here for BaseAsset and
-# RawAsset) are redundant with those in the Asset class.
 FIXED_LOCALE = 'FIX'
 MOBILE_LOCALE = 'MOB'
 VIRTUAL_LOCALE = 'VIR'
@@ -16,6 +14,7 @@ LOCALIZABILITY_CHOICES = (
     (MOBILE_LOCALE, 'Mobile'),
     (VIRTUAL_LOCALE, 'Cyber'),
 )
+
 
 class AssetType(models.Model):
     """ Asset types """
@@ -65,7 +64,7 @@ class Location(models.Model):
     )
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
-    geom = models.PointField(null=True)
+    geom = models.PointField(null=True, blank=True)
     geocoding_properties = models.TextField(null=True, blank=True)
 
     history = HistoricalRecords()
@@ -126,6 +125,7 @@ class DataSource(models.Model):
     def __str__(self):
         return self.name or '<MISSING NAME>'
 
+
 class BaseAsset(models.Model):
     name = models.CharField(max_length=255)
     localizability = models.CharField(max_length=3, choices=LOCALIZABILITY_CHOICES, null=True, blank=True)
@@ -165,6 +165,7 @@ class BaseAsset(models.Model):
 
     def __str__(self):
         return self.name or '<MISSING NAME>'
+
 
 class RawAsset(BaseAsset):
     # Location and Organization information is all represented in a flat manner here
@@ -258,16 +259,6 @@ class RawAsset(BaseAsset):
 
 
 class Asset(models.Model):
-    FIXED_LOCALE = 'FIX'
-    MOBILE_LOCALE = 'MOB'
-    VIRTUAL_LOCALE = 'VIR'
-
-    LOCALIZABILITY_CHOICES = (
-        (FIXED_LOCALE, 'Fixed'),
-        (MOBILE_LOCALE, 'Mobile'),
-        (VIRTUAL_LOCALE, 'Cyber'),
-    )
-
     name = models.CharField(max_length=255)
     localizability = models.CharField(max_length=3, choices=LOCALIZABILITY_CHOICES, null=True, blank=True)
 
