@@ -14,8 +14,8 @@ from django.shortcuts import render
 from assets.forms import UploadFileForm
 
 def list_of(named_things):
-    # This converts ManyToManyField values back to pipe-delimited lists.
-    return '|'.join([t.name for t in named_things.all()])
+    # This converts ManyToManyField values back to a list.
+    return [t.name for t in named_things.all()]
 
 def handle_uploaded_file(f, mode):
     import csv
@@ -57,11 +57,12 @@ def handle_uploaded_file(f, mode):
                 destination_asset.asset_name = asset_name
 
             asset_types = row['asset_type'].split('|')
-            old_types = list_of(destination_asset.asset_types)
-            if asset_type != old_types:
-                more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {old_types} to {asset_types}.")
+            list_of_old_types = list_of(destination_asset.asset_types)
+            #names_of_old_types = [t.name for t in destination_asset.asset_types]
+            if set(asset_types) != set(list_of_old_types):
+                more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {set(list_of_old_types)} to {set(asset_types)}.")
                 try:
-                    validated_asset_types = [AssetType.objects.get(name=asset_type)[0] for asset_type in asset_types] # Change get to get_or_create to allow creation of new asset types.
+                    validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in asset_types] # Change get to get_or_create to allow creation of new asset types.
                 except assets.models.AssetType.DoesNotExist:
                     more_results.append("Unable to find one of these asset types: {asset_types}.\n ABORTING!!!")
                     break
@@ -69,7 +70,7 @@ def handle_uploaded_file(f, mode):
                     destination_asset.asset_types.set(validated_asset_types)
 
             if mode == 'update':
-                more_results.apend("ACTUALLY ABOUT TO DO IT (after some code changes).")
+                more_results.append("ACTUALLY ABOUT TO DO IT (after some code changes).")
                 #destination_asset.save()
                 #raw_assets.save()
 
@@ -81,7 +82,7 @@ def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            if 'validate' in self.request.POST: # The user hit the "Validate" button:
+            if 'validate' in request.POST: # The user hit the "Validate" button:
                 mode = "validate"
             else:
                 mode = "update"
