@@ -102,11 +102,10 @@ def handle_uploaded_file(f, mode):
                 more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_types)} to {pipe_delimit(asset_types)}.")
                 try:
                     validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in asset_types] # Change get to get_or_create to allow creation of new asset types.
+                    destination_asset.asset_types.set(validated_asset_types)
                 except assets.models.AssetType.DoesNotExist:
                     more_results.append("Unable to find one of these asset types: {asset_types}.\n ABORTING!!!")
                     break
-                finally:
-                    destination_asset.asset_types.set(validated_asset_types)
 
             source_field_name = 'tags'
             new_values = row[source_field_name].split('|')
@@ -142,7 +141,7 @@ def handle_uploaded_file(f, mode):
 
             source_field_name = 'organization_name'
             destination_field_name = 'name'
-            new_value = row[source_field_name]
+            new_value = non_blank_type_or_none(row[source_field_name])
             old_value = organization.name
             if new_value != old_value:
                 more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
@@ -150,14 +149,14 @@ def handle_uploaded_file(f, mode):
 
             source_field_name = 'organization_email'
             destination_field_name = 'email'
-            new_value = row[source_field_name]
+            new_value = non_blank_type_or_none(row[source_field_name])
             old_value = organization.email
             if new_value != old_value:
                 more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                 organization.email = new_value
 
             source_field_name = 'organization_phone'
-            new_value = row[source_field_name]
+            new_value = non_blank_type_or_none(row[source_field_name])
             old_value = organization.phone
             if new_value != old_value:
                 more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
