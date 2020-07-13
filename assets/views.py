@@ -233,7 +233,8 @@ def handle_uploaded_file(f, mode):
                 more_results.append("Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)<hr>")
                 destination_asset.save()
                 location.save()
-                raw_assets.save()
+                for raw_asset in raw_assets:
+                    raw_asset.save()
 
             results += more_results
 
