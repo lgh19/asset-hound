@@ -91,7 +91,7 @@ def handle_uploaded_file(f, mode):
             location = destination_asset.location
             organization = destination_asset.organization
 
-            more_results = [f"Preparing to link raw assets with IDs {[r.id for r in raw_assets]} and names {[r.name for r in raw_assets]} to asset with PREVIOUS name {destination_asset.name}."]
+            more_results = [f"Preparing to link raw assets with IDs {[r.id for r in raw_assets]} and names {[r.name for r in raw_assets]} to asset with PREVIOUS name {destination_asset.name} (id = {asset_id})."]
 
             if mode == 'validate':
                 more_results.append("(Just validating stuff here.)")
@@ -107,13 +107,13 @@ def handle_uploaded_file(f, mode):
             if set(new_values) != set(list_of_old_values):
                 more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
                 if new_values == []:
-                    more_results.append(f"asset_type can not be empty\n ABORTING!!!\n{'_'*40}")
+                    more_results.append(f"asset_type can not be empty\n ABORTING!!!\n<hr>")
                     break
                 try:
                     validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in new_values] # Change get to get_or_create to allow creation of new asset types.
                     destination_asset.asset_types.set(validated_asset_types)
                 except assets.models.AssetType.DoesNotExist:
-                    more_results.append(f"Unable to find one of these asset types: {asset_types}.\n ABORTING!!!\n{'_'*40}")
+                    more_results.append(f"Unable to find one of these asset types: {asset_types}.\n ABORTING!!!\n<hr>")
                     break
 
             source_field_name = 'tags'
@@ -234,7 +234,7 @@ def handle_uploaded_file(f, mode):
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'etl_notes', field_type=str)
 
             if mode == 'update':
-                more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n{'_'*40}")
+                more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n<hr>")
                 destination_asset.save()
                 location.save()
                 for raw_asset in raw_assets:
