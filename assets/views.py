@@ -186,7 +186,7 @@ def handle_uploaded_file(f, mode):
 
                 if mode == 'update' and some_organization_field_changed:
                     more_results.append("Updating Organization.")
-                    #organization.save()
+                    organization.save()
 
 
             # I'm choosing to not update the Location.name field here since we may want to manually name Location instances,
@@ -231,9 +231,9 @@ def handle_uploaded_file(f, mode):
 
             if mode == 'update':
                 more_results.append("Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)<hr>")
-                #destination_asset.save()
-                #location.save()
-                #raw_assets.save()
+                destination_asset.save()
+                location.save()
+                raw_assets.save()
 
             results += more_results
 
