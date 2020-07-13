@@ -103,7 +103,7 @@ def handle_uploaded_file(f, mode):
             if len(raw_assets) == 1:
                 summary = f"{'Validating this process:' if mode =='validate' else ''} Editing the Asset with id = {asset_id}, previously named {destination_asset.name}, and linking it to RawAsset with ID = {raw_assets[0].id} and name = {raw_assets[0].name}."
             else:
-                summary = f"{'Merging' if mode == 'update' else 'Validating the merging of'} RawAssets with IDs {', '.join([r.id for r in raw_assets])} and names {', '.join([r.name for r in raw_assets])} to Asset with id = {asset_id}, previously named {destination_asset.name}."
+                summary = f"{'Merging' if mode == 'update' else 'Validating the merging of'} RawAssets with IDs {', '.join([str(r.id) for r in raw_assets])} and names {', '.join([r.name for r in raw_assets])} to Asset with id = {asset_id}, previously named {destination_asset.name}."
             more_results = [summary]
 
             asset_name = row['name']
