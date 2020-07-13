@@ -188,6 +188,10 @@ def handle_uploaded_file(f, mode):
                     more_results.append("Updating Organization.")
                     #organization.save()
 
+
+            # I'm choosing to not update the Location.name field here since we may want to manually name Location instances,
+            # particularly to deal with cases like the two restaurant locations in Schenley Plaza that have the same
+            # street address and parcel ID but slightly different geocoordinates.
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'city', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'state', field_type=str)
@@ -226,10 +230,9 @@ def handle_uploaded_file(f, mode):
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'etl_notes', field_type=str)
 
             if mode == 'update':
-                more_results.append("Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)")
+                more_results.append("Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)<hr>")
                 #destination_asset.save()
                 #location.save()
-                #organization.save()
                 #raw_assets.save()
 
             results += more_results
