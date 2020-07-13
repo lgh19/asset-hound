@@ -88,7 +88,7 @@ def handle_uploaded_file(f, mode):
 
             ids_to_merge = row['ids_to_merge']
             if ids_to_merge == '':
-                break # Skip rows with no ids to merge.
+                continue # Skip rows with no ids to merge.
             raw_ids = [int(i) for i in ids_to_merge.split('+')]
             raw_assets_iterator = RawAsset.objects.filter(id__in = raw_ids)
             assert len(raw_assets_iterator) > 0 # To ensure some exist in the database.
@@ -196,7 +196,7 @@ def handle_uploaded_file(f, mode):
 
                     source_field_name = 'organization_phone'
                     if source_field_name in row:
-                        new_value = row[source_field_name]
+                        new_value = non_blank_type_or_none(row, source_field_name, str)
                         old_value = organization.phone
                         if new_value != old_value:
                             more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
@@ -227,7 +227,7 @@ def handle_uploaded_file(f, mode):
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'email', field_type=str)
             source_field_name = 'phone'
             if source_field_name in row:
-                new_value = row[source_field_name]
+                new_value = non_blank_type_or_none(row, source_field_name, str)
                 old_value = destination_asset.phone
                 if new_value != old_value:
                     more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
