@@ -37,6 +37,8 @@ def non_blank_type_or_none(row, field, desired_type): # This could be imported f
     if field in row:
         if row[field] == '':
             return None
+        if desired_type == bool:
+            return boolify(row[field])
         try:
             return desired_type(row[field])
         except ValueError:

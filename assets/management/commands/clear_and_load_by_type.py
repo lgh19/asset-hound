@@ -22,6 +22,14 @@ from assets.management.commands.load_assets import parse_cell, get_localizabilit
 
 from pprint import pprint
 
+
+def boolify(x): # This differs from the assets.management.commands.load_assets versiion of boolify.
+    if x.lower() in ['true', 't']:
+        return True
+    if x.lower() in ['false', 'f']:
+        return False
+    return None
+
 def non_blank_value_or_none(row, field):
     """If the field is in the row dict, return the value (unless it's an empty
     string, which gets coerced to None).
@@ -39,6 +47,8 @@ def non_blank_type_or_none(row, field, desired_type):
     if field in row:
         if row[field] == '':
             return None
+        if desired_type == bool:
+            return boolify(row[field])
         try:
             return desired_type(row[field])
         except ValueError:
