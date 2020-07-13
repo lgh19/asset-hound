@@ -50,7 +50,6 @@ INSTALLED_APPS = [
 
     # dependencies
     'corsheaders',
-    'reversion',
     'rest_framework',
     'rest_framework_gis',
     'recurrence',

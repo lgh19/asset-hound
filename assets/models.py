@@ -242,7 +242,7 @@ class RawAsset(BaseAsset):
     # will be tracked.
 
 
-#class Asset(BaseAsset): # This is supposed to replace the original Asset class.
+# class Asset(BaseAsset): # This is supposed to replace the original Asset class.
 #    # [ ] After a staging server has been set up, with a duplicate database,
 #    # Check (first when making migrations) that this will not screw everything up.
 #
@@ -296,9 +296,7 @@ class Asset(models.Model):
     date_entered = models.DateTimeField(editable=False, auto_now_add=True)
     last_updated = models.DateTimeField(editable=False, auto_now=True)
 
-    history = HistoricalRecords() # This adds a HistoricalAsset table to the database, which
-    # will record a new row every time a tracked change (model creation, change, or deletion)
-    # occurs.
+    history = HistoricalRecords()
 
     @property
     def category(self):
