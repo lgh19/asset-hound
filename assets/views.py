@@ -102,7 +102,7 @@ def handle_uploaded_file(f, mode):
             list_of_old_types = list_of(destination_asset.asset_types)
             if set(asset_types) != set(list_of_old_types):
                 more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_types)} to {pipe_delimit(asset_types)}.")
-                if asset_types == []:
+                if asset_types == ['']:
                     more_results.append("asset_type can not be empty\n ABORTING!!!<hr>")
                     break
                 try:
@@ -117,7 +117,7 @@ def handle_uploaded_file(f, mode):
             list_of_old_values = list_of(destination_asset.tags)
             if set(new_values) != set(list_of_old_values):
                 more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                if new_values == []:
+                if new_values == ['']:
                     destination_asset.tags.clear()
                 else:
                     validated_values = [Tag.objects.get_or_create(name=value)[0] for value in new_values]
@@ -128,7 +128,7 @@ def handle_uploaded_file(f, mode):
             list_of_old_values = list_of(destination_asset.services)
             if set(new_values) != set(list_of_old_values):
                 more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                if new_values == []:
+                if new_values == ['']:
                     destination_asset.services.clear()
                 else:
                     validated_values = [ProvidedService.objects.get_or_create(name=value)[0] for value in new_values]
@@ -139,7 +139,7 @@ def handle_uploaded_file(f, mode):
             list_of_old_values = list_of(destination_asset.hard_to_count_population)
             if set(new_values) != set(list_of_old_values):
                 more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                if new_values == []:
+                if new_values == ['']:
                     destination_asset.hard_to_count_population.clear()
                 else:
                     validated_values = [TargetPopulation.objects.get_or_create(name=value)[0] for value in new_values]
