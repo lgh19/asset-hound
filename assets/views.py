@@ -72,16 +72,18 @@ def handle_uploaded_file(f, mode):
             assert len(primary_raw_asset_iterator) == 1 # To ensure it exists in the database.
             primary_raw_asset = primary_raw_asset_iterator[0]
 
+            asset_id = row['asset_id']
+            destination_asset_iterator = Asset.objects.filter(id = asset_id)
+            assert len(destination_asset_iterator) == 1 # To ensure it exists in the database.
+            destination_asset = destination_asset_iterator[0]
+
             ids_to_merge = row['ids_to_merge']
             raw_ids = [int(i) for i in ids_to_merge.split('+')]
             raw_assets_iterator = RawAsset.objects.filter(id__in = raw_ids)
             assert len(raw_assets_iterator) > 0 # To ensure some exist in the database.
             raw_assets = list(raw_assets_iterator)
-
-            asset_id = row['asset_id']
-            destination_asset_iterator = Asset.objects.filter(id = asset_id)
-            assert len(destination_asset_iterator) == 1 # To ensure it exists in the database.
-            destination_asset = destination_asset_iterator[0]
+            for raw_asset in raw_assets:
+                raw_asset.asset = destination_asset
 
             location = destination_asset.location
             organization = destination_asset.organization
