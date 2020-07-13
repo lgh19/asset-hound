@@ -12,7 +12,9 @@ from assets.management.commands.load_assets import parse_cell, standardize_phone
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.contrib.admin.views.decorators import staff_member_required
 from assets.forms import UploadFileForm
+
 
 def boolify(x): # This differs from the assets.management.commands.load_assets versiion of boolify.
     if x.lower() in ['true', 't']:
@@ -244,6 +246,7 @@ def handle_uploaded_file(f, mode):
 
     return results
 
+@staff_member_required
 def upload_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
