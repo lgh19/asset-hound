@@ -76,8 +76,16 @@ class Location(models.Model):
 
     def save(self, *args, **kwargs):
         """ When the model is saved, attempt to geocode it based on address """
-        if not self.pk:
-            self.name = f'{self.street_address} {self.city}, {self.state} {self.zip_code}'
+        if not self.pk or self.name == 'None, None None None':
+            if self.street_address is not None:
+                self.name = f'{self.street_address} {self.city}, {self.state} {self.zip_code}'
+            elif self.parcel_id is not None:
+                self.name = f'{self.parcel_id}'
+            elif self.latitude is not None:
+                self.name = f'({self.latitude}, {self.longitude})'
+            else:
+                self.name = f'<Unnamed location>'
+
         # if not (self.longitude or self.latitude):
         #    self.latitude, self.longitude = geocode_address(self.name) # This can give very
         # bad geocoordinates to an asset (like the centroid of Pittsburgh). Currently ~0.5%
