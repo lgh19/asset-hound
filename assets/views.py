@@ -153,28 +153,40 @@ def handle_uploaded_file(f, mode):
                 more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                 destination_asset.accessibility = boolify(new_value)
 
-            source_field_name = 'organization_name'
-            destination_field_name = 'name'
-            new_value = non_blank_type_or_none(row, source_field_name, str)
-            old_value = organization.name
-            if new_value != old_value:
-                more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                organization.name = new_value
+            if row['organization_name'] == '':
+                destination_asset.organization = None # Set ForiegnKey to None.
+                more_results.append(f"Since organization_name == '', the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
+            else:
+                some_organization_field_changed = False
+                source_field_name = 'organization_name'
+                destination_field_name = 'name'
+                new_value = non_blank_type_or_none(row, source_field_name, str)
+                old_value = organization.name
+                if new_value != old_value:
+                    more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                    organization.name = new_value
+                    some_organization_field_changed = True
 
-            source_field_name = 'organization_email'
-            destination_field_name = 'email'
-            new_value = non_blank_type_or_none(row, source_field_name, str)
-            old_value = organization.email
-            if new_value != old_value:
-                more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                organization.email = new_value
+                source_field_name = 'organization_email'
+                destination_field_name = 'email'
+                new_value = non_blank_type_or_none(row, source_field_name, str)
+                old_value = organization.email
+                if new_value != old_value:
+                    more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                    organization.email = new_value
+                    some_organization_field_changed = True
 
-            source_field_name = 'organization_phone'
-            new_value = row[source_field_name]
-            old_value = organization.phone
-            if new_value != old_value:
-                more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                organization.phone = standardize_phone(new_value)
+                source_field_name = 'organization_phone'
+                new_value = row[source_field_name]
+                old_value = organization.phone
+                if new_value != old_value:
+                    more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                    organization.phone = standardize_phone(new_value)
+                    some_organization_field_changed = True
+
+                if mode == 'update' and some_organization_field_changed:
+                    more_results.append("Updating Organization.")
+                    #organization.save()
 
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'city', field_type=str)
