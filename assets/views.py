@@ -103,13 +103,13 @@ def handle_uploaded_file(f, mode):
             if set(asset_types) != set(list_of_old_types):
                 more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_types)} to {pipe_delimit(asset_types)}.")
                 if asset_types == ['']:
-                    more_results.append("asset_type can not be empty\n ABORTING!!!<hr>")
+                    more_results.append(f"asset_type can not be empty\n ABORTING!!!\n{'_'*40}")
                     break
                 try:
                     validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in asset_types] # Change get to get_or_create to allow creation of new asset types.
                     destination_asset.asset_types.set(validated_asset_types)
                 except assets.models.AssetType.DoesNotExist:
-                    more_results.append("Unable to find one of these asset types: {asset_types}.\n ABORTING!!!<hr>")
+                    more_results.append(f"Unable to find one of these asset types: {asset_types}.\n ABORTING!!!\n{'_'*40}")
                     break
 
             source_field_name = 'tags'
@@ -230,7 +230,7 @@ def handle_uploaded_file(f, mode):
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'etl_notes', field_type=str)
 
             if mode == 'update':
-                more_results.append("Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)<hr>")
+                more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n{'_'*40}")
                 destination_asset.save()
                 location.save()
                 for raw_asset in raw_assets:
