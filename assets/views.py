@@ -21,6 +21,9 @@ def boolify(x): # This differs from the assets.management.commands.load_assets v
         return False
     return None
 
+def eliminate_empty_strings(xs):
+    return [x for x in xs if x != '']
+
 def non_blank_type_or_none(row, field, desired_type): # This could be imported from elsewhere.
     """This function tries to cast the value of row[field] to
     the passed desired type (e.g, float or int). If it fails,
@@ -98,48 +101,49 @@ def handle_uploaded_file(f, mode):
                 more_results.append(f"asset_name {'will be ' if mode == 'validate' else ''}changed from {destination_asset.name} to {asset_name}.")
                 destination_asset.asset_name = asset_name
 
-            asset_types = row['asset_type'].split('|')
-            list_of_old_types = list_of(destination_asset.asset_types)
-            if set(asset_types) != set(list_of_old_types):
-                more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_types)} to {pipe_delimit(asset_types)}.")
-                if asset_types == ['']:
+            source_field_name = 'asset_type'
+            new_values = eliminate_empty_strings(row[source_field_name].split('|'))
+            list_of_old_values = list_of(destination_asset.asset_types)
+            if set(new_values) != set(list_of_old_values):
+                more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
+                if new_values == []:
                     more_results.append(f"asset_type can not be empty\n ABORTING!!!\n{'_'*40}")
                     break
                 try:
-                    validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in asset_types] # Change get to get_or_create to allow creation of new asset types.
+                    validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in new_values] # Change get to get_or_create to allow creation of new asset types.
                     destination_asset.asset_types.set(validated_asset_types)
                 except assets.models.AssetType.DoesNotExist:
                     more_results.append(f"Unable to find one of these asset types: {asset_types}.\n ABORTING!!!\n{'_'*40}")
                     break
 
             source_field_name = 'tags'
-            new_values = row[source_field_name].split('|')
+            new_values = eliminate_empty_strings(row[source_field_name].split('|'))
             list_of_old_values = list_of(destination_asset.tags)
             if set(new_values) != set(list_of_old_values):
                 more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                if new_values == ['']:
+                if new_values == []:
                     destination_asset.tags.clear()
                 else:
                     validated_values = [Tag.objects.get_or_create(name=value)[0] for value in new_values]
                     destination_asset.tags.set(validated_values)
 
             source_field_name = 'services'
-            new_values = row[source_field_name].split('|')
+            new_values = eliminate_empty_strings(row[source_field_name].split('|'))
             list_of_old_values = list_of(destination_asset.services)
             if set(new_values) != set(list_of_old_values):
                 more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                if new_values == ['']:
+                if new_values == []:
                     destination_asset.services.clear()
                 else:
                     validated_values = [ProvidedService.objects.get_or_create(name=value)[0] for value in new_values]
                     destination_asset.services.set(validated_values)
 
             source_field_name = 'hard_to_count_population'
-            new_values = row[source_field_name].split('|')
+            new_values = eliminate_empty_strings(row[source_field_name].split('|'))
             list_of_old_values = list_of(destination_asset.hard_to_count_population)
             if set(new_values) != set(list_of_old_values):
                 more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                if new_values == ['']:
+                if new_values == []:
                     destination_asset.hard_to_count_population.clear()
                 else:
                     validated_values = [TargetPopulation.objects.get_or_create(name=value)[0] for value in new_values]
