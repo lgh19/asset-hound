@@ -87,6 +87,8 @@ def handle_uploaded_file(f, mode):
             destination_asset = destination_asset_iterator[0]
 
             ids_to_merge = row['ids_to_merge']
+            if ids_to_merge == '':
+                break # Skip rows with no ids to merge.
             raw_ids = [int(i) for i in ids_to_merge.split('+')]
             raw_assets_iterator = RawAsset.objects.filter(id__in = raw_ids)
             assert len(raw_assets_iterator) > 0 # To ensure some exist in the database.
