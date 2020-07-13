@@ -5,8 +5,6 @@ from simple_history.models import HistoricalRecords
 
 from assets.utils import geocode_address
 
-# These constant defintitions (put here for BaseAsset and
-# RawAsset) are redundant with those in the Asset class.
 FIXED_LOCALE = 'FIX'
 MOBILE_LOCALE = 'MOB'
 VIRTUAL_LOCALE = 'VIR'
@@ -16,6 +14,7 @@ LOCALIZABILITY_CHOICES = (
     (MOBILE_LOCALE, 'Mobile'),
     (VIRTUAL_LOCALE, 'Cyber'),
 )
+
 
 class AssetType(models.Model):
     """ Asset types """
@@ -65,7 +64,7 @@ class Location(models.Model):
     )
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
-    geom = models.PointField(null=True)
+    geom = models.PointField(null=True, blank=True)
     geocoding_properties = models.TextField(null=True, blank=True)
 
     history = HistoricalRecords()
@@ -134,6 +133,7 @@ class DataSource(models.Model):
     def __str__(self):
         return self.name or '<MISSING NAME>'
 
+
 class BaseAsset(models.Model):
     name = models.CharField(max_length=255)
     localizability = models.CharField(max_length=3, choices=LOCALIZABILITY_CHOICES, null=True, blank=True)
@@ -173,6 +173,7 @@ class BaseAsset(models.Model):
 
     def __str__(self):
         return self.name or '<MISSING NAME>'
+
 
 class RawAsset(BaseAsset):
     # Location and Organization information is all represented in a flat manner here
@@ -249,7 +250,7 @@ class RawAsset(BaseAsset):
     # will be tracked.
 
 
-#class Asset(BaseAsset): # This is supposed to replace the original Asset class.
+# class Asset(BaseAsset): # This is supposed to replace the original Asset class.
 #    # [ ] After a staging server has been set up, with a duplicate database,
 #    # Check (first when making migrations) that this will not screw everything up.
 #
@@ -266,16 +267,6 @@ class RawAsset(BaseAsset):
 
 
 class Asset(models.Model):
-    FIXED_LOCALE = 'FIX'
-    MOBILE_LOCALE = 'MOB'
-    VIRTUAL_LOCALE = 'VIR'
-
-    LOCALIZABILITY_CHOICES = (
-        (FIXED_LOCALE, 'Fixed'),
-        (MOBILE_LOCALE, 'Mobile'),
-        (VIRTUAL_LOCALE, 'Cyber'),
-    )
-
     name = models.CharField(max_length=255)
     localizability = models.CharField(max_length=3, choices=LOCALIZABILITY_CHOICES, null=True, blank=True)
 
@@ -313,9 +304,7 @@ class Asset(models.Model):
     date_entered = models.DateTimeField(editable=False, auto_now_add=True)
     last_updated = models.DateTimeField(editable=False, auto_now=True)
 
-    history = HistoricalRecords() # This adds a HistoricalAsset table to the database, which
-    # will record a new row every time a tracked change (model creation, change, or deletion)
-    # occurs.
+    history = HistoricalRecords()
 
     @property
     def category(self):
