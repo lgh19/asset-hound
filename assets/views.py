@@ -171,8 +171,12 @@ def handle_uploaded_file(f, mode):
 
             if 'organization_name' in row:
                 if row['organization_name'] == '':
-                    destination_asset.organization = None # Set ForiegnKey to None.
-                    more_results.append(f"Since organization_name == '', the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
+                    if ('organization_phone' in row and row['organization_phone'] != '') or ('organization_email' in row and row['organization_email'] != ''):
+                        destination_asset.organization = None # Set ForiegnKey to None.
+                        more_results.append(f"Since organization_name == '', the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
+                    else:
+                        more_results.append(f"The organization's name is a required field if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
+                        break
                 else:
                     some_organization_field_changed = False
                     source_field_name = 'organization_name'
