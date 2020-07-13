@@ -99,10 +99,12 @@ def handle_uploaded_file(f, mode):
             location = destination_asset.location
             organization = destination_asset.organization
 
-            more_results = [f"Preparing to link raw assets with IDs {[r.id for r in raw_assets]} and names {[r.name for r in raw_assets]} to asset with PREVIOUS name {destination_asset.name} (id = {asset_id})."]
 
-            if mode == 'validate':
-                more_results.append("(Just validating stuff here.)")
+            if len(raw_assets) == 1:
+                summary = f"{'Validating this process:' if mode =='validate' else ''} Editing the Asset with id = {asset_id}, previously named {destination_asset.name}, and linking it to RawAsset with ID = {raw_assets[0].id} and name = {raw_assets[0].name}."
+            else:
+                summary = f"{'Merging' if mode == 'update' else 'Validating the merging of'} RawAssets with IDs {', '.join([r.id for r in raw_assets])} and names {', '.join([r.name for r in raw_assets])} to Asset with id = {asset_id}, previously named {destination_asset.name}."
+            more_results = [summary]
 
             asset_name = row['name']
             if asset_name != destination_asset.name:
@@ -259,6 +261,8 @@ def handle_uploaded_file(f, mode):
                 location.save()
                 for raw_asset in raw_assets:
                     raw_asset.save()
+            else:
+                more_results.append(f"\n<hr>")
 
             results += more_results
 
