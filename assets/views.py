@@ -184,7 +184,7 @@ def handle_uploaded_file(f, mode):
                         break
                     else:
                         destination_asset.organization = None # Set ForiegnKey to None.
-                        more_results.append(f"Since organization_name == '', the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
+                        more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;Since organization_name == '', the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
                 else:
                     some_organization_field_changed = False
                     source_field_name = 'organization_name'
@@ -236,7 +236,7 @@ def handle_uploaded_file(f, mode):
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'longitude', field_type=float)
             if 'latitude' in row or 'longitude' in row:
                 dist = distance(old_latitude, old_longitude, location.latitude, location.longitude)
-                more_results.append(f"    The distance between the old and new coordinates is {dist} feet.")
+                more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;The distance between the old and new coordinates is {dist} feet.")
 
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'available_transportation', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'geocoding_properties', field_type=str)
