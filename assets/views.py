@@ -42,6 +42,12 @@ def non_blank_type_or_none(row, field, desired_type): # This could be imported f
         try:
             return desired_type(row[field])
         except ValueError:
+            if desired_type == int:
+                try:
+                    return int(float(row[field])) # This is necessary to handle
+                    # cases where Excel obliviously appends ".0" to integers.
+                except ValueError:
+                    return None
             return None
     return None
 
