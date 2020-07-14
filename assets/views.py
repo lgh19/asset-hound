@@ -65,7 +65,7 @@ def check_or_update_value(instance, row, mode, more_results, source_field_name, 
 
 def handle_uploaded_file(f, mode):
     import csv
-    results = []
+    more_results = []
 
     if f.size > 2500000:
         raise ValueError("handle_uploaded_file hasn't implemented saving the file for reading/parsing yet.")
@@ -101,10 +101,10 @@ def handle_uploaded_file(f, mode):
 
 
             if len(raw_assets) == 1:
-                summary = f"{'Validating this process:' if mode =='validate' else ''} Editing the Asset with id = {asset_id}, previously named {destination_asset.name}, and linking it to RawAsset with ID = {raw_assets[0].id} and name = {raw_assets[0].name}."
+                summary = f"{'Validating this process: ' if mode == 'validate' else ''}Editing the Asset with id = {asset_id}, previously named {destination_asset.name}, and linking it to RawAsset with id = {raw_assets[0].id} and name = {raw_assets[0].name}."
             else:
                 summary = f"{'Merging' if mode == 'update' else 'Validating the merging of'} RawAssets with IDs {', '.join([str(r.id) for r in raw_assets])} and names {', '.join([r.name for r in raw_assets])} to Asset with id = {asset_id}, previously named {destination_asset.name}."
-            more_results = [summary]
+            more_results.append(summary)
 
             asset_name = row['name']
             if asset_name != destination_asset.name:
@@ -174,11 +174,11 @@ def handle_uploaded_file(f, mode):
             if 'organization_name' in row:
                 if row['organization_name'] == '':
                     if ('organization_phone' in row and row['organization_phone'] != '') or ('organization_email' in row and row['organization_email'] != ''):
-                        destination_asset.organization = None # Set ForiegnKey to None.
-                        more_results.append(f"Since organization_name == '', the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
-                    else:
                         more_results.append(f"The organization's name is a required field if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
                         break
+                    else:
+                        destination_asset.organization = None # Set ForiegnKey to None.
+                        more_results.append(f"Since organization_name == '', the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
                 else:
                     some_organization_field_changed = False
                     source_field_name = 'organization_name'
@@ -244,7 +244,6 @@ def handle_uploaded_file(f, mode):
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'capacity', field_type=int)
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'periodicity', field_type=str)
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'wifi_network', field_type=str)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'wifi_network', field_type=str)
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'internet_access', field_type=bool)
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'computers_available', field_type=bool)
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'accessibility', field_type=bool)
@@ -264,9 +263,7 @@ def handle_uploaded_file(f, mode):
             else:
                 more_results.append(f"\n<hr>")
 
-            results += more_results
-
-    return results
+    return more_results
 
 @staff_member_required
 def upload_file(request):
