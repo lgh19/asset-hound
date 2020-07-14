@@ -1,7 +1,51 @@
-import requests
+import requests, math
 
 from asset_hound.settings import GEOCODER_API_KEY
 
+def distance_on_unit_sphere(lat1, long1, lat2, long2):
+    # Convert latitude and longitude to
+    # spherical coordinates in radians.
+    degrees_to_radians = math.pi/180.0
+
+    # phi = 90 - latitude
+    phi1 = (90.0 - lat1)*degrees_to_radians
+    phi2 = (90.0 - lat2)*degrees_to_radians
+
+    # theta = longitude
+    theta1 = long1*degrees_to_radians
+    theta2 = long2*degrees_to_radians
+
+    # Compute spherical distance from spherical coordinates.
+
+    # For two locations in spherical coordinates
+    # (1, theta, phi) and (1, theta', phi')
+    # cosine( arc length ) =
+    # sin phi sin phi' cos(theta-theta') + cos phi cos phi'
+    # distance = rho * arc length
+
+    cos = (math.sin(phi1)*math.sin(phi2)*math.cos(theta1 - theta2) +
+    math.cos(phi1)*math.cos(phi2))
+
+    try:
+        arc = math.acos( cos )
+    except ValueError:
+        if 1.0 < cos < 1.01:
+            cos = 1
+        try:
+            arc = math.acos( cos )
+        except ValueError:
+            ic(cos)
+            raise
+    # Remember to multiply arc by the radius of the earth
+    # in your favorite set of units to get length.
+    return arc
+
+def distance(lat1, long1, lat2, long2):
+    arc = distance_on_unit_sphere(lat1, long1, lat2, long2)
+    R = 20.902*1000*1000 # in feet
+    # Remember to multiply arc by the radius of the earth
+    # in your favorite set of units to get length.
+    return R*arc
 
 def geocode_address(address):
     """ Takes a string address and attempts to geocode it using a remote geocoder

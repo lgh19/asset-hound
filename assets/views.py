@@ -14,7 +14,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from assets.forms import UploadFileForm
-
+from assets.utils import distance
 
 def boolify(x): # This differs from the assets.management.commands.load_assets versiion of boolify.
     if x.lower() in ['true', 't']:
@@ -229,8 +229,15 @@ def handle_uploaded_file(f, mode):
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'zip_code', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'parcel_id', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'residence', field_type=bool)
+
+            if 'latitude' in row or 'longitude' in row:
+                old_latitude, old_longitude = location.latitude, location.longitude
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'latitude', field_type=float)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'longitude', field_type=float)
+            if 'latitude' in row or 'longitude' in row:
+                dist = distance(old_latitude, old_longitude, location.latitude, location.longitude)
+                more_results.append(f"    The distance between the old and new coordinates is {dist} feet.")
+
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'available_transportation', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'geocoding_properties', field_type=str)
             # Ignore parent location for now.
