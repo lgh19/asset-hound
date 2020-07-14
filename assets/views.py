@@ -236,7 +236,7 @@ def handle_uploaded_file(f, mode):
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'longitude', field_type=float)
             if 'latitude' in row or 'longitude' in row:
                 dist = distance(old_latitude, old_longitude, location.latitude, location.longitude)
-                more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;The distance between the old and new coordinates is {dist} feet.")
+                more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;The distance between the old and new coordinates is {dist:.2f} feet.")
 
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'available_transportation', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'geocoding_properties', field_type=str)
