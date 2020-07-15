@@ -212,7 +212,7 @@ def handle_uploaded_file(f, mode):
 
                     source_field_name = 'organization_phone'
                     if source_field_name in row:
-                        new_value = standardize_phone(non_blank_type_or_none(row, source_field_name, str))
+                        new_value = non_blank_type_or_none(standardize_phone(row, source_field_name, str))
                         old_value = organization.phone
                         if new_value != old_value:
                             more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
@@ -250,7 +250,7 @@ def handle_uploaded_file(f, mode):
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'email', field_type=str)
             source_field_name = 'phone'
             if source_field_name in row:
-                new_value = standardize_phone(non_blank_type_or_none(row, source_field_name, str))
+                new_value = non_blank_type_or_none(standardize_phone(row, source_field_name, str))
                 old_value = destination_asset.phone
                 if new_value != old_value:
                     more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
