@@ -272,7 +272,8 @@ def handle_uploaded_file(f, mode):
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'etl_notes', field_type=str)
 
             if mode == 'update':
-                more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n<hr>")
+                more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n")
+                more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://assets.wprdc.org/api/dev/assets/assets/{asset_id}/" target="_blank">>Updated Asset</a>\n<hr>")
                 destination_asset.save()
                 location.save()
                 for raw_asset in raw_assets:
