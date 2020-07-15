@@ -273,7 +273,7 @@ def handle_uploaded_file(f, mode):
 
             if mode == 'update':
                 more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n")
-                more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://assets.wprdc.org/api/dev/assets/assets/{asset_id}/" target="_blank">>Updated Asset</a>\n<hr>")
+                more_results.append(f'&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://assets.wprdc.org/api/dev/assets/assets/{asset_id}/" target="_blank">Updated Asset</a>\n<hr>')
                 destination_asset.save()
                 location.save()
                 for raw_asset in raw_assets:
