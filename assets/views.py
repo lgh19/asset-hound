@@ -129,8 +129,8 @@ def handle_uploaded_file(f, mode):
                     validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in new_values] # Change get to get_or_create to allow creation of new asset types.
                     if mode == 'update':
                         destination_asset.asset_types.set(validated_asset_types)
-                except assets.models.AssetType.DoesNotExist:
-                    more_results.append(f"Unable to find one of these asset types: {asset_types}.\n ABORTING!!!\n<hr>")
+                except AssetType.DoesNotExist:
+                    more_results.append(f"Unable to find one of these asset types: {new_values}.\n ABORTING!!!\n<hr>")
                     break
 
             source_field_name = 'tags'
