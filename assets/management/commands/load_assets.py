@@ -56,6 +56,7 @@ def type_or_none(row, field, desired_type):
 
 def standardize_phone(phone: str):
     result_number = None
+    phone = re.sub('\.0$', '', phone) # Deal with Excel converting phone numbers to floats.
     try:
         candidate_phone = '+1' + re.sub(r'\D', '', phone) # This actually adds a leading '+1'
         # even if the phone number already starts with a 1, but the phonenumbers.parse function is
