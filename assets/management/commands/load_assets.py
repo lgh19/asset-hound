@@ -54,7 +54,10 @@ def type_or_none(row, field, desired_type):
     return None
 
 
-def standardize_phone(phone: str):
+def standardize_phone(phone):
+    if phone is None:
+        return None
+    assert type(phone) == str
     result_number = None
     phone = re.sub('\.0$', '', phone) # Deal with Excel converting phone numbers to floats.
     try:
