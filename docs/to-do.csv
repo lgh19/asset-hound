@@ -7,6 +7,8 @@ Implement solution to float precision issues on geocoordinates (probably switch 
 "Delete 'PGH PARKING AUTHORITY' (232 BLVD OF THE ALLIES) as a laundromat",
 Delete orphaned Location/Organization/other-non-Asset instances,
 Write upsert-capable loader,
+Find data sources for assets we'd like to add (e.g., bookstores, hotels),
+Identify other asset types we'd like to include,
 "Standardize Location.name fields (eliminating, for instance, trailing spaces)",
 "Rename all 'None, None None None' Locations",
 Import 8 multitype assets excluded from v1 so far,
