@@ -41,6 +41,8 @@ def distance_on_unit_sphere(lat1, long1, lat2, long2):
     return arc
 
 def distance(lat1, long1, lat2, long2):
+    if lat1 in ['', None] or long1 in ['', None] or lat2 in ['', None] or long2 in ['', None]:
+        return None # Don't try to calculate distances of invalid coordinates.
     arc = distance_on_unit_sphere(lat1, long1, lat2, long2)
     R = 20.902*1000*1000 # in feet
     # Remember to multiply arc by the radius of the earth
