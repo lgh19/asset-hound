@@ -16,6 +16,16 @@ from django.contrib.admin.views.decorators import staff_member_required
 from assets.forms import UploadFileForm
 from assets.utils import distance
 
+def there_is_a_field_to_update(row, fields_to_check):
+    """Scan record for certain fields and see if any exist
+    and are non-null (meaning that a Location could be
+    created."""
+    update_is_needed = False
+    for field in fields_to_check:
+        if field in row and row['field'] not in ['', None]:
+            return True
+    return update_is_needed
+
 def boolify(x): # This differs from the assets.management.commands.load_assets versiion of boolify.
     if x.lower() in ['true', 't']:
         return True
@@ -194,6 +204,9 @@ def handle_uploaded_file(f, mode):
                     source_field_name = 'organization_name'
                     destination_field_name = 'name'
                     new_value = non_blank_type_or_none(row, source_field_name, str)
+                    if organization is None:
+                        organization = Organization() # Create new organization instance.
+
                     old_value = organization.name
                     if new_value != old_value:
                         more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
@@ -227,6 +240,13 @@ def handle_uploaded_file(f, mode):
             # I'm choosing to not update the Location.name field here since we may want to manually name Location instances,
             # particularly to deal with cases like the two restaurant locations in Schenley Plaza that have the same
             # street address and parcel ID but slightly different geocoordinates.
+            if location is None:
+                if there_is_a_field_to_update(row, ['street_address', 'city', 'state', 'zip_code', 'parcel_id', 'latitude', 'longitude']):
+                    location = Location()
+                elif there_is_a_field_to_update(row, ['residence', 'available_transportation', 'geocoding_properties']):
+                    more_results.append("There is not enough information to create a new location for this Asset, but there are fields in the merge-instructions file which need to be assigned to a Location. Does not compute! ABORTING!!!<hr>")
+                    break
+
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'city', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'state', field_type=str)
