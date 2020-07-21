@@ -2,9 +2,11 @@ import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
   html,
-  body {
+  body,
+  #app {
     height: 100%;
     width: 100%;
+    min-height: 0;
   }
 
   body {
@@ -12,7 +14,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body.fontLoaded {
-    font-family: 'Public Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
   p,
@@ -24,6 +26,17 @@ const GlobalStyle = createGlobalStyle`
   .mapboxgl-popup, .mapboxgl-popup-content {
     background: transparent;
     box-shadow: none;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
   }
 `;
 

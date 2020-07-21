@@ -1,11 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import Typography from '@material-ui/core/Typography';
 import { localPropTypes } from '../../utils';
 
 const ListItem = styled.li`
-  display: table-cell;
-  vertical-align: middle;
+  height: 100%;
+  width: 100%;
 `;
 
 const Button = styled.a`
@@ -16,12 +16,12 @@ const Button = styled.a`
   border-radius: 4px;
   box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 2px 2px;
   text-align: center;
+  padding: 8px;
 
   &:link,
   &:visited {
     background-color: #f1faee;
     color: #1d3557;
-    padding: 14px 25px;
     text-decoration: none;
     display: inline-block;
   }
@@ -36,33 +36,20 @@ const Button = styled.a`
   }
 `;
 
-const ButtonContent = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const IconDiv = styled.div`
-  flex: 1 0 32px;
-`;
-
-const TextDiv = styled.div`
-  flex: 0 1;
-`;
-
 const Icon = styled.img`
+  display: block;
   height: 48px;
+  margin: 0 auto;
 `;
 
 function NavMenuItem({ section }) {
   return (
     <ListItem>
       <Button title={section.name} href={`#${section.slug}`}>
-        <ButtonContent>
-          <IconDiv>
-            <Icon src={section.image} alt={section.name} />
-          </IconDiv>
-          <TextDiv>{section.name}</TextDiv>
-        </ButtonContent>
+        <Icon src={section.image} alt={section.name} />
+        <Typography display="block" variant="button" noWrap>
+          {section.name}
+        </Typography>
       </Button>
     </ListItem>
   );

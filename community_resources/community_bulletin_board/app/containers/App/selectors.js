@@ -1,5 +1,7 @@
 import { createSelector } from 'reselect';
 
+import { initialState } from './reducer';
+
 const selectRouter = state => state.router;
 
 const makeSelectLocation = () =>
@@ -8,4 +10,46 @@ const makeSelectLocation = () =>
     routerState => routerState.location,
   );
 
-export { makeSelectLocation };
+const reduceResourcesIntoFeatures = (features, resource) =>
+  features.concat(
+    resource.locations.features.map(({ properties, ...other }) => ({
+      ...other,
+      properties: {
+        ...properties,
+        name: resource.name,
+        id: resource.slug,
+        resource: resource.name,
+        slug: resource.slug,
+        categories: resource.categories.map(c => c.slug),
+      },
+    })),
+  );
+
+/**
+ * Selectors
+ */
+
+const selectGlobalDomain = state => state.global || initialState;
+
+const makeSelectAllLocationsGeoJSON = () =>
+  createSelector(
+    selectGlobalDomain,
+    substate => ({
+      type: 'FeatureCollection',
+      features: substate.community
+        ? substate.community.resources.reduce(reduceResourcesIntoFeatures, [])
+        : [],
+    }),
+  );
+
+const makeSelectCommunity = () =>
+  createSelector(
+    selectGlobalDomain,
+    substate => substate.community,
+  );
+
+export {
+  makeSelectLocation,
+  makeSelectCommunity,
+  makeSelectAllLocationsGeoJSON,
+};

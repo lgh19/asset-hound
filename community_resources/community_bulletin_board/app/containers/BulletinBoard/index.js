@@ -4,49 +4,73 @@
  *
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Helmet } from 'react-helmet';
-// import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
-
+import styled from 'styled-components';
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
-import { Layer, Source } from 'react-map-gl';
-import {
-  makeSelectBulletinBoardAllLocationsGeoJSON,
-  makeSelectBulletinBoardCommunity,
-} from './selectors';
-import reducer from './reducer';
-import saga from './saga';
-// import messages from './messages';
+import Typography from '@material-ui/core/Typography';
+import { FormattedMessage } from 'react-intl';
+import { Container } from '@material-ui/core';
+import _ from 'lodash';
+import reducer from '../App/reducer';
+import saga from '../App/saga';
 import { filterResourcesByCategory, localPropTypes } from '../../utils';
-// import Header from '../../components/Header';
-import Typography from '../../components/Typography';
-import { getCommunityDataRequest } from './actions';
-import Board from './Board';
-import Content from '../../components/Content';
+import { getCommunityDataRequest } from '../App/actions';
 import ResourceList from '../../components/ResourceList';
 import NavMenu from '../../components/NavMenu';
 import CategorySection from '../../components/CategorySection';
-import Map from '../../components/Map';
-import { allLocationsLayer } from './layers';
-import ResourceMap from '../../components/ResourceMap';
+import {
+  makeSelectAllLocationsGeoJSON,
+  makeSelectCommunity,
+} from '../App/selectors';
+import messages from './messages';
+import BackToTopButton from '../../components/BackToTopButton';
+import Content from '../../components/Content';
+
+const ScrollZone = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+`;
 
 export function BulletinBoard({
   community,
-  allLocations,
+  // allLocations,
   handleRequestCommunityData,
 }) {
   useInjectReducer({ key: 'bulletinBoard', reducer });
   useInjectSaga({ key: 'bulletinBoard', saga });
 
+  const contentRef = useRef(null);
+  const [backToTopButtonVisible, setbackToTopButtonVisible] = useState(false);
+
   // Init
   useEffect(() => {
     handleRequestCommunityData(1);
   }, []);
+
+  // listen to scroll business
+  useEffect(() => {
+    if (contentRef && contentRef.current) {
+      contentRef.current.addEventListener('scroll', handleScroll);
+    }
+  }, [contentRef.current]);
+
+  function handleScroll() {
+    if (contentRef && contentRef.current) {
+      if (!backToTopButtonVisible && contentRef.current.scrollTop >= 500) {
+        setbackToTopButtonVisible(true);
+      }
+      if (backToTopButtonVisible && contentRef.current.scrollTop < 500) {
+        setbackToTopButtonVisible(false);
+      }
+    }
+  }
 
   // handle no data
   if (!community)
@@ -55,28 +79,46 @@ export function BulletinBoard({
         <Typography variant="h3">Loading...</Typography>
       </div>
     );
-
   return (
-    <Board>
-      <Helmet>
-        <title>{community.name} Resources</title>
-        <meta name="description" content={`Listing of available resources}.`} />
-      </Helmet>
-      <Typography.H1>{community.name} Resources</Typography.H1>
-      <Content html={community.topSectionContent} />
-      <NavMenu sections={community.resourceCategories} />
-      <Typography.H2>Or by location</Typography.H2>
-      <ResourceMap data={allLocations} />
-
-      {community.resourceCategories.map(category => (
-        <CategorySection category={category}>
-          <ResourceList
-            category={category}
-            resources={filterResourcesByCategory(community.resources, category)}
+    <ScrollZone
+      ref={contentRef}
+      onScroll={_.debounce(handleScroll, 100)}
+      style={{ maxHeight: '100%', overflow: 'auto' }}
+    >
+      <Container maxWidth="md">
+        <Helmet>
+          <title>{community.name} Resources</title>
+          <meta
+            name="description"
+            content={`Listing of available resources}.`}
           />
-        </CategorySection>
-      ))}
-    </Board>
+        </Helmet>
+        <Typography variant="h2" component="span" id="call-to-action">
+          <FormattedMessage {...messages.callToAction} />
+        </Typography>
+        <NavMenu sections={community.resourceCategories} />
+
+        <div>
+          <Content html={community.topSectionContent} />
+        </div>
+
+        {community.resourceCategories.map(category => (
+          <CategorySection category={category}>
+            <ResourceList
+              category={category}
+              resources={filterResourcesByCategory(
+                community.resources,
+                category,
+              )}
+            />
+          </CategorySection>
+        ))}
+        <BackToTopButton
+          hidden={!backToTopButtonVisible}
+          scroller={contentRef.current}
+        />
+      </Container>
+    </ScrollZone>
   );
 }
 
@@ -87,8 +129,8 @@ BulletinBoard.propTypes = {
 };
 
 const mapStateToProps = createStructuredSelector({
-  community: makeSelectBulletinBoardCommunity(),
-  allLocations: makeSelectBulletinBoardAllLocationsGeoJSON(),
+  community: makeSelectCommunity(),
+  allLocations: makeSelectAllLocationsGeoJSON(),
 });
 
 function mapDispatchToProps(dispatch) {

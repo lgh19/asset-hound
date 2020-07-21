@@ -1,5 +1,5 @@
-import { defaultAction } from '../actions';
-import { DEFAULT_ACTION } from '../constants';
+import { defaultAction } from '../../App/actions';
+import { DEFAULT_ACTION } from '../../App/constants';
 
 describe('BulletinBoard actions', () => {
   describe('Default Action', () => {

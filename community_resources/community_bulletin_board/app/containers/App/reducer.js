@@ -1,6 +1,6 @@
 /*
  *
- * BulletinBoard reducer
+ * Global reducer
  *
  */
 import produce from 'immer';
@@ -15,7 +15,7 @@ export const initialState = {
 };
 
 /* eslint-disable default-case, no-param-reassign */
-const bulletinBoardReducer = (state = initialState, action) =>
+const globalReducer = (state = initialState, action) =>
   produce(state, draft => {
     switch (action.type) {
       case GET_COMMUNITY_DATA_REQUEST:
@@ -30,4 +30,4 @@ const bulletinBoardReducer = (state = initialState, action) =>
     }
   });
 
-export default bulletinBoardReducer;
+export default globalReducer;

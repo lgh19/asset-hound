@@ -5,38 +5,50 @@
  */
 
 import React, { memo } from 'react';
-import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
+import Fab from '@material-ui/core/Fab';
+import UpIcon from '@material-ui/icons/ArrowUpward';
+import Tooltip from '@material-ui/core/Tooltip';
+import Fade from '@material-ui/core/Fade';
+import Zoom from '@material-ui/core/Zoom';
 
-import { FormattedMessage } from 'react-intl';
-import messages from './messages';
-
-const Button = styled.button`
-  cursor: pointer;
-  background: none;
-  border: none;
-  text-align: right;
-  padding: 0 2px;
-
-  &:hover {
-    text-decoration: underline;
-  }
+const Button = styled(Fab)`
+  position: absolute;
+  ${({ theme }) => css`
+    bottom: ${theme.spacing(2)}px;
+    right: ${theme.spacing(2)}px;
+  `}
 `;
 
-function BackToTopButton() {
+Button.propTypes = Fab.propTypes;
+
+function BackToTopButton({ scroller, label, hidden }) {
+  const target = scroller || window;
+  function handleClick() {
+    target.scrollTo(0, 0);
+  }
+
   return (
-    <Button
-      onClick={() => window.scrollTo(0, 0)}
-      aria-labelledby={messages.top.id}
-      type="button"
-    >
-      <span role="img" aria-labelledby={messages.top.id}>
-        ⬆
-      </span>
-      ️ <FormattedMessage {...messages.top} />
-    </Button>
+    <Zoom in={!hidden}>
+      <Tooltip title={label}>
+        <Button color="primary" onClick={handleClick} aria-label={label}>
+          <UpIcon />
+        </Button>
+      </Tooltip>
+    </Zoom>
   );
 }
 
-BackToTopButton.propTypes = {};
+BackToTopButton.propTypes = {
+  scroller: PropTypes.element,
+  hidden: PropTypes.bool,
+  label: PropTypes.string,
+};
+
+BackToTopButton.defaultProps = {
+  hidden: true,
+  label: 'Back to top',
+};
 
 export default memo(BackToTopButton);
