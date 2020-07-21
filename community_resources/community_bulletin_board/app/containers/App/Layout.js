@@ -1,10 +1,9 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const Wrapper = styled.div`
-  flex: 1;
+  flex: 1 0 100;
   overflow: auto;
-  width: 100%;
-
+  height: 100%;
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
@@ -23,6 +22,11 @@ const Wrapper = styled.div`
   -webkit-align-items: flex-start;
   -ms-flex-align: start;
   align-items: flex-start;
+
+  ${({ theme }) =>
+    css`
+      background-color: ${theme.palette.background.default};
+    `}
 `;
 
 const Content = styled.div`
@@ -35,13 +39,11 @@ const Content = styled.div`
   -webkit-align-self: stretch;
   -ms-flex-item-align: stretch;
   align-self: stretch;
-  min-height: 0;
   position: relative;
   display: flex;
-  & > div {
-    flex: 1;
-    min-height: 100px;
-  }
+  flex-direction: row;
+  width: 100%;
+  overflow: auto;
 `;
 
 const TopBar = styled.div`

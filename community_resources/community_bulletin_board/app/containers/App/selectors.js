@@ -16,8 +16,11 @@ const reduceResourcesIntoFeatures = (features, resource) =>
       ...other,
       properties: {
         ...properties,
+        name: resource.name,
+        id: resource.slug,
         resource: resource.name,
         slug: resource.slug,
+        categories: resource.categories.map(c => c.slug),
       },
     })),
   );
@@ -26,11 +29,11 @@ const reduceResourcesIntoFeatures = (features, resource) =>
  * Selectors
  */
 
-const selectGlobaldDomain = state => state.global || initialState;
+const selectGlobalDomain = state => state.global || initialState;
 
 const makeSelectAllLocationsGeoJSON = () =>
   createSelector(
-    selectGlobaldDomain,
+    selectGlobalDomain,
     substate => ({
       type: 'FeatureCollection',
       features: substate.community
@@ -41,7 +44,7 @@ const makeSelectAllLocationsGeoJSON = () =>
 
 const makeSelectCommunity = () =>
   createSelector(
-    selectGlobaldDomain,
+    selectGlobalDomain,
     substate => substate.community,
   );
 

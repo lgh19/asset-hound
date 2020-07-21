@@ -8,11 +8,9 @@ import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import Grid from '@material-ui/core/Grid';
 import NavMenuItem from './NavMenuitem';
 import { localPropTypes } from '../../utils';
-import Typography from '../Typography';
-
-const Wrapper = styled.div``;
 
 const Nav = styled.nav`
   padding: 4px 8px;
@@ -20,24 +18,27 @@ const Nav = styled.nav`
 
 const MenuList = styled.ol`
   padding-left: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  grid-gap: 10px;
-  grid-auto-rows: minmax(100px, auto);
 `;
 
 function NavMenu({ sections }) {
   return (
-    <Wrapper>
-      <Typography.H2>Find resources for a specific topic</Typography.H2>
-      <Nav>
-        <MenuList>
+    <Nav>
+      <MenuList>
+        <Grid
+          container
+          spacing={2}
+          direction="row"
+          justify="center"
+          alignItems="center"
+        >
           {sections.map(section => (
-            <NavMenuItem key={section.slug} section={section} />
+            <Grid item xs={6} sm={4} md={4} lg={3}>
+              <NavMenuItem key={section.slug} section={section} />
+            </Grid>
           ))}
-        </MenuList>
-      </Nav>
-    </Wrapper>
+        </Grid>
+      </MenuList>
+    </Nav>
   );
 }
 

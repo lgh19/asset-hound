@@ -1,6 +1,12 @@
+import { createMuiTheme } from '@material-ui/core';
+import indigo from '@material-ui/core/colors/indigo';
+import cyan from '@material-ui/core/colors/cyan';
+
 const getTheme = inDarkMode => ({
-  color: {
-    primary: '#102f93',
+  color: {},
+  palette: {
+    primary: indigo,
+    secondary: cyan,
   },
   borderRadius: '4px',
   breakpoints: {
@@ -11,4 +17,11 @@ const getTheme = inDarkMode => ({
   },
 });
 
-export default getTheme(true);
+export const muiTheme = createMuiTheme({
+  palette: {
+    primary: indigo,
+    secondary: cyan,
+  },
+});
+
+export default muiTheme;

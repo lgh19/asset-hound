@@ -17,6 +17,24 @@ const makeSelectSelectedResource = () =>
     substate => substate.selectedResource,
   );
 
+const makeSelectCategoryFilter = () =>
+  createSelector(
+    selectExplorerDomain,
+    substate => substate.categoryFilter,
+  );
+
+const makeSelectPopupData = () =>
+  createSelector(
+    selectExplorerDomain,
+    substate => substate.popupData,
+  );
+
+const makeSelectInSmallMode = () =>
+  createSelector(
+    selectExplorerDomain,
+    substate => substate.inSmallMode,
+  );
+
 /**
  * Default selector used by Explorer
  */
@@ -28,4 +46,10 @@ const makeSelectExplorer = () =>
   );
 
 export default makeSelectExplorer;
-export { selectExplorerDomain, makeSelectSelectedResource };
+export {
+  selectExplorerDomain,
+  makeSelectSelectedResource,
+  makeSelectCategoryFilter,
+  makeSelectPopupData,
+  makeSelectInSmallMode,
+};

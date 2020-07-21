@@ -7,17 +7,21 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { push } from 'connected-react-router';
 import { Helmet } from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
-import makeSelectExplorer, { makeSelectSelectedResource } from './selectors';
+import {
+  makeSelectCategoryFilter,
+  makeSelectInSmallMode,
+  makeSelectPopupData,
+  makeSelectSelectedResource,
+} from './selectors';
 import reducer from './reducer';
 import saga from './saga';
-import messages from './messages';
 import ResourceMap from '../../components/ResourceMap';
 import {
   makeSelectAllLocationsGeoJSON,
@@ -25,20 +29,18 @@ import {
 } from '../App/selectors';
 import { localPropTypes } from '../../utils';
 import { getCommunityDataRequest } from '../App/actions';
-import Typography from '../../components/Typography';
-import Header from '../../components/Header';
-import { Wrapper, Content, TopBar } from './Layout';
-import ResourceDetails from '../../components/ResourceDetails';
-import { setSelectedResource } from './actions';
-import SearchBar from '../../components/SearchBar';
+import { Wrapper, Content } from './Layout';
+import { setResourceFilter, setSelectedResource } from './actions';
 
 export function Explorer({
   community,
   allLocations,
-  handleRequestCommunityData,
   handleResourceSelection,
   handleClose,
   selectedResource,
+  handleFilterChange,
+  categoryFilter,
+  handleRequestDetails,
 }) {
   useInjectReducer({ key: 'explorer', reducer });
   useInjectSaga({ key: 'explorer', saga });
@@ -49,21 +51,17 @@ export function Explorer({
         <title>Explorer</title>
         <meta name="description" content="Description of Explorer" />
       </Helmet>
-      <TopBar>
-        <Header title="Hill District Resources" />
-      </TopBar>
       <Content>
         <ResourceMap
           geojson={allLocations}
           community={community}
-          handleResourceSelection={handleResourceSelection}
+          onResourceSelection={handleResourceSelection}
+          filter={categoryFilter}
+          onFilterChange={handleFilterChange}
+          selectedResource={selectedResource}
+          onCloseDetails={handleClose}
+          onOpenDetails={handleRequestDetails}
         />
-        {selectedResource && (
-          <ResourceDetails
-            resource={selectedResource}
-            handleClose={handleClose}
-          />
-        )}
       </Content>
     </Wrapper>
   );
@@ -72,25 +70,35 @@ export function Explorer({
 Explorer.propTypes = {
   community: localPropTypes.community,
   allLocations: localPropTypes.locations,
-  handleRequestCommunityData: PropTypes.func,
   handleResourceSelection: PropTypes.func,
   selectedResource: localPropTypes.resource,
   handleClose: PropTypes.func,
+  handleFilterChange: PropTypes.func,
+  handleRequestDetails: PropTypes.func,
+  categoryFilter: PropTypes.object,
+  popupData: PropTypes.shape({
+    lngLat: PropTypes.arrayOf(PropTypes.number),
+    mapRef: PropTypes.object,
+  }),
 };
 
 const mapStateToProps = createStructuredSelector({
   community: makeSelectCommunity(),
   allLocations: makeSelectAllLocationsGeoJSON(),
   selectedResource: makeSelectSelectedResource(),
+  categoryFilter: makeSelectCategoryFilter(),
+  popupData: makeSelectPopupData(),
+  inSmallMode: makeSelectInSmallMode(),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
     handleRequestCommunityData: communityId =>
       dispatch(getCommunityDataRequest(communityId)),
-    handleResourceSelection: resource =>
-      dispatch(setSelectedResource(resource)),
+    handleResourceSelection: (resource, popupData, inSmallMode) =>
+      dispatch(setSelectedResource(resource, popupData, inSmallMode)),
     handleClose: () => dispatch(setSelectedResource(undefined)),
+    handleFilterChange: filter => dispatch(setResourceFilter(filter)),
   };
 }
 

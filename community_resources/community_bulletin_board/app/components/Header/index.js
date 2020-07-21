@@ -7,52 +7,71 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-
-import { FormattedMessage } from 'react-intl';
-import messages from './messages';
-import Typography from '../Typography';
+import { PropTypes as MuiPropTypes } from '@material-ui/core';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import Typography from '@material-ui/core/Typography';
+import Hidden from '@material-ui/core/Hidden';
+import CloseIcon from '@material-ui/icons/Close';
 import SearchBar from '../SearchBar';
 
-const Wrapper = styled.header`
-  padding: 8px;
-  text-align: center;
-  border-bottom: 1px solid dimgray;
-  box-shadow: 2px 2px 1px 1px rgba(0, 0, 0, 0.3);
-  width: 100%;
-
-  display: inline-grid;
-  grid-gap: 8px;
-  grid-template-columns: 1fr;
-
+const MenuButton = styled(IconButton)`
   ${({ theme }) => css`
-    @media (${theme.breakpoints.md}) {
-      grid-template-columns: 1fr auto;
-      text-align: left;
-    }
+    margin-right: ${theme.spacing(2)}px;
+  `}
+`;
+
+const Title = styled(props => <Typography variant="h6" noWrap {...props} />)`
+  ${({ theme }) => css`
+  ${theme.breakpoints.up('sm')} {
+    display: block;
   `}
 `;
 
 const TitleSection = styled.div`
+  flex-grow: 1;
 `;
 
-const MenuSection = styled.div`
+const ActionSection = styled.div`
+  flex-grow: 0;
 `;
 
-function Header({ title }) {
+const SearchSection = styled.div``;
+
+function Header({ title, color, onMenuClick, onClose }) {
   return (
-    <Wrapper>
-      <TitleSection>
-        <Typography variant="h5" component="h1">
-          {title}
-        </Typography>
-      </TitleSection>
-      <MenuSection>
-        <SearchBar />
-      </MenuSection>
-    </Wrapper>
+    <AppBar color={color} position="static">
+      <Toolbar>
+        {onMenuClick && (
+          <MenuButton edge="start" color="inherit" aria-label="open drawer">
+            <MenuIcon />
+          </MenuButton>
+        )}
+        <TitleSection>
+          <Title>{title}</Title>
+        </TitleSection>
+        {onClose && (
+          <ActionSection>
+            <IconButton onClick={onClose}>
+              <CloseIcon />
+            </IconButton>
+          </ActionSection>
+        )}
+      </Toolbar>
+    </AppBar>
   );
 }
 
-Header.propTypes = {};
+Header.propTypes = {
+  title: PropTypes.node,
+  color: PropTypes.oneOf(['primary', 'secondary', 'default']),
+  onMenuClick: PropTypes.func,
+};
+
+Header.defaultProps = {
+  color: 'primary',
+};
 
 export default memo(Header);

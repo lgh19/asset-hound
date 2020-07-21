@@ -92,7 +92,7 @@ class AssetAdmin(admin.ModelAdmin):
         'last_updated',
         'data_source',
         'primary_key_from_rocket',
-    )q
+    )
     # list_filter = (
     #     'organization',
     #     'location',

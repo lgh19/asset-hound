@@ -39,6 +39,7 @@ const categoryShape = {
   name: PropTypes.string.isRequired,
   slug: PropTypes.string.isRequired,
   description: PropTypes.string,
+  image: PropTypes.string.isRequired,
 };
 
 const populationShape = {
@@ -58,7 +59,7 @@ const locationShape = {
       'MultiPolygon',
     ]).isRequired,
     coordinates: PropTypes.arrayOf(PropTypes.number),
-  }).isRequired,
+  }),
   properties: PropTypes.shape({
     name: PropTypes.string.isRequired,
     availableTransportation: PropTypes.string,

@@ -12,7 +12,9 @@ import { parseHref } from '../../utils';
 
 import externalLinkBadge from '../../images/external-link.png';
 
-const A = styled.a`
+import MuiLink from '@material-ui/core/Link';
+
+const A = styled(MuiLink)`
   ${({ external }) =>
     external
       ? css`

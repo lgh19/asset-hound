@@ -17,6 +17,9 @@ import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { ThemeProvider } from 'styled-components';
+import { MuiThemeProvider, StylesProvider } from '@material-ui/core';
+
+import Typography from '@material-ui/core/Typography';
 import GlobalStyle from '../../global-styles';
 import Explorer from '../Explorer';
 import { useInjectReducer } from '../../utils/injectReducer';
@@ -24,17 +27,21 @@ import reducer from './reducer';
 import saga from './saga';
 import { useInjectSaga } from '../../utils/injectSaga';
 import { localPropTypes } from '../../utils';
-import Typography from '../../components/Typography';
 import {
   makeSelectAllLocationsGeoJSON,
   makeSelectCommunity,
 } from './selectors';
 import { getCommunityDataRequest } from './actions';
 
-import theme from '../../theme';
-import BulletinBoard from '../BulletinBoard';
+import theme, { muiTheme } from '../../theme';
 
-function App({ community, allLocations, handleRequestCommunityData }) {
+import { Wrapper, Content, TopBar } from './Layout';
+
+import BulletinBoard from '../BulletinBoard';
+import Header from '../../components/Header';
+import Details from '../Details';
+
+function App({ community, handleRequestCommunityData }) {
   useInjectReducer({ key: 'global', reducer });
   useInjectSaga({ key: 'global', saga });
 
@@ -42,6 +49,9 @@ function App({ community, allLocations, handleRequestCommunityData }) {
   useEffect(() => {
     handleRequestCommunityData(1);
   }, []);
+
+  const title =
+    community && community.name ? `${community.name} Resources` : undefined;
 
   // handle no data
   if (!community)
@@ -52,16 +62,25 @@ function App({ community, allLocations, handleRequestCommunityData }) {
     );
 
   return (
-    <ThemeProvider theme={theme} style={{ height: '100%' }}>
-      <div style={{ height: '100%', display: 'flex' }}>
-        <Switch>
-          <Route exact path="/" component={BulletinBoard} />
-          <Route exact path="/map" component={Explorer} />
-          <Route component={NotFoundPage} />
-        </Switch>
-        <GlobalStyle />
-      </div>
-    </ThemeProvider>
+    <StylesProvider injectFirst>
+      <MuiThemeProvider theme={muiTheme}>
+        <ThemeProvider theme={theme} style={{ height: '100%' }}>
+          <Wrapper>
+            <TopBar>
+              <Header title={title || 'Neighborhood Resources'} />
+            </TopBar>
+            <Content id="content">
+              <Switch>
+                <Route exact path="/" component={BulletinBoard} />
+                <Route exact path="/map" component={Explorer} />
+                <Route component={NotFoundPage} />
+              </Switch>
+            </Content>
+            <GlobalStyle />
+          </Wrapper>
+        </ThemeProvider>
+      </MuiThemeProvider>
+    </StylesProvider>
   );
 }
 

@@ -1,6 +1,6 @@
 /**
  *
- * Tests for Typography
+ * Tests for ResourceSummary
  *
  * @see https://github.com/react-boilerplate/react-boilerplate/tree/master/docs/testing
  *
@@ -8,14 +8,20 @@
 
 import React from 'react';
 import { render } from 'react-testing-library';
+import { IntlProvider } from 'react-intl';
 // import 'jest-dom/extend-expect'; // add some helpful assertions
 
-import Typography from '../index';
+import ResourceSummary from '../index';
+import { DEFAULT_LOCALE } from '../../../i18n';
 
-describe('<Typography />', () => {
+describe('<ResourceSummary />', () => {
   it('Expect to not log errors in console', () => {
     const spy = jest.spyOn(global.console, 'error');
-    render(<Typography />);
+    render(
+      <IntlProvider locale={DEFAULT_LOCALE}>
+        <ResourceSummary />
+      </IntlProvider>,
+    );
     expect(spy).not.toHaveBeenCalled();
   });
 
@@ -31,7 +37,11 @@ describe('<Typography />', () => {
   it.skip('Should render and match the snapshot', () => {
     const {
       container: { firstChild },
-    } = render(<Typography />);
+    } = render(
+      <IntlProvider locale={DEFAULT_LOCALE}>
+        <ResourceSummary />
+      </IntlProvider>,
+    );
     expect(firstChild).toMatchSnapshot();
   });
 });

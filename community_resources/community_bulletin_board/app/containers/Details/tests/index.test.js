@@ -1,6 +1,6 @@
 /**
  *
- * Tests for ResourceMapFilter
+ * Tests for Details
  *
  * @see https://github.com/react-boilerplate/react-boilerplate/tree/master/docs/testing
  *
@@ -8,14 +8,21 @@
 
 import React from 'react';
 import { render } from 'react-testing-library';
+import { IntlProvider } from 'react-intl';
 // import 'jest-dom/extend-expect'; // add some helpful assertions
 
-import ResourceMapFilter from '../index';
+import { Details } from '../index';
+import { DEFAULT_LOCALE } from '../../../i18n';
 
-describe('<ResourceMapFilter />', () => {
+describe('<Details />', () => {
   it('Expect to not log errors in console', () => {
     const spy = jest.spyOn(global.console, 'error');
-    render(<ResourceMapFilter />);
+    const dispatch = jest.fn();
+    render(
+      <IntlProvider locale={DEFAULT_LOCALE}>
+        <Details dispatch={dispatch} />
+      </IntlProvider>,
+    );
     expect(spy).not.toHaveBeenCalled();
   });
 
@@ -31,7 +38,11 @@ describe('<ResourceMapFilter />', () => {
   it.skip('Should render and match the snapshot', () => {
     const {
       container: { firstChild },
-    } = render(<ResourceMapFilter />);
+    } = render(
+      <IntlProvider locale={DEFAULT_LOCALE}>
+        <Details />
+      </IntlProvider>,
+    );
     expect(firstChild).toMatchSnapshot();
   });
 });

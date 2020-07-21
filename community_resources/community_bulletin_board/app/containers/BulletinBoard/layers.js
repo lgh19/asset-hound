@@ -12,6 +12,6 @@ export const allLocationsLayer = {
     'circle-radius': 5,
     'circle-color': '#1d3557',
     'circle-stroke-color': '#457b9d',
-    'circle-stroke-width': 1
+    'circle-stroke-width': 1,
   },
 };

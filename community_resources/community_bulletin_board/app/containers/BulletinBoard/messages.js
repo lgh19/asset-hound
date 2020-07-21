@@ -9,8 +9,8 @@ import { defineMessages } from 'react-intl';
 export const scope = 'app.containers.BulletinBoard';
 
 export default defineMessages({
-  header: {
-    id: `${scope}.header`,
-    defaultMessage: 'This is the BulletinBoard container!',
+  callToAction: {
+    id: `${scope}.callToAction`,
+    defaultMessage: 'Find support near you',
   },
 });

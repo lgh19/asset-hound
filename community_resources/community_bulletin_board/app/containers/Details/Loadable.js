@@ -1,6 +1,6 @@
 /**
  *
- * Asynchronously loads the component for Typography
+ * Asynchronously loads the component for Details
  *
  */
 

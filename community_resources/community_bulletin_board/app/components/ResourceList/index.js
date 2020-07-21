@@ -10,7 +10,6 @@ import styled from 'styled-components';
 
 import ResourceListItem from './ResourceListItem';
 import { localPropTypes } from '../../utils';
-import Typography from '../Typography';
 
 const List = styled.ul`
   list-style: none;

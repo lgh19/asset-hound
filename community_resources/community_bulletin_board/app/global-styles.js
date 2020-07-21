@@ -14,7 +14,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body.fontLoaded {
-    font-family: 'Public Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
   p,
