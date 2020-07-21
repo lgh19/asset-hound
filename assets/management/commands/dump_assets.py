@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from assets.models import Asset
 
 
-def to_dict_for_csv(asset: Asset):
+def to_dict_for_csv(asset: Asset, for_carto=False):
     return {
         'id': asset.id,
         'name': asset.name,
@@ -25,8 +25,25 @@ def to_dict_for_csv(asset: Asset):
 class Command(BaseCommand):
     help = 'Dump assets from database to a CSV file'
 
+    def add_arguments(self, parser):
+        # Named (optional) arguments
+        parser.add_argument(
+            '-t',
+            '--asset-types',
+            nargs='*',
+            help='Specify which asset types to filter by',
+        )
+        parser.add_argument(
+            '-c'
+            '--carto',
+            action='store_true',
+            help='Dump with geom fields for carto.',
+        )
+
     def handle(self, *args, **options):
-        output_file = os.path.join(settings.BASE_DIR, 'asset_dump.csv');
+        output_file = os.path.join(settings.BASE_DIR, 'asset_dump.csv')
+        asset_types = options['asset-types']
+        for_carto = options['carto']
 
         with open(output_file, 'w') as f:
             writer = csv.DictWriter(
@@ -43,5 +60,7 @@ class Command(BaseCommand):
                  'longitude'],
             )
             writer.writeheader()
-            for asset in Asset.objects.all():
-                writer.writerow(to_dict_for_csv(asset))
+            asset_set = Asset.objects.all() if not asset_types else Asset.objects.filter(
+                asset_types__name__in=asset_types)
+            for asset in asset_set:
+                writer.writerow(to_dict_for_csv(asset, for_carto=for_carto))

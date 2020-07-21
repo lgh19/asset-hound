@@ -18,7 +18,8 @@ from asset_hound.local_settings import (
     DB_USER,
     DB_PASS,
     DB_HOST,
-    GEOCODIO_API_KEY, 
+    GEOCODIO_API_KEY,
+    CARTO_API_KEY,
     DEV_APPS,
 )
 
@@ -49,12 +50,12 @@ INSTALLED_APPS = [
 
     # dependencies
     'corsheaders',
-    'reversion',
     'rest_framework',
     'rest_framework_gis',
     'recurrence',
     'phonenumber_field',
     'ckeditor',
+    'simple_history',
 
     # asset-hound apps
     'geo',
@@ -75,7 +76,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'asset_hound.urls'
@@ -174,6 +175,7 @@ REST_FRAMEWORK = {
 
 # Extra stuff
 GEOCODER_API_KEY = GEOCODIO_API_KEY
+
 
 CORS_ORIGIN_ALLOW_ALL = True
 

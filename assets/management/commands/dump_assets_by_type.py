@@ -19,6 +19,8 @@ def to_dict_for_csv(asset: Asset):
         'do_not_display': asset.do_not_display,
         'latitude': asset.location.latitude,
         'longitude': asset.location.longitude,
+        'primary_key_from_rocket': asset.primary_key_from_rocket,
+        'synthesized_key': asset.synthesized_key,
     }
 
 
@@ -58,11 +60,12 @@ class Command(BaseCommand):
                  'sensitive',
                  'do_not_display',
                  'latitude',
-                 'longitude'],
+                 'longitude',
+                 'primary_key_from_rocket',
+                 'synthesized_key',],
             )
             writer.writeheader()
-            rows = []
-            for asset in assets_iterator:
-                rows.append(to_dict_for_csv(asset))
-
-            writer.writerows(rows)
+            for k,asset in enumerate(assets_iterator.iterator()): # Use the "iterator()" method to lazily evaluate the query in chunks (to save memory).
+                writer.writerow(to_dict_for_csv(asset))
+                if k % 2000 == 2000-1:
+                    print(f"Wrote {k+1} assets so far.")

@@ -128,6 +128,9 @@ const resourceShape = {
   locations: PropTypes.shape(locationsShape),
   virtualOnly: PropTypes.bool,
   recurrence: PropTypes.string,
+  allDay: PropTypes.bool,
+  startTime: PropTypes.string,
+  endTime: PropTypes.string,
 };
 
 const neighborhoodShape = {

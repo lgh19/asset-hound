@@ -16,6 +16,7 @@ import { localPropTypes } from '../../../utils';
 import Content from '../../Content';
 import ContactInfo from './ContactInfo';
 
+
 const Wrapper = styled(Card)`
   cursor: auto;
   // style for Map View

@@ -12,7 +12,6 @@ from assets.models import (Asset,
                            Location,
                            AssetType,
                            Tag,
-                           AccessibilityFeature,
                            ProvidedService,
                            TargetPopulation,
                            DataSource)
@@ -55,8 +54,12 @@ def type_or_none(row, field, desired_type):
     return None
 
 
-def standardize_phone(phone: str):
+def standardize_phone(phone):
+    if phone is None:
+        return None
+    assert type(phone) == str
     result_number = None
+    phone = re.sub('\.0$', '', phone) # Deal with Excel converting phone numbers to floats.
     try:
         candidate_phone = '+1' + re.sub(r'\D', '', phone) # This actually adds a leading '+1'
         # even if the phone number already starts with a 1, but the phonenumbers.parse function is
@@ -113,9 +116,6 @@ class Command(BaseCommand):
                 tags = [Tag.objects.get_or_create(name=tag)[0] for tag in
                         parse_cell(row['tags'])] if row['tags'] else []
 
-                accessibility_features = [AccessibilityFeature.objects.get_or_create(name=access)[0] for access in
-                                          parse_cell(row['accessibility'])] if row['accessibility'] else []
-
                 services = [ProvidedService.objects.get_or_create(name=service)[0] for service in
                             parse_cell(row['services'])] if 'services' in row else []
 
@@ -146,6 +146,7 @@ class Command(BaseCommand):
                     child_friendly=boolify(value_or_none(row, 'child_friendly')),
                     internet_access=boolify(value_or_none(row, 'internet_access')),
                     computers_available=boolify(value_or_none(row, 'computers_available')),
+                    accessibility=boolify(value_or_none(row, 'accessibility')),
                     open_to_public=boolify(value_or_none(row, 'open_to_public')),
                     sensitive=boolify(value_or_none(row, 'sensitive')),
                     do_not_display=boolify(value_or_none(row, 'do_not_display')),
@@ -160,7 +161,6 @@ class Command(BaseCommand):
                 asset.asset_types.set(asset_types)
                 asset.tags.set(tags)
                 asset.services.set(services)
-                asset.accessibility_features.set(accessibility_features)
                 asset.hard_to_count_population.set(hard_to_count_pops)
                 asset.save()
                 count += 1

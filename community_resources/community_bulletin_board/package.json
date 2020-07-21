@@ -1,5 +1,6 @@
 {
   "name": "community-bulletin-board",
+  "homepage": "/resources/",
   "version": "0.0.1",
   "description": "A site where community organizations can share information on what resources are available to their neighbors.",
   "repository": {
@@ -83,6 +84,7 @@
     "libphonenumber-js": "^1.7.52",
     "lodash": "^4.17.15",
     "minimist": "^1.2.5",
+    "moment": "^2.26.0",
     "prop-types": "15.7.2",
     "react": "16.8.6",
     "react-dom": "16.8.6",

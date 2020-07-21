@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Asset Updater/Merger</title>
+</head>
+
+<body>
+Upload a merge-instructions CSV file here to attempt to execute asset merges (specifying Asset field values and linking the corresponding RawAsset records to the merged Asset instance).
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {{ form }}<P>
+        <button type="submit" name="validate">Validate</button>
+        <button type="submit" name="update">Update assets</button>
+    </form>
+
+{% if results %}
+    {% for result in results %}
+        {{ result | safe }}<br>
+    {% endfor %}
+
+{% endif %}
+</body>
+
+</html>
