@@ -2,6 +2,7 @@ thing,status
 Automate pushing new data to Carto table on Django Asset/Location saves,
 Find and geocode ~164 ungeocoded assets,
 Delist locations/assets outside of Allegheny County,
+Experiment with usaddress{,-scourgify} to standardize addresses,
 Consider using OpenStreetMap tags for inspiration: https://wiki.openstreetmap.org/wiki/Category:Tag_descriptions,
 Modify map to distinguish/highlight multiple assets at the same location,
 Implement solution to float precision issues on geocoordinates (probably switch to Decimal type),
