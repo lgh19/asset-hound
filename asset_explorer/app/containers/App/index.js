@@ -7,42 +7,34 @@
  *
  */
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
-
-// import HomePage from 'containers/Explorer/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
-
-import { createSelector, createStructuredSelector } from 'reselect';
+import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { Provider, defaultTheme, Flex, View } from '@adobe/react-spectrum';
+import { useInjectReducer } from '../../utils/injectReducer';
 import GlobalStyle from '../../global-styles';
 import Header from '../../components/Header';
-import AppWrapper from './AppWrapper';
-import ContentWrapper from './ContentWrapper';
 import { setDarkMode } from './actions';
-import { makeSelectDarkMode } from './selectors';
-import { useInjectReducer } from '../../utils/injectReducer';
-
-import Explorer from '../Explorer';
-
+import { makeSelectColorScheme } from './selectors';
 import reducer from './reducer';
+import Explorer from '../Explorer';
 import Footer from '../../components/Footer';
-import ContactCard from '../../components/ContactCard';
 
-function App({ darkMode, handleDarkModeChange }) {
+function App({ colorScheme, handleDarkModeChange }) {
   useInjectReducer({ key: 'global', reducer });
+
   return (
-    <Provider theme={defaultTheme} width="100%">
-      <Flex
-        direction="column"
-        height="100%"
-        maxHeight="100%'"
-      >
+    <Provider theme={defaultTheme} colorScheme={colorScheme} width="100%">
+      <Flex direction="column" height="100%" maxHeight="100%'">
         <View height="size-1000">
-          <Header darkMode={darkMode} onDarkModeChange={handleDarkModeChange} />
+          <Header
+            colorScheme={colorScheme}
+            onDarkModeChange={handleDarkModeChange}
+          />
         </View>
 
         <Flex
@@ -67,12 +59,12 @@ function App({ darkMode, handleDarkModeChange }) {
 }
 
 App.propTypes = {
-  darkMode: PropTypes.bool,
+  colorScheme: PropTypes.string,
   handleDarkModeChange: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({
-  darkMode: makeSelectDarkMode(),
+  colorScheme: makeSelectColorScheme(),
 });
 
 function mapDispatchToProps(dispatch) {

@@ -44,7 +44,7 @@ import {
   setSearchTerm,
 } from './actions';
 import Map from '../../components/Map';
-import { makeSelectDarkMode } from '../App/selectors';
+import { makeSelectColorScheme } from '../App/selectors';
 import { categorySchema } from '../../schemas';
 import MapFilter from '../../components/MapFilter';
 import AssetList from '../../components/AssetList';
@@ -61,7 +61,7 @@ function Explorer({
   getCategories,
   getAsset,
   categories,
-  darkMode,
+                    colorScheme,
   assetListOffset,
   loadingAssets,
   moreAssetsRemain,
@@ -168,7 +168,7 @@ function Explorer({
       {/* Map */}
       <View flex>
         <Map
-          darkMode={darkMode}
+          colorScheme={colorScheme}
           onAssetClick={getAsset}
           categories={currCategories}
           filter={mbFilter}
@@ -188,7 +188,7 @@ Explorer.propTypes = {
   allAssets: PropTypes.arrayOf(PropTypes.object),
   getAsset: PropTypes.func.isRequired,
   getCategories: PropTypes.func.isRequired,
-  darkMode: PropTypes.bool,
+  colorScheme: PropTypes.string,
   categories: PropTypes.arrayOf(PropTypes.shape(categorySchema)),
 
   assetListOffset: PropTypes.number,
@@ -204,7 +204,7 @@ const mapStateToProps = createStructuredSelector({
   allAssets: makeSelectAllAssets(),
   currentAsset: makeSelectExplorerCurrentAsset(),
   categories: makeSelectAssetCategories(),
-  darkMode: makeSelectDarkMode(),
+  colorScheme: makeSelectColorScheme(),
   searchTerm: makeSelectSearchTerm(),
 
   assetListOffset: makeSelectAssetListOffset(),

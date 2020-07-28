@@ -15,13 +15,8 @@ import {
   Header,
   Heading,
   ActionButton,
-  Item,
   Flex,
   View,
-  ActionGroup,
-  ButtonGroup,
-  Provider,
-  defaultTheme,
   Divider,
 } from '@adobe/react-spectrum';
 import Light from '@spectrum-icons/workflow/Light';
@@ -31,10 +26,12 @@ import FileData from '@spectrum-icons/workflow/FileData';
 
 const BG_COLOR = 'gold-400';
 
-function AppHeader({ darkMode, onDarkModeChange }) {
+function AppHeader({ colorScheme, onDarkModeChange }) {
+  const inDarkMode = colorScheme === 'dark';
+
   return (
-    <Header component="header" position="static" width="100%" role="banner">
-      <Flex direction="row" width="100%">
+    <Header role="banner">
+      <Flex direction="row">
         <View flex="1 0 auto" padding="size-250">
           <Heading level={2} margin={0}>
             Asset Map
@@ -48,18 +45,16 @@ function AppHeader({ darkMode, onDarkModeChange }) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <FileData />
             <Text>Get the Data Here!</Text>
           </Button>
         </View>
-        <View
-          flex="0 1 auto"
-          padding="size-250"
-          aria-hidden
-          backgroundColor={BG_COLOR}
-        >
-          <ActionButton isQuiet onClick={() => onDarkModeChange(!darkMode)}>
-            {!darkMode ? <Moon /> : <Light />}
+        <View flex="0 1 auto" padding="size-250" aria-hidden>
+          <ActionButton
+            onPress={() => onDarkModeChange(!inDarkMode)}
+            aria-hidden
+            title="Toggle Dark Mode"
+          >
+            {inDarkMode ? <Moon size="L" /> : <Light size="L" />}
           </ActionButton>
         </View>
       </Flex>
@@ -69,7 +64,7 @@ function AppHeader({ darkMode, onDarkModeChange }) {
 }
 
 AppHeader.propTypes = {
-  darkMode: PropTypes.bool,
+  colorScheme: PropTypes.bool,
   onDarkModeChange: PropTypes.func.isRequired,
 };
 

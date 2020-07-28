@@ -42,7 +42,7 @@ function Map({
   sources,
   layers,
   isStatic,
-  darkMode,
+  colorScheme,
   children,
   onAssetClick,
   categories,
@@ -54,7 +54,7 @@ function Map({
   const startingViewport = { ...DEFAULT_VIEWPORT, ...defaultViewport };
   const [assetSource, setAssetSource] = useState(undefined);
   const [viewport, setViewport] = useState(startingViewport);
-  const mapStyle = darkMode ? basemaps.dark : basemaps.light;
+  const mapStyle = basemaps[colorScheme];
 
   const [popup, setPopup] = useState(undefined);
   const [popupFeature, setPopupFeature] = useState(undefined);
@@ -166,7 +166,7 @@ Map.propTypes = {
   sources: PropTypes.arrayOf(PropTypes.object),
   layers: PropTypes.arrayOf(PropTypes.object),
   isStatic: PropTypes.bool,
-  darkMode: PropTypes.bool,
+  colorScheme: PropTypes.string,
   children: PropTypes.node,
   onAssetClick: PropTypes.func,
   categories: PropTypes.arrayOf(PropTypes.shape(categorySchema)),

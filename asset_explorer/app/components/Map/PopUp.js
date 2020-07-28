@@ -20,7 +20,7 @@ function PopUp({ name, slug, type, lat, lng, onClose }) {
       closeButton={false}
       tipSize={0}
       anchor="bottom"
-      interactiveLayers={['asset-points']}
+      offsetTop={-5}
       style={{ padding: 0 }}
     >
       <View

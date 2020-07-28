@@ -10,10 +10,10 @@ const makeSelectLocation = () =>
     routerState => routerState.location,
   );
 
-const makeSelectDarkMode = () =>
+const makeSelectColorScheme = () =>
   createSelector(
     selectGlobal,
-    globalState => globalState.darkMode,
+    globalState => globalState.colorScheme,
   );
 
-export { makeSelectLocation, makeSelectDarkMode };
+export { makeSelectLocation, makeSelectColorScheme };
