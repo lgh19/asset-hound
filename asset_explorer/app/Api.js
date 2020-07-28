@@ -54,12 +54,12 @@ function serializeParams(params) {
  *
  * @param {Endpoints} endpoint - target for request
  * @param {Methods} method - HTTP method to use
- * @param {Object} options - optional parameters
- * @param {string | number} options.id - id of resource at endpoint to be retrieved
- * @param {Object} options.params - url parameters
- * @param {Object} options.body - body data to supply to fetch request
- * @param {Object} options.headers - HTTP headers to supply to fetch
- * @param {Object} options.fetchInit - catchall for other fetch init options
+ * @param {Object} [options] - optional parameters
+ * @param {string | number} [options.id] - id of resource at endpoint to be retrieved
+ * @param {Object} [options.params] - url parameters
+ * @param {Object} [options.body] - body data to supply to fetch request
+ * @param {Object} [options.headers] - HTTP headers to supply to fetch
+ * @param {Object} [options.fetchInit] - catchall for other fetch init options
  * @returns {Promise<Response>}
  */
 function callApi(
@@ -117,6 +117,7 @@ function getAssets(params) {
  * @returns {Promise<Response>}
  */
 function getAssetById(id) {
+  if (!id && id !== 0) throw Error('Required parameter `id` is missing');
   return callApi(Endpoints.ASSETS, Methods.get, { id });
 }
 

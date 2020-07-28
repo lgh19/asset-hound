@@ -1,6 +1,6 @@
 /**
  *
- * Tests for Link
+ * Tests for CategoryIcon
  *
  * @see https://github.com/react-boilerplate/react-boilerplate/tree/master/docs/testing
  *
@@ -10,12 +10,12 @@ import React from 'react';
 import { render } from 'react-testing-library';
 // import 'jest-dom/extend-expect'; // add some helpful assertions
 
-import Link from '../index';
+import CategoryIcon from '../index';
 
-describe('<Link />', () => {
+describe('<CategoryIcon />', () => {
   it('Expect to not log errors in console', () => {
     const spy = jest.spyOn(global.console, 'error');
-    render(<Link />);
+    render(<CategoryIcon />);
     expect(spy).not.toHaveBeenCalled();
   });
 
@@ -31,7 +31,7 @@ describe('<Link />', () => {
   it.skip('Should render and match the snapshot', () => {
     const {
       container: { firstChild },
-    } = render(<Link />);
+    } = render(<CategoryIcon />);
     expect(firstChild).toMatchSnapshot();
   });
 });

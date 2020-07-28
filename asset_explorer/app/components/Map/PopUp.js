@@ -1,12 +1,16 @@
 import React from 'react';
+import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Popup } from 'react-map-gl';
-import { Paper } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-
+import { View, Flex, Text } from '@adobe/react-spectrum';
+import CategoryIcon from '../CategoryIcon';
 // import styled, {css} from 'styled-components';
 
-function PopUp({ name, type, lat, lng, onClose }) {
+const Description = styled.span`
+  font-size: 86%;
+`;
+
+function PopUp({ name, slug, type, lat, lng, onClose }) {
   return (
     <Popup
       latitude={lat}
@@ -19,10 +23,29 @@ function PopUp({ name, type, lat, lng, onClose }) {
       interactiveLayers={['asset-points']}
       style={{ padding: 0 }}
     >
-      <Paper style={{ textAlign: 'center', padding: '4px' }}>
-        <Typography variant="body1">{name}</Typography>
-        <Typography variant="caption">{type}</Typography>
-      </Paper>
+      <View
+        backgroundColor="default"
+        borderWidth="thin"
+        borderColor="dark"
+        borderRadius="medium"
+        padding="size-100"
+      >
+        <Flex direction="row">
+          <View paddingEnd="size-150" paddingTop="size-100">
+            <CategoryIcon categorySlug={slug} size="M" />
+          </View>
+          <View>
+            <View>
+              <Text>{name}</Text>
+            </View>
+            <View>
+              <Text>
+                <Description>{type}</Description>
+              </Text>
+            </View>
+          </View>
+        </Flex>
+      </View>
     </Popup>
   );
 }

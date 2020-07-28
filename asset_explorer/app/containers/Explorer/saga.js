@@ -1,9 +1,11 @@
-import { takeEvery, takeLatest, all, call, put } from 'redux-saga/effects';
+import { takeLatest, all, call, put } from 'redux-saga/effects';
+import { select } from '@redux-saga/core/effects';
 import {
   GET_ALL_ASSETS_REQUEST,
   GET_ASSET_DETAIL_REQUEST,
   GET_CATEGORIES_REQUEST,
-  GET_NEXT_ASSET_LIST_PAGE_REQUEST, SET_SEARCH_TERM,
+  GET_NEXT_ASSET_LIST_PAGE_REQUEST,
+  SET_SEARCH_TERM,
 } from './constants';
 import Api from '../../Api';
 import {
@@ -16,8 +18,7 @@ import {
   getNextAssetPageFailure,
   getNextAssetPageSuccess,
 } from './actions';
-import {select} from "@redux-saga/core/effects";
-import {makeSelectSearchTerm} from "./selectors";
+import { makeSelectSearchTerm } from './selectors';
 
 const PAGE_SIZE = 40;
 
@@ -59,7 +60,6 @@ export function* fetchSingleAsset(action) {
 }
 
 export function* fetchNextAssetPage(action) {
-  console.log('fetchin');
   const { offset } = action.payload;
   const searchTerm = yield select(makeSelectSearchTerm());
   try {

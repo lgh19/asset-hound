@@ -6,34 +6,22 @@
 
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import Typography from '@material-ui/core/Typography';
-import PanelDiv from '../PanelDiv';
+import { Heading, Header } from '@adobe/react-spectrum';
 import AssetTypesList from './AssetTypesLine';
 import { assetTypeSchema } from '../../schemas';
-import StatusIconList from '../StatusIconList';
 
-// import { FormattedMessage } from 'react-intl';
-// import messages from './messages';
-
-function InfoHeading({ name, address, assetTypes, statuses }) {
+function InfoHeading({ name, assetTypes }) {
   return (
-    <PanelDiv>
-      <Typography variant="h5" component="h2">
-        {name}
-      </Typography>
-      <Typography variant="subtitle2">{address}</Typography>
+    <Header>
+      <Heading level={2}>{name}</Heading>
       <AssetTypesList assetTypes={assetTypes} />
-      <StatusIconList items={statuses} />
-    </PanelDiv>
+    </Header>
   );
 }
 
 InfoHeading.propTypes = {
   name: PropTypes.string.isRequired,
-  address: PropTypes.string,
   assetTypes: PropTypes.arrayOf(PropTypes.shape(assetTypeSchema)).isRequired,
-  statuses: PropTypes.array,
 };
 
 export default memo(InfoHeading);

@@ -1,7 +1,7 @@
 /*
  * Explorer
  *
- * This is the first thing users see of our App, at the '/' route
+ *
  *
  */
 
@@ -12,13 +12,20 @@ import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
+import {
+  Flex,
+  ListBox,
+  Item,
+  View,
+  SearchField,
+  Divider,
+} from '@adobe/react-spectrum';
+import { Header } from '@react-spectrum/view';
+import { Heading } from '@react-spectrum/text';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { useInjectSaga } from '../../utils/injectSaga';
 import reducer from './reducer';
 import saga from './saga';
-import Wrapper from './Wrapper';
-import MainPane from './MainPane';
-import SidePane from './SidePane';
 import InfoPanel from '../InfoPanel';
 import {
   makeSelectAllAssets,
@@ -39,23 +46,15 @@ import {
 import Map from '../../components/Map';
 import { makeSelectDarkMode } from '../App/selectors';
 import { categorySchema } from '../../schemas';
-import AssetList from '../../components/AssetList';
-import SideSheet from '../../components/SideSheet';
-import SearchBox from '../../components/SearchBox';
 import MapFilter from '../../components/MapFilter';
-
-function reduceDefaultCategories(acc, cur) {
-  return { ...acc, [cur.name]: true };
-}
+import AssetList from '../../components/AssetList';
+// import AssetList from '../../components/AssetList';
 
 function makeAssetFilter(newFilters) {
-  const filterCats = Object.entries(newFilters)
-    .filter(([filter, value]) => value)
-    .map(([filter, value]) => filter);
-  return ['in', ['get', 'category'], ['literal', filterCats]];
+  return ['in', ['get', 'category'], ['literal', newFilters]];
 }
 
-const categoryFilter = filters => category => filters[category.name];
+const categoryFilter = filters => category => filters.includes(category.name);
 
 function Explorer({
   allAssets,
@@ -70,11 +69,12 @@ function Explorer({
   handleSearch,
   handleClearSearch,
   searchTerm,
+  currentAsset,
 }) {
   useInjectReducer({ key: 'explorer', reducer });
   useInjectSaga({ key: 'explorer', saga });
   const [filters, setFilters] = useState(
-    categories ? categories.reduce(reduceDefaultCategories, {}) : undefined,
+    categories ? categories.map(c => c.name) : undefined,
   );
   const [mbFilter, setMbFilter] = useState(['has', 'name']);
   const [currCategories, setCurrCategories] = useState(
@@ -82,6 +82,7 @@ function Explorer({
       ? categories.filter(categoryFilter(filters))
       : undefined,
   );
+
   /**
    * Initialization happens here
    */
@@ -101,7 +102,7 @@ function Explorer({
 
   useEffect(() => {
     if (categories) {
-      const tempFilters = categories.reduce(reduceDefaultCategories, {});
+      const tempFilters = categories.map(c => c.name);
       setFilters(tempFilters);
       setMbFilter(makeAssetFilter(tempFilters));
       setCurrCategories(categories.filter(categoryFilter(tempFilters)));
@@ -115,30 +116,57 @@ function Explorer({
   }
 
   return (
-    <Wrapper>
-      <SidePane>
-        <SideSheet variant="nav">
-          <SearchBox
+    <Flex direction="row" flex="1" minHeight="size-0">
+      <Flex
+        direction="column"
+        minHeight="size-0"
+        width="size-3600"
+      >
+        <Header>
+          <View width="100%" paddingX="size-150">
+            <Heading level={2}>Explore community assets near you</Heading>
+          </View>
+        </Header>
+
+        <View width="100%" padding="size-150">
+          <SearchField
+            value={searchTerm}
+            label="Search for assets"
+            placeholder="Start typing to search for assets"
             onChange={handleSearch}
-            onClear={handleClearSearch}
-            term={searchTerm}
+            width="100%"
           />
+        </View>
+
+        <View width="100%" padding="size-150">
           <MapFilter
             categories={categories}
             filters={filters}
             onChange={handleFilterChange}
           />
+        </View>
+        <View
+          overflow="auto"
+          flex="1"
+          minHeight="size-0"
+          width="100%"
+          padding="size-150"
+        >
           <AssetList
-            hasNextPage={moreAssetsRemain}
-            isNextPageLoading={loadingAssets}
-            items={allAssets}
-            loadNextPage={getNextAssetPage(assetListOffset)}
-            onAssetClick={getAsset}
-            searchTerm={searchTerm}
-          />
-        </SideSheet>
-      </SidePane>
-      <MainPane>
+            aria-label="Select an asset"
+            assets={allAssets}
+            currentAsset={currentAsset}
+            onSelectAsset={getAsset}
+            isLoading={loadingAssets}
+            // onLoadMore={getNextAssetPage(assetListOffset)}
+          >
+            {item => <Item key={item.name}>{item.name}</Item>}
+          </AssetList>
+        </View>
+      </Flex>
+
+      {/* Map */}
+      <View flex>
         <Map
           darkMode={darkMode}
           onAssetClick={getAsset}
@@ -146,11 +174,13 @@ function Explorer({
           filter={mbFilter}
           searchTerm={searchTerm}
         />
-      </MainPane>
-      <SidePane>
+      </View>
+
+      {/* Details */}
+      <View width="size-4600">
         <InfoPanel />
-      </SidePane>
-    </Wrapper>
+      </View>
+    </Flex>
   );
 }
 

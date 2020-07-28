@@ -90,6 +90,7 @@ function Map({
       setPopup(
         <PopUp
           name={feature.properties.name}
+          slug={feature.properties.category}
           type={feature.properties.asset_type_title}
           lat={lat}
           lng={lng}

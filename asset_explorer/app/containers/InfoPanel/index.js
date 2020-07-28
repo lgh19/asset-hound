@@ -13,14 +13,12 @@ import { compose } from 'redux';
 
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
-import { LinearProgress } from '@material-ui/core';
-import ChildFriendlyIcon from '@material-ui/icons/ChildFriendly';
-import InternetAvailableIcon from '@material-ui/icons/Wifi';
-import ComputersAvailableIcon from '@material-ui/icons/Computer';
-import OpenToPublicIcon from '@material-ui/icons/EmojiPeople';
+import { ProgressBar, View } from '@adobe/react-spectrum';
+
 import { makeSelectInfoPanelIsOpen } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
+
 // import messages from './messages';
 import SideSheet from '../../components/SideSheet';
 import { closeInfoPanel } from './actions';
@@ -34,6 +32,7 @@ import { assetSchema } from '../../schemas';
 import WelcomeInfo from '../../components/WelcomeInfo';
 import InfoSection from '../../components/InfoSection';
 import InfoLine from '../../components/InfoLine';
+import StatusIconList from '../../components/StatusIconList';
 
 export function InfoPanel({ isOpen, loading, asset }) {
   useInjectReducer({ key: 'infoPanel', reducer });
@@ -51,31 +50,27 @@ export function InfoPanel({ isOpen, loading, asset }) {
       {
         name: 'Open to the Public',
         status: asset.openToPublic,
-        icon: OpenToPublicIcon,
       },
       {
         name: 'Child Friendly',
         status: asset.childFriendly,
-        icon: ChildFriendlyIcon,
       },
       {
         name: 'Public Internet Access',
         status: asset.internetAccess,
-        icon: InternetAvailableIcon,
         disabledMsg: 'No Public Internet Access',
       },
       {
         name: 'Computers Available',
         status: asset.computersAvailable,
-        icon: ComputersAvailableIcon,
         disabledMsg: 'No Public Computers Available',
       },
     ];
   }
 
   return (
-    <SideSheet open={isOpen}>
-      {loading && <LinearProgress variant="query" color="secondary" />}
+    <View padding="size-150">
+      {loading && <ProgressBar label="Loading…" isIndeterminate />}
       {!loading && !asset && <WelcomeInfo />}
       {!loading && asset && (
         <>
@@ -83,14 +78,19 @@ export function InfoPanel({ isOpen, loading, asset }) {
             name={asset.name}
             assetTypes={asset.assetTypes}
             address={asset.location.properties.name}
-            statuses={statusList}
           />
-          <ContactCard
-            email={asset.email}
-            phone={asset.phone}
-            website={url}
-            address={asset.location.properties.name}
-          />
+          <InfoSection title="Contact Information">
+            <ContactCard
+              email={asset.email}
+              phone={asset.phone}
+              website={url}
+              address={asset.location.properties.name}
+            />
+          </InfoSection>
+          {/*<InfoSection>*/}
+          {/*  <StatusIconList items={statusList} />*/}
+          {/*</InfoSection>*/}
+
           <InfoSection title="Hours of Operation">
             <InfoLine term="Regular" value={asset.hoursOfOperation} />
             <InfoLine term="Holiday" value={asset.holidayHoursOfOperation} />
@@ -110,7 +110,7 @@ export function InfoPanel({ isOpen, loading, asset }) {
           </InfoSection>
         </>
       )}
-    </SideSheet>
+    </View>
   );
 }
 

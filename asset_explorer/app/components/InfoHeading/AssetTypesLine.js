@@ -1,31 +1,42 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import Typography from '@material-ui/core/Typography';
-import MuiChip from '@material-ui/core/Chip';
+import { View, Text } from '@adobe/react-spectrum';
 import { assetTypeSchema } from '../../schemas';
+import CategoryIcon from '../CategoryIcon';
 
-const Wrapper = styled.div`
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing(theme.itemSpacing)}px;
-  `}
+const List = styled.ul`
+  list-style: none;
+  padding-left: 0;
+  & > li {
+    display: inline-block;
+  }
 `;
 
-const Chip = styled(MuiChip)`
-  ${({ theme }) => css`
-    margin-right: ${theme.spacing(theme.itemSpacing)}px;
-  `}
-`;
-
-Chip.propTypes = MuiChip.propTypes;
+function Tag({ slug, label }) {
+  console.log('slug', slug);
+  return (
+    <View
+      paddingX="size-100"
+      borderWidth="thin"
+      borderColor="dark"
+      borderRadius="regular"
+      backgroundColor="gray-300"
+    >
+      <Text>{label}</Text>
+    </View>
+  );
+}
 
 function AssetTypesList({ assetTypes }) {
   return (
-    <Wrapper>
+    <List>
       {assetTypes.map(({ name, title }) => (
-        <Chip variant="outlined" size="small" key={name} label={title} />
+        <li>
+          <Tag key={name} label={title} slug={name} />
+        </li>
       ))}
-    </Wrapper>
+    </List>
   );
 }
 
