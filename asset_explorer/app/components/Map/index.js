@@ -71,7 +71,11 @@ function Map({
 
   useEffect(() => {
     if (searchTerm) {
-      setAssetLayerFilter(['all', filter, ['in', searchTerm, ['get', 'name']]]);
+      setAssetLayerFilter([
+        'all',
+        filter,
+        ['in', ['downcase', searchTerm], ['downcase', ['get', 'name']]],
+      ]);
     } else {
       setAssetLayerFilter(filter);
     }
