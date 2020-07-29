@@ -4,100 +4,81 @@
  *
  */
 
-import React, { useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-// import styled from 'styled-components';
-import InfiniteLoader from 'react-window-infinite-loader';
-import { FixedSizeList } from 'react-window';
-// import { FormattedMessage } from 'react-intl';
-import ListItem from '@material-ui/core/ListItem';
-import List from '@material-ui/core/List';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { ListItemText } from '@material-ui/core';
+
+import { ListBox, Item, View, Text, Divider } from '@adobe/react-spectrum';
+import Building from '@spectrum-icons/workflow/Building';
+import Train from '@spectrum-icons/workflow/Train';
+import Money from '@spectrum-icons/workflow/Money';
+import Home from '@spectrum-icons/workflow/Home';
+import Heart from '@spectrum-icons/workflow/Heart';
+import Book from '@spectrum-icons/workflow/Book';
+import PeopleGroup from '@spectrum-icons/workflow/PeopleGroup';
+import Shop from '@spectrum-icons/workflow/Shop';
+import Education from '@spectrum-icons/workflow/Education';
 
 // import messages from './messages';
+const SIZE = 'L';
 
 function AssetList({
-  hasNextPage,
-  isNextPageLoading,
-  items,
-  loadNextPage,
-  onAssetClick,
+  assets,
+  currentAsset,
+  isLoading,
+  onLoadMore,
+  onSelectAsset,
+  ...props
 }) {
-
-  const itemCount = hasNextPage ? items.length + 1 : items.length;
-
-  const loadMoreItems = isNextPageLoading
-    ? () => {}
-    : () => Promise.resolve(loadNextPage());
-
-  const isItemLoaded = index => !hasNextPage || index < items.length;
-
-  // Render an item or a loading indicator.
-  const AssetListItem = ({ index, style }) => {
-    const asset = items[index];
-    let primary;
-    let secondary;
-    if (!isItemLoaded(index) || !asset) {
-      primary = 'Loading...';
-      secondary = '';
-    } else {
-      primary = asset.name;
-      // eslint-disable-next-line prefer-destructuring
-      secondary = asset.assetTypes[0].title;
-    }
-
-    return (
-      <ListItem
-        style={style}
-        button
-        divider
-        onClick={() => onAssetClick(asset.id)}
-      >
-        <ListItemText
-          primaryTypographyProps={{ noWrap: true, display: 'block' }}
-          primary={primary}
-          secondary={secondary}
-        />
-      </ListItem>
-    );
+  const categoryIcons = {
+    'non-profit': <Building size={SIZE} />,
+    transportation: <Train size={SIZE} />,
+    business: <Money size={SIZE} />,
+    housing: <Home size={SIZE} />,
+    health: <Heart size={SIZE} />,
+    food: <Shop size={SIZE} />,
+    'education/youth': <Education size={SIZE} />,
+    'community-center': <PeopleGroup size={SIZE} />,
+    civic: <Book size={SIZE} />,
   };
 
+  /**
+   * Extracts selected id from the set of selected keys that `ListBox` passes
+   * and calls the `onSelectAsset` prop with it as its argument.
+   * @param {Set} selectedKeys
+   */
+  function handleSelectionChange(selectedKeys) {
+    const selectedKeysArr = Array.from(selectedKeys);
+    if (selectedKeysArr.length) onSelectAsset(Array.from(selectedKeys)[0]);
+  }
+
   return (
-    <AutoSizer disableWidth>
-      {({ height, width }) => (
-        <List>
-          <InfiniteLoader
-            isItemLoaded={isItemLoaded}
-            itemCount={itemCount}
-            loadMoreItems={loadMoreItems}
-          >
-            {({ onItemsRendered, ref }) => (
-              <FixedSizeList
-                itemCount={itemCount}
-                onItemsRendered={onItemsRendered}
-                ref={ref}
-                height={height}
-                width={width}
-                itemSize={75}
-              >
-                {AssetListItem}
-              </FixedSizeList>
-            )}
-          </InfiniteLoader>
-        </List>
+    <ListBox
+      selectedKeys={currentAsset ? [`${currentAsset.id}`] : undefined}
+      selectionMode="single"
+      aria-label="Select an asset"
+      items={assets}
+      isLoading={isLoading}
+      onLoadMore={onLoadMore}
+      onSelectionChange={handleSelectionChange}
+      {...props}
+    >
+      {item => (
+        <Item key={item.id} textValue={item.name}>
+          {categoryIcons[item.category.name]}
+          <Text>{item.name}</Text>
+          <Text slot="description">{item.category.title}</Text>
+        </Item>
       )}
-    </AutoSizer>
+    </ListBox>
   );
 }
 
 AssetList.propTypes = {
-  hasNextPage: PropTypes.bool,
-  isNextPageLoading: PropTypes.bool,
-  items: PropTypes.array,
-  loadNextPage: PropTypes.func,
-  onAssetClick: PropTypes.func,
-  searchTerm: PropTypes.string,
+  assets: PropTypes.arrayOf(PropTypes.object),
+  currentAsset: PropTypes.object,
+  isLoading: PropTypes.bool,
+  onLoadMore: PropTypes.func,
+  onSelectAsset: PropTypes.func,
 };
 
 export default AssetList;

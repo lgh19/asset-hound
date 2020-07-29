@@ -16,13 +16,7 @@ import PropTypes from 'prop-types';
 
 import styled from 'styled-components';
 import { MAPBOX_API_TOKEN } from '../../settings';
-import {
-  DEFAULT_VIEWPORT,
-  basemaps,
-  CARTO_SQL,
-  assetLayer,
-  categoryColors,
-} from './settings';
+import { DEFAULT_VIEWPORT, basemaps, CARTO_SQL, getTheme } from './settings';
 import { extractFeatureFromEvent, fetchCartoVectorSource } from './utils';
 import { categorySchema } from '../../schemas';
 import PopUp from './PopUp';
@@ -42,7 +36,7 @@ function Map({
   sources,
   layers,
   isStatic,
-  darkMode,
+  colorScheme,
   children,
   onAssetClick,
   categories,
@@ -52,14 +46,17 @@ function Map({
   const ReactMapGL = isStatic ? StaticMap : InteractiveMap;
 
   const startingViewport = { ...DEFAULT_VIEWPORT, ...defaultViewport };
+
+  // Internal state
   const [assetSource, setAssetSource] = useState(undefined);
   const [viewport, setViewport] = useState(startingViewport);
-  const mapStyle = darkMode ? basemaps.dark : basemaps.light;
-
   const [popup, setPopup] = useState(undefined);
   const [popupFeature, setPopupFeature] = useState(undefined);
-
   const [assetLayerFilter, setAssetLayerFilter] = useState(['has', 'name']);
+
+  // Theming
+  const mapStyle = basemaps[colorScheme];
+  const { categoryColors, assetLayer } = getTheme(colorScheme);
 
   useEffect(() => {
     fetchCartoVectorSource(
@@ -71,7 +68,11 @@ function Map({
 
   useEffect(() => {
     if (searchTerm) {
-      setAssetLayerFilter(['all', filter, ['in', searchTerm, ['get', 'name']]]);
+      setAssetLayerFilter([
+        'all',
+        filter,
+        ['in', ['downcase', searchTerm], ['downcase', ['get', 'name']]],
+      ]);
     } else {
       setAssetLayerFilter(filter);
     }
@@ -90,6 +91,7 @@ function Map({
       setPopup(
         <PopUp
           name={feature.properties.name}
+          slug={feature.properties.category}
           type={feature.properties.asset_type_title}
           lat={lat}
           lng={lng}
@@ -140,7 +142,7 @@ function Map({
 
       {popup}
       {!!categories && (
-        <Legend colors={categoryColors} categories={categories} />
+        <Legend colors={categoryColors} categories={categories} backgroundColor="gray-500" />
       )}
       <ControlDiv>
         <NavigationControl />
@@ -161,7 +163,7 @@ Map.propTypes = {
   sources: PropTypes.arrayOf(PropTypes.object),
   layers: PropTypes.arrayOf(PropTypes.object),
   isStatic: PropTypes.bool,
-  darkMode: PropTypes.bool,
+  colorScheme: PropTypes.string,
   children: PropTypes.node,
   onAssetClick: PropTypes.func,
   categories: PropTypes.arrayOf(PropTypes.shape(categorySchema)),

@@ -7,28 +7,25 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Typography from '@material-ui/core/Typography';
 
-const Wrapper = styled.div``;
+import { View, Text } from '@adobe/react-spectrum';
 
 function InfoLine({ term, value, icon, missingDataMsg }) {
   return (
-    <Wrapper>
+    <View>
       {!!term && (
-        <Typography display="inline" variant="body1">
+        <Text display="inline">
           <b>{term}: </b>
-        </Typography>
+        </Text>
       )}
       {![null, undefined, ''].includes(value) ? (
-        <Typography display="inline" variant="body1">
-          {value}
-        </Typography>
+        <Text display="inline">{value}</Text>
       ) : (
-        <Typography color="textSecondary" display="inline" variant="body1">
+        <Text display="inline">
           <i>{missingDataMsg}</i>
-        </Typography>
+        </Text>
       )}
-    </Wrapper>
+    </View>
   );
 }
 

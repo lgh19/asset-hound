@@ -6,34 +6,37 @@
 
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
-import Typography from '@material-ui/core/Typography';
-import PanelDiv from '../PanelDiv';
-import AssetTypesList from './AssetTypesLine';
-import { assetTypeSchema } from '../../schemas';
-import StatusIconList from '../StatusIconList';
+import { Heading, Header, Text, View } from '@adobe/react-spectrum';
+import AssetTypesList from './AssetTypesList';
+import { assetTypeSchema, categorySchema } from '../../schemas';
+import CategoryIcon from '../CategoryIcon';
 
-// import { FormattedMessage } from 'react-intl';
-// import messages from './messages';
+function InfoHeading({ name, assetTypes, category }) {
+  const color = 'var(--spectrum-global-color-gray-600)';
 
-function InfoHeading({ name, address, assetTypes, statuses }) {
   return (
-    <PanelDiv>
-      <Typography variant="h5" component="h2">
-        {name}
-      </Typography>
-      <Typography variant="subtitle2">{address}</Typography>
+    <Header>
+      <View>
+        <CategoryIcon
+          categorySlug={category.name}
+          size="XS"
+          UNSAFE_style={{ color }}
+        />
+        <Text marginStart="size-25" UNSAFE_style={{ color }}>
+          {category.title}
+        </Text>
+      </View>
+      <Heading marginTop="size-50" level={2}>{name}</Heading>
+
       <AssetTypesList assetTypes={assetTypes} />
-      <StatusIconList items={statuses} />
-    </PanelDiv>
+    </Header>
   );
 }
 
 InfoHeading.propTypes = {
   name: PropTypes.string.isRequired,
-  address: PropTypes.string,
+  category: PropTypes.shape(categorySchema).isRequired,
   assetTypes: PropTypes.arrayOf(PropTypes.shape(assetTypeSchema)).isRequired,
-  statuses: PropTypes.array,
 };
 
 export default memo(InfoHeading);
