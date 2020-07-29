@@ -29,7 +29,7 @@ function AppHeader({ colorScheme, onDarkModeChange }) {
   const inDarkMode = colorScheme === 'dark';
 
   return (
-    <Provider backgroundColor="gold-400">
+    <Provider colorScheme="dark">
       <Header role="banner">
         <Flex direction="column" height="size-1000">
           <Flex direction="row" flex>
@@ -52,6 +52,7 @@ function AppHeader({ colorScheme, onDarkModeChange }) {
             </View>
             <View flex="0 1 auto" padding="size-250" aria-hidden>
               <ActionButton
+                isQuiet
                 onPress={() => onDarkModeChange(!inDarkMode)}
                 aria-hidden
                 title="Toggle Dark Mode"
