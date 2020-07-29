@@ -71,7 +71,7 @@ class Location(models.Model):
 
     @property
     def full_address(self):
-        if self.street_address or self.city or self.state or self.zip_code:
+        if self.street_address:
             return f'{self.street_address or ""}, {self.city or ""} {self.state or ""} {self.zip_code or ""}'
         return ""
 

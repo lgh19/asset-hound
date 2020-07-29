@@ -77,14 +77,19 @@ export function InfoPanel({ isOpen, loading, asset }) {
             address={asset.location.properties.name}
           />
           <Content>
-            <InfoSection title="Contact Information">
-              <ContactCard
-                email={asset.email}
-                phone={asset.phone}
-                website={url}
-                address={asset.location.properties.name}
-              />
-            </InfoSection>
+            {(asset.email ||
+              asset.phone ||
+              url ||
+              asset.location.properties.fullAddress) && (
+              <InfoSection title="Contact Information">
+                <ContactCard
+                  email={asset.email}
+                  phone={asset.phone}
+                  website={url}
+                  address={asset.location.properties.fullAddress}
+                />
+              </InfoSection>
+            )}
 
             <InfoSection title="Hours of Operation">
               <InfoLine term="Regular" value={asset.hoursOfOperation} />
