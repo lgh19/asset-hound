@@ -7,10 +7,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { View, Header, ListBox, Item } from '@adobe/react-spectrum';
+import { ListBox, Item } from '@adobe/react-spectrum';
 import { categorySchema } from '../../schemas';
 
-function MapFilter({ onChange, categories, filters }) {
+function MapFilter({ onChange, categories, filters, ...props }) {
   function handleChange(selected) {
     onChange(Array.from(selected));
   }
@@ -20,24 +20,21 @@ function MapFilter({ onChange, categories, filters }) {
   }
 
   return (
-    <View>
-      <Header>Filter by Category</Header>
-      <ListBox
-        selectionMode="multiple"
-        aria-label="Pick an animal"
-        items={categories}
-        selectedKeys={filters}
-        // selectedKeys={Object.entries(filters).red8}
-        onSelectionChange={handleChange}
-      >
-        {item => <Item key={item.name}>{item.title}</Item>}
-      </ListBox>
-    </View>
+    <ListBox
+      selectionMode="multiple"
+      aria-label="Pick an animal"
+      items={categories}
+      selectedKeys={filters}
+      onSelectionChange={handleChange}
+      {...props}
+    >
+      {item => <Item key={item.name}>{item.title}</Item>}
+    </ListBox>
   );
 }
 
 MapFilter.propTypes = {
-  categories: PropTypes.arrayOf(PropTypes.shape(categorySchema)).isRequired,
+  categories: PropTypes.arrayOf(PropTypes.shape(categorySchema)),
   filters: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func,
 };

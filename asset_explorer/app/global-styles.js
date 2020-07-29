@@ -20,6 +20,7 @@ const GlobalStyle = createGlobalStyle`
 
   .mapboxgl-popup, .mapboxgl-popup-content {
     background: transparent;
+    padding: 0;
   }
 `;
 

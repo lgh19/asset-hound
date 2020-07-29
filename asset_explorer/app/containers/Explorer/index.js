@@ -19,6 +19,7 @@ import {
   View,
   SearchField,
   Divider,
+  Text,
 } from '@adobe/react-spectrum';
 import { Header } from '@react-spectrum/view';
 import { Heading } from '@react-spectrum/text';
@@ -61,7 +62,7 @@ function Explorer({
   getCategories,
   getAsset,
   categories,
-                    colorScheme,
+  colorScheme,
   assetListOffset,
   loadingAssets,
   moreAssetsRemain,
@@ -117,11 +118,7 @@ function Explorer({
 
   return (
     <Flex direction="row" flex="1" minHeight="size-0">
-      <Flex
-        direction="column"
-        minHeight="size-0"
-        width="size-3600"
-      >
+      <Flex direction="column" minHeight="size-0" width="size-3600">
         <Header>
           <View width="100%" paddingX="size-150">
             <Heading level={2}>Explore community assets near you</Heading>
@@ -129,9 +126,12 @@ function Explorer({
         </Header>
 
         <View width="100%" padding="size-150">
+          <Heading level={3} id="searchLabel">
+            Search for Assets
+          </Heading>
           <SearchField
             value={searchTerm}
-            label="Search for assets"
+            aria-labelledby="searchLabel"
             placeholder="Start typing to search for assets"
             onChange={handleSearch}
             width="100%"
@@ -139,32 +139,38 @@ function Explorer({
         </View>
 
         <View width="100%" padding="size-150">
+          <Heading level={3} id="filterLabel">
+            Filter By Category
+          </Heading>
           <MapFilter
             categories={categories}
             filters={filters}
             onChange={handleFilterChange}
+            aria-labelledby="filterLabel"
           />
         </View>
-        <View
-          overflow="auto"
-          flex="1"
-          minHeight="size-0"
-          width="100%"
-          padding="size-150"
-        >
-          <AssetList
-            aria-label="Select an asset"
-            assets={allAssets}
-            currentAsset={currentAsset}
-            onSelectAsset={getAsset}
-            isLoading={loadingAssets}
-            // onLoadMore={getNextAssetPage(assetListOffset)}
-          >
-            {item => <Item key={item.name}>{item.name}</Item>}
-          </AssetList>
-        </View>
+        <Divider size="M" />
+        <Flex direction="column" flex="1" minHeight="size-0">
+          <View padding="size-150">
+            <Heading level={3} id="assetListLabel">
+              Assets
+            </Heading>
+          </View>
+          <View overflow="auto" flex="1" minHeight="size-0" padding="size-150">
+            <AssetList
+              aria-labelledby="assetListLabel"
+              assets={allAssets}
+              currentAsset={currentAsset}
+              onSelectAsset={getAsset}
+              isLoading={loadingAssets}
+              // onLoadMore={getNextAssetPage(assetListOffset)}
+            >
+              {item => <Item key={item.name}>{item.name}</Item>}
+            </AssetList>
+          </View>
+        </Flex>
       </Flex>
-
+      <Divider size="M" orientation="vertical" />
       {/* Map */}
       <View flex>
         <Map
@@ -175,7 +181,7 @@ function Explorer({
           searchTerm={searchTerm}
         />
       </View>
-
+      <Divider size="M" orientation="vertical" />
       {/* Details */}
       <View width="size-4600">
         <InfoPanel />

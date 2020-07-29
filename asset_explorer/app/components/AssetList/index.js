@@ -27,6 +27,7 @@ function AssetList({
   isLoading,
   onLoadMore,
   onSelectAsset,
+  ...props
 }) {
   const categoryIcons = {
     'non-profit': <Building size={SIZE} />,
@@ -59,6 +60,7 @@ function AssetList({
       isLoading={isLoading}
       onLoadMore={onLoadMore}
       onSelectionChange={handleSelectionChange}
+      {...props}
     >
       {item => (
         <Item key={item.id} textValue={item.name}>

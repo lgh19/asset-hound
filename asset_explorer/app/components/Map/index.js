@@ -16,13 +16,7 @@ import PropTypes from 'prop-types';
 
 import styled from 'styled-components';
 import { MAPBOX_API_TOKEN } from '../../settings';
-import {
-  DEFAULT_VIEWPORT,
-  basemaps,
-  CARTO_SQL,
-  assetLayer,
-  categoryColors,
-} from './settings';
+import { DEFAULT_VIEWPORT, basemaps, CARTO_SQL, getTheme } from './settings';
 import { extractFeatureFromEvent, fetchCartoVectorSource } from './utils';
 import { categorySchema } from '../../schemas';
 import PopUp from './PopUp';
@@ -52,14 +46,17 @@ function Map({
   const ReactMapGL = isStatic ? StaticMap : InteractiveMap;
 
   const startingViewport = { ...DEFAULT_VIEWPORT, ...defaultViewport };
+
+  // Internal state
   const [assetSource, setAssetSource] = useState(undefined);
   const [viewport, setViewport] = useState(startingViewport);
-  const mapStyle = basemaps[colorScheme];
-
   const [popup, setPopup] = useState(undefined);
   const [popupFeature, setPopupFeature] = useState(undefined);
-
   const [assetLayerFilter, setAssetLayerFilter] = useState(['has', 'name']);
+
+  // Theming
+  const mapStyle = basemaps[colorScheme];
+  const { categoryColors, assetLayer } = getTheme(colorScheme);
 
   useEffect(() => {
     fetchCartoVectorSource(
@@ -145,7 +142,7 @@ function Map({
 
       {popup}
       {!!categories && (
-        <Legend colors={categoryColors} categories={categories} />
+        <Legend colors={categoryColors} categories={categories} backgroundColor="gray-500" />
       )}
       <ControlDiv>
         <NavigationControl />

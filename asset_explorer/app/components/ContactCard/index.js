@@ -23,32 +23,43 @@ import Phone from '@spectrum-icons/workflow/DevicePhone';
 import WebPage from '@spectrum-icons/workflow/Link';
 import Email from '@spectrum-icons/workflow/Email';
 
+const ShortenedText = styled.div`
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: inherit;
+  max-width: 100%;
+`;
+
 function Item({ Icon, title, label, href }) {
   return (
     <View
       borderWidth="thin"
       borderColor="dark"
       borderRadius="medium"
-      margin="size-150"
+      marginBottom="size-75"
       aria-label={label}
     >
       <Flex direection="row" width="100%">
         <View
           flex="0 1 small-500"
-          padding="size-150"
+          padding="size-75"
           borderEndWidth="thin"
           borderColor="dark"
           backgroundColor="gray-300"
           borderTopStartRadius="medium"
           borderBottomStartRadius="medium"
-
         >
-          <Icon size="M" variant="overBackground" />
+          <Icon size="S" variant="overBackground" />
         </View>
-        <View padding="size-150">
-          <Link variant="secondary" href={href}>
-            {title}
-          </Link>
+        <View padding="size-75" flex overflow="auto" d>
+          <ShortenedText>
+            <Link variant="secondary">
+              <a href={href} title={title}>
+                {title}
+              </a>
+            </Link>
+          </ShortenedText>
         </View>
       </Flex>
     </View>

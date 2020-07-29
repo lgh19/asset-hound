@@ -17,7 +17,7 @@ import { compose } from 'redux';
 import { Provider, defaultTheme, Flex, View } from '@adobe/react-spectrum';
 import { useInjectReducer } from '../../utils/injectReducer';
 import GlobalStyle from '../../global-styles';
-import Header from '../../components/Header';
+import AppHeader from '../../components/AppHeader';
 import { setDarkMode } from './actions';
 import { makeSelectColorScheme } from './selectors';
 import reducer from './reducer';
@@ -31,7 +31,7 @@ function App({ colorScheme, handleDarkModeChange }) {
     <Provider theme={defaultTheme} colorScheme={colorScheme} width="100%">
       <Flex direction="column" height="100%" maxHeight="100%'">
         <View height="size-1000">
-          <Header
+          <AppHeader
             colorScheme={colorScheme}
             onDarkModeChange={handleDarkModeChange}
           />

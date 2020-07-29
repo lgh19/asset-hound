@@ -62,7 +62,6 @@ export function getAssetDetailsFailure(errorMsg) {
 }
 
 export function getNextAssetPageRequest(offset) {
-  console.log(offset);
   return {
     type: GET_NEXT_ASSET_LIST_PAGE_REQUEST,
     payload: {

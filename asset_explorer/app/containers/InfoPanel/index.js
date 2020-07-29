@@ -13,7 +13,7 @@ import { compose } from 'redux';
 
 import { useInjectSaga } from 'utils/injectSaga';
 import { useInjectReducer } from 'utils/injectReducer';
-import { ProgressBar, View } from '@adobe/react-spectrum';
+import { ProgressBar, View, Content } from '@adobe/react-spectrum';
 
 import { makeSelectInfoPanelIsOpen } from './selectors';
 import reducer from './reducer';
@@ -69,7 +69,7 @@ export function InfoPanel({ isOpen, loading, asset }) {
   }
 
   return (
-    <View padding="size-150">
+    <View padding="size-150" position="relative">
       {loading && <ProgressBar label="Loading…" isIndeterminate />}
       {!loading && !asset && <WelcomeInfo />}
       {!loading && asset && (
@@ -77,37 +77,37 @@ export function InfoPanel({ isOpen, loading, asset }) {
           <InfoHeading
             name={asset.name}
             assetTypes={asset.assetTypes}
+            category={asset.category}
             address={asset.location.properties.name}
           />
-          <InfoSection title="Contact Information">
-            <ContactCard
-              email={asset.email}
-              phone={asset.phone}
-              website={url}
-              address={asset.location.properties.name}
-            />
-          </InfoSection>
-          {/*<InfoSection>*/}
-          {/*  <StatusIconList items={statusList} />*/}
-          {/*</InfoSection>*/}
+          <Content>
+            <InfoSection title="Contact Information">
+              <ContactCard
+                email={asset.email}
+                phone={asset.phone}
+                website={url}
+                address={asset.location.properties.name}
+              />
+            </InfoSection>
 
-          <InfoSection title="Hours of Operation">
-            <InfoLine term="Regular" value={asset.hoursOfOperation} />
-            <InfoLine term="Holiday" value={asset.holidayHoursOfOperation} />
-          </InfoSection>
-          <InfoSection title="Internet">
-            <InfoLine term="WiFi Network" value={asset.wifiNetwork} />
-          </InfoSection>
-          <InfoSection title="Metadata">
-            <InfoLine
-              term="Date Added"
-              value={new Date(asset.dateEntered).toLocaleString('en')}
-            />
-            <InfoLine
-              term="Last Updated"
-              value={new Date(asset.lastUpdated).toLocaleString('en')}
-            />
-          </InfoSection>
+            <InfoSection title="Hours of Operation">
+              <InfoLine term="Regular" value={asset.hoursOfOperation} />
+              <InfoLine term="Holiday" value={asset.holidayHoursOfOperation} />
+            </InfoSection>
+            <InfoSection title="Internet">
+              <InfoLine term="WiFi Network" value={asset.wifiNetwork} />
+            </InfoSection>
+            <InfoSection title="Metadata">
+              <InfoLine
+                term="Date Added"
+                value={new Date(asset.dateEntered).toLocaleString('en')}
+              />
+              <InfoLine
+                term="Last Updated"
+                value={new Date(asset.lastUpdated).toLocaleString('en')}
+              />
+            </InfoSection>
+          </Content>
         </>
       )}
     </View>

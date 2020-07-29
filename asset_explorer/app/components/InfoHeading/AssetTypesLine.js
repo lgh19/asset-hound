@@ -14,7 +14,6 @@ const List = styled.ul`
 `;
 
 function Tag({ slug, label }) {
-  console.log('slug', slug);
   return (
     <View
       paddingX="size-100"
@@ -32,8 +31,8 @@ function AssetTypesList({ assetTypes }) {
   return (
     <List>
       {assetTypes.map(({ name, title }) => (
-        <li>
-          <Tag key={name} label={title} slug={name} />
+        <li key={name}>
+          <Tag  label={title} slug={name} />
         </li>
       ))}
     </List>

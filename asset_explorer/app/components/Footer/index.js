@@ -9,14 +9,16 @@ import React, { memo } from 'react';
 import styled, { css } from 'styled-components';
 
 import { FormattedMessage } from 'react-intl';
+import { View, Divider } from '@adobe/react-spectrum';
 import messages from './messages';
 
 function Footer() {
   const year = new Date().getFullYear();
   return (
-    <div>
+    <View>
+      <Divider size="S" />
       &#169; <FormattedMessage {...messages.copyright} values={{ year }} />
-    </div>
+    </View>
   );
 }
 

@@ -20,8 +20,8 @@ function PopUp({ name, slug, type, lat, lng, onClose }) {
       closeButton={false}
       tipSize={0}
       anchor="bottom"
-      offsetTop={-5}
-      style={{ padding: 0 }}
+      offsetTop={-10}
+      style={{ padding: 0, margin: 0, backgroundColor: 'red' }}
     >
       <View
         backgroundColor="default"
@@ -29,6 +29,7 @@ function PopUp({ name, slug, type, lat, lng, onClose }) {
         borderColor="dark"
         borderRadius="medium"
         padding="size-100"
+        margin={0}
       >
         <Flex direction="row">
           <View paddingEnd="size-150" paddingTop="size-100">

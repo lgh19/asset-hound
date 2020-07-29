@@ -1,6 +1,6 @@
 /**
  *
- * Tests for Header
+ * Tests for AppHeader
  *
  * @see https://github.com/react-boilerplate/react-boilerplate/tree/master/docs/testing
  *
@@ -14,7 +14,7 @@ import { IntlProvider } from 'react-intl';
 import Header from '../index';
 import { DEFAULT_LOCALE } from '../../../i18n';
 
-describe('<Header />', () => {
+describe('<AppHeader />', () => {
   it('Expect to not log errors in console', () => {
     const spy = jest.spyOn(global.console, 'error');
     render(

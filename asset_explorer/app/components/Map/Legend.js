@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View } from '@adobe/react-spectrum';
+import { View, StatusLight } from '@adobe/react-spectrum';
 import styled, { css } from 'styled-components';
 
 const List = styled.ul`
@@ -9,7 +9,7 @@ const List = styled.ul`
   padding: 0;
 `;
 
-function Legend({ colors, categories }) {
+function Legend({ colors, categories, ...props }) {
   return (
     <View
       position="absolute"
