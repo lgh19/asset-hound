@@ -121,7 +121,9 @@ function Explorer({
       <Flex direction="column" minHeight="size-0" width="size-3600">
         <Header>
           <View width="100%" paddingX="size-150">
-            <Heading level={2}>Explore community assets near you</Heading>
+            <Heading marginBottom={0} level={2}>
+              Explore community assets near you
+            </Heading>
           </View>
         </Header>
 
@@ -151,12 +153,12 @@ function Explorer({
         </View>
         <Divider size="M" />
         <Flex direction="column" flex="1" minHeight="size-0">
-          <View padding="size-150">
+          <View paddingX="size-150">
             <Heading level={3} id="assetListLabel">
               Assets
             </Heading>
           </View>
-          <View overflow="auto" flex="1" minHeight="size-0" padding="size-150">
+          <View overflow="auto" flex="1" minHeight="size-0" paddingX="size-150">
             <AssetList
               aria-labelledby="assetListLabel"
               assets={allAssets}

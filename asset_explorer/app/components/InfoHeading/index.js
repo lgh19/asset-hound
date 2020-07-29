@@ -7,7 +7,7 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Heading, Header, Text, View } from '@adobe/react-spectrum';
-import AssetTypesList from './AssetTypesLine';
+import AssetTypesList from './AssetTypesList';
 import { assetTypeSchema, categorySchema } from '../../schemas';
 import CategoryIcon from '../CategoryIcon';
 

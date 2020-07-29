@@ -32,7 +32,7 @@ function AssetTypesList({ assetTypes }) {
     <List>
       {assetTypes.map(({ name, title }) => (
         <li key={name}>
-          <Tag  label={title} slug={name} />
+          <Tag label={title} slug={name} />
         </li>
       ))}
     </List>

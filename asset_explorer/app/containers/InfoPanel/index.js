@@ -7,7 +7,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-// import { FormattedMessage } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 
@@ -19,8 +18,6 @@ import { makeSelectInfoPanelIsOpen } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 
-// import messages from './messages';
-import SideSheet from '../../components/SideSheet';
 import { closeInfoPanel } from './actions';
 import InfoHeading from '../../components/InfoHeading';
 import ContactCard from '../../components/ContactCard';
@@ -32,7 +29,6 @@ import { assetSchema } from '../../schemas';
 import WelcomeInfo from '../../components/WelcomeInfo';
 import InfoSection from '../../components/InfoSection';
 import InfoLine from '../../components/InfoLine';
-import StatusIconList from '../../components/StatusIconList';
 
 export function InfoPanel({ isOpen, loading, asset }) {
   useInjectReducer({ key: 'infoPanel', reducer });

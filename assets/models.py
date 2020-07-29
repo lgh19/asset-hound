@@ -71,7 +71,9 @@ class Location(models.Model):
 
     @property
     def full_address(self):
-        return f'{self.street_address}, {self.city} {self.state} {self.zip_code}'
+        if self.street_address or self.city or self.state or self.zip_code:
+            return f'{self.street_address or ""}, {self.city or ""} {self.state or ""} {self.zip_code or ""}'
+        return ""
 
     def save(self, *args, **kwargs):
         """ When the model is saved, attempt to geocode it based on address """
@@ -163,11 +165,12 @@ class BaseAsset(models.Model):
     data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True)
 
     tags = models.ManyToManyField('Tag', blank=True)
-    etl_notes = models.TextField(null=True, blank=True) # notes from Rocket
+    etl_notes = models.TextField(null=True, blank=True)  # notes from Rocket
     primary_key_from_rocket = models.TextField(null=True, blank=True)
     synthesized_key = models.TextField(null=True, blank=True)
-    date_entered = models.DateTimeField(editable=False, auto_now_add=True) # As implemented, these are
-    last_updated = models.DateTimeField(editable=False, auto_now=True) # just for tracking history of
+    date_entered = models.DateTimeField(editable=False, auto_now_add=True)  # As implemented, these are
+    last_updated = models.DateTimeField(editable=False, auto_now=True)  # just for tracking history of
+
     # these records. These may be retirable if the django-simple-history approach is sufficiently
     # convenient.
 
@@ -209,7 +212,7 @@ class RawAsset(BaseAsset):
     # Location/Organization manipulations might be a separate round of extract-edit-upload-modify.
 
     # BEGIN flattened Location
-    #location_name = models.CharField(max_length=255, editable=False) # Is this needed at this stage? This is not in the original assets CSV file.
+    # location_name = models.CharField(max_length=255, editable=False) # Is this needed at this stage? This is not in the original assets CSV file.
     street_address = models.CharField(max_length=100, null=True, blank=True)
     city = models.CharField(max_length=50, null=True, blank=True)
     state = models.CharField(max_length=50, null=True, blank=True)
@@ -238,12 +241,12 @@ class RawAsset(BaseAsset):
     organization_phone = PhoneNumberField(null=True, blank=True)
 
     # END flattened Organization
-    raw_asset_notes = models.TextField(max_length=1000, null=True, blank=True) # This is named
+    raw_asset_notes = models.TextField(max_length=1000, null=True, blank=True)  # This is named
     # to distinguish it from the Asset-level notes field, which should not be produced by merging # these RawAsset-level notes.
 
     asset = models.ForeignKey('Asset', on_delete=models.SET_NULL, null=True, blank=True)
 
-    history = HistoricalRecords() # This adds a HistoricalRawAsset table to the database, which
+    history = HistoricalRecords()  # This adds a HistoricalRawAsset table to the database, which
     # will record a new row every time a tracked change (model creation, change, or deletion)
     # occurs. This field needs to be added explicitly to every table to be tracked (it is
     # not inherited from a parent model). However, fields inherited from a parent model
