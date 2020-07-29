@@ -79,6 +79,8 @@ class Command(BaseCommand):
         parser.add_argument('args', nargs='*')
 
     def handle(self, *args, **options):
+        raise ValueError("load_assets.py is now deprecated since it just overwrites existing Location, Organization, and Tag instance parameters. clear_and_load_by_type.py is going to try to merge these in a more careful way.")
+
         if len(args) == 0:
             file_name = os.path.join(settings.BASE_DIR, 'update.csv')
         else:
