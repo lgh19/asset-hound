@@ -34,34 +34,12 @@ export function InfoPanel({ isOpen, loading, asset }) {
   useInjectReducer({ key: 'infoPanel', reducer });
   useInjectSaga({ key: 'infoPanel', saga });
   let url = '';
-  let statusList;
 
   if (asset) {
     if (asset.url)
       url = asset.url.match(/^[a-zA-Z]+:\/\//)
         ? asset.url
         : `https://${asset.url}`;
-
-    statusList = [
-      {
-        name: 'Open to the Public',
-        status: asset.openToPublic,
-      },
-      {
-        name: 'Child Friendly',
-        status: asset.childFriendly,
-      },
-      {
-        name: 'Public Internet Access',
-        status: asset.internetAccess,
-        disabledMsg: 'No Public Internet Access',
-      },
-      {
-        name: 'Computers Available',
-        status: asset.computersAvailable,
-        disabledMsg: 'No Public Computers Available',
-      },
-    ];
   }
 
   return (

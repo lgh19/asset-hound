@@ -14,15 +14,13 @@ import { compose } from 'redux';
 
 import {
   Flex,
-  ListBox,
   Item,
   View,
   SearchField,
   Divider,
-  Text,
+  Header,
+  Heading,
 } from '@adobe/react-spectrum';
-import { Header } from '@react-spectrum/view';
-import { Heading } from '@react-spectrum/text';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { useInjectSaga } from '../../utils/injectSaga';
 import reducer from './reducer';
@@ -34,11 +32,9 @@ import {
   makeSelectExplorerCurrentAsset,
   makeSelectAssetListOffset,
   makeSelectLoadingAssets,
-  makeSelectMoreAssetsRemain,
   makeSelectSearchTerm,
 } from './selectors';
 import {
-  clearSearchTerm,
   getAssetDetailsRequest,
   getCategoriesRequest,
   getNextAssetPageRequest,
@@ -46,7 +42,7 @@ import {
 } from './actions';
 import Map from '../../components/Map';
 import { makeSelectColorScheme } from '../App/selectors';
-import { categorySchema } from '../../schemas';
+import { assetSchema, categorySchema } from '../../schemas';
 import MapFilter from '../../components/MapFilter';
 import AssetList from '../../components/AssetList';
 // import AssetList from '../../components/AssetList';
@@ -65,10 +61,8 @@ function Explorer({
   colorScheme,
   assetListOffset,
   loadingAssets,
-  moreAssetsRemain,
   getNextAssetPage,
   handleSearch,
-  handleClearSearch,
   searchTerm,
   currentAsset,
 }) {
@@ -117,17 +111,23 @@ function Explorer({
   }
 
   return (
-    <Flex direction="row" flex="1" minHeight="size-0">
-      <Flex direction="column" minHeight="size-0" width="size-3600">
+    <Flex direction="row" flex="1" minHeight={0}>
+      <Flex
+        direction="column"
+        width="size-3600"
+        minHeight={0}
+        maxHeight="100vh"
+        overflow="auto"
+      >
         <Header>
-          <View width="100%" paddingX="size-150">
+          <View paddingX="size-150">
             <Heading marginBottom={0} level={2}>
               Explore community assets near you
             </Heading>
           </View>
         </Header>
 
-        <View width="100%" padding="size-150">
+        <View width="100%" paddingX="size-150">
           <Heading level={3} id="searchLabel">
             Search for Assets
           </Heading>
@@ -140,7 +140,7 @@ function Explorer({
           />
         </View>
 
-        <View width="100%" padding="size-150">
+        <View paddingX="size-150">
           <Heading level={3} id="filterLabel">
             Filter By Category
           </Heading>
@@ -152,25 +152,19 @@ function Explorer({
           />
         </View>
         <Divider size="M" />
-        <Flex direction="column" flex="1" minHeight="size-0">
-          <View paddingX="size-150">
-            <Heading level={3} id="assetListLabel">
-              Assets
-            </Heading>
-          </View>
-          <View overflow="auto" flex="1" minHeight="size-0" paddingX="size-150">
-            <AssetList
-              aria-labelledby="assetListLabel"
-              assets={allAssets}
-              currentAsset={currentAsset}
-              onSelectAsset={getAsset}
-              isLoading={loadingAssets}
-              // onLoadMore={getNextAssetPage(assetListOffset)}
-            >
-              {item => <Item key={item.name}>{item.name}</Item>}
-            </AssetList>
-          </View>
-        </Flex>
+        <Heading level={3} id="assetListLabel" paddingX="size-150">
+          Assets
+        </Heading>
+        <AssetList
+          aria-labelledby="assetListLabel"
+          assets={allAssets}
+          currentAsset={currentAsset}
+          onSelectAsset={getAsset}
+          isLoading={loadingAssets}
+          onLoadMore={getNextAssetPage(assetListOffset)}
+        >
+          {item => <Item key={item.name}>{item.name}</Item>}
+        </AssetList>
       </Flex>
       <Divider size="M" orientation="vertical" />
       {/* Map */}
@@ -198,14 +192,12 @@ Explorer.propTypes = {
   getCategories: PropTypes.func.isRequired,
   colorScheme: PropTypes.string,
   categories: PropTypes.arrayOf(PropTypes.shape(categorySchema)),
-
   assetListOffset: PropTypes.number,
   loadingAssets: PropTypes.bool,
-  moreAssetsRemain: PropTypes.bool,
   getNextAssetPage: PropTypes.func,
   handleSearch: PropTypes.func,
-  handleClearSearch: PropTypes.func,
   searchTerm: PropTypes.string,
+  currentAsset: PropTypes.shape(assetSchema),
 };
 
 const mapStateToProps = createStructuredSelector({
@@ -214,10 +206,8 @@ const mapStateToProps = createStructuredSelector({
   categories: makeSelectAssetCategories(),
   colorScheme: makeSelectColorScheme(),
   searchTerm: makeSelectSearchTerm(),
-
   assetListOffset: makeSelectAssetListOffset(),
   loadingAssets: makeSelectLoadingAssets(),
-  moreAssetsRemain: makeSelectMoreAssetsRemain(),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -227,7 +217,6 @@ function mapDispatchToProps(dispatch) {
     getNextAssetPage: nextOffset => () =>
       dispatch(getNextAssetPageRequest(nextOffset)),
     handleSearch: term => dispatch(setSearchTerm(term)),
-    handleClearSearch: () => dispatch(clearSearchTerm()),
   };
 }
 

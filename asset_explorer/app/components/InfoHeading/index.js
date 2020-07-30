@@ -26,8 +26,9 @@ function InfoHeading({ name, assetTypes, category }) {
           {category.title}
         </Text>
       </View>
-      <Heading marginTop="size-50" level={2}>{name}</Heading>
-
+      <Heading marginTop="size-50" level={2}>
+        {name}
+      </Heading>
       <AssetTypesList assetTypes={assetTypes} />
     </Header>
   );

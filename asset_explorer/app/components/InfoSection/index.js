@@ -12,14 +12,13 @@ import styled, { css } from 'styled-components';
 // import messages from './messages';
 import { View } from '@adobe/react-spectrum';
 import SectionHeader from '../SectionHeader';
-import PanelDiv from '../PanelDiv';
 
 function InfoSection({ title, subtitle, children }) {
   return (
-    <PanelDiv>
+    <View>
       <SectionHeader>{title}</SectionHeader>
       <View paddingStart="size-150">{children}</View>
-    </PanelDiv>
+    </View>
   );
 }
 

@@ -15,7 +15,7 @@ import messages from './messages';
 function Footer() {
   const year = new Date().getFullYear();
   return (
-    <View>
+    <View padding="size-50">
       <Divider size="S" />
       &#169; <FormattedMessage {...messages.copyright} values={{ year }} />
     </View>

@@ -6,11 +6,10 @@
 
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
 
 import { View, Text } from '@adobe/react-spectrum';
 
-function InfoLine({ term, value, icon, missingDataMsg }) {
+function InfoLine({ term, value, missingDataMsg }) {
   return (
     <View>
       {!!term && (
@@ -32,7 +31,6 @@ function InfoLine({ term, value, icon, missingDataMsg }) {
 InfoLine.propTypes = {
   term: PropTypes.node,
   value: PropTypes.node,
-  icon: PropTypes.node,
   missingDataMsg: PropTypes.node,
 };
 
