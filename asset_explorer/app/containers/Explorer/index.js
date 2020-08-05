@@ -152,9 +152,11 @@ function Explorer({
           />
         </View>
         <Divider size="M" />
-        <Heading level={3} id="assetListLabel" paddingX="size-150">
-          Assets
-        </Heading>
+        <View paddingX="size-150">
+          <Heading level={3} id="assetListLabel">
+            Assets
+          </Heading>
+        </View>
         <AssetList
           aria-labelledby="assetListLabel"
           assets={allAssets}

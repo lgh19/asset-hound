@@ -19,5 +19,5 @@ class ResourceViewSet(viewsets.ModelViewSet):
     queryset = Resource.objects.all()
     pagination_class = LimitOffsetPagination
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name', 'description']
+    search_fields = ['name',]
     serializer_class = ResourceSerializer

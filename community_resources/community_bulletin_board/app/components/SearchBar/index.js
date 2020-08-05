@@ -11,9 +11,19 @@ import { FormattedMessage } from 'react-intl';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 import { fade } from '@material-ui/core/styles';
+import * as _ from 'lodash';
+import { Divider, Paper, TextField } from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { Search } from '@material-ui/icons';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Grid from '@material-ui/core/Grid';
 import searchIcon from '../../images/search.svg';
-
+import Link from '../Link';
 const Wrapper = styled.div`
+  position: relative;
+`;
+
+const SearchWrapper = styled.div`
   ${({ theme }) => css`
     position: relative;
     border-radius: ${theme.shape.borderRadius}px;
@@ -25,7 +35,7 @@ const Wrapper = styled.div`
     width: 100%;
     ${theme.breakpoints.up('sm')} {
       margin-left: ${theme.spacing(1)}px;
-      width: auto;
+      width: 32ch;
     }
   `}
 `;
@@ -42,42 +52,75 @@ const Adornment = styled.div`
   `}
 `;
 
-const SearchInput = styled(InputBase)`
-  color: inherit;
-`;
+function SearchBar({ onChange, results, isSearching }) {
+  const [open, setOpen] = React.useState(false);
+  function handleChange(event) {
+    onChange(event.target.value);
+  }
 
-const Input = styled.input`
-  ${({ theme }) => css`
-    padding: ${theme.spacing(1, 1, 1, 0)};
-    padding-left: calc(1em + ${theme.spacing(4)}px);
-    transition: ${theme.transitions.create('width')};
-    width: 100%;
-    ${theme.breakpoints.up('sm')} {
-      width: 12ch;
-      '&:focus': {
-        width: 20ch;
-      }
+  const renderInput = params => (
+    <TextField
+      fullWidth
+      {...params}
+      margin="none"
+      size="small"
+      aria-label="Search"
+      variant="outlined"
+      placeholder="Search…"
+      style={{ borderColor: 'rgba(0,0,0,0)' }}
+      InputProps={{
+        ...params.InputProps,
+        style: { border: '0px', paddingLeft: '48px' },
+        endAdornment: (
+          <React.Fragment>
+            {isSearching ? (
+              <CircularProgress color="inherit" size={20} />
+            ) : null}
+            {params.InputProps.endAdornment}
+          </React.Fragment>
+        ),
+      }}
+      onChange={handleChange}
+    />
+  );
+
+  function handleSelection(event, selection) {
+    if (selection && selection.slug) {
+      window.location.hash = selection.slug;
     }
-  `}
-`;
+  }
 
-function SearchBar({ onChange }) {
   return (
-    <Wrapper>
+    <SearchWrapper>
       <Adornment>
         <SearchIcon />
       </Adornment>
-      <SearchInput
-        placeholder="Search…"
-        inputComponent={Input}
-        inputProps={{ 'aria-label': 'search' }}
+      <Autocomplete
+        fullWidth
+        freeSolo
+        id="asynchronous-demo"
+        open={open}
+        onOpen={() => {
+          setOpen(true);
+        }}
+        onClose={() => {
+          setOpen(false);
+        }}
+        getOptionSelected={(option, value) => option.slug === value.slug}
+        getOptionLabel={option => option.name}
+        options={results || []}
+        loading={isSearching}
+        renderInput={renderInput}
+        onChange={handleSelection}
       />
-    </Wrapper>
+    </SearchWrapper>
   );
 }
 
 SearchBar.propTypes = {
   onChange: PropTypes.func.isRequired,
+  results: PropTypes.array,
+  isSearching: PropTypes.bool,
 };
 
 export default SearchBar;

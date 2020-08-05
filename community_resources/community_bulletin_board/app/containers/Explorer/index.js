@@ -93,8 +93,6 @@ const mapStateToProps = createStructuredSelector({
 
 function mapDispatchToProps(dispatch) {
   return {
-    handleRequestCommunityData: communityId =>
-      dispatch(getCommunityDataRequest(communityId)),
     handleResourceSelection: (resource, popupData, inSmallMode) =>
       dispatch(setSelectedResource(resource, popupData, inSmallMode)),
     handleClose: () => dispatch(setSelectedResource(undefined)),
