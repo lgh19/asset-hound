@@ -59,7 +59,7 @@ function App({
   useEffect(() => {
     handleRequestCommunityData(1);
   }, []);
-
+  console.debug(location);
   const title =
     community && community.name ? `${community.name} Resources` : undefined;
 
