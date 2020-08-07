@@ -82,6 +82,7 @@ class AssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
         fields = [
+            'id',
             'name',
             'asset_types',
             'category',

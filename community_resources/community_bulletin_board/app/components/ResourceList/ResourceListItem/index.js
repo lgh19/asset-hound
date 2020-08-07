@@ -16,14 +16,15 @@ import { localPropTypes } from '../../../utils';
 import Content from '../../Content';
 import ContactInfo from './ContactInfo';
 
-
 const Wrapper = styled(Card)`
   cursor: auto;
   // style for Map View
+  margin-bottom: 8px;
   ${({ map }) =>
     map &&
     css`
       max-width: 24em;
+      margin-bottom: 0;
     `}
 `;
 
@@ -70,9 +71,11 @@ function ResourceListItem({ map, resource, onMoreInfoCLick }) {
           <Content html={resource.description} />
         )}
       </CardContent>
-      <CardActions>
-        <Button onClick={onMoreInfoCLick}>See More Information</Button>
-      </CardActions>
+      {map && (
+        <CardActions>
+          <Button onClick={onMoreInfoCLick}>See More Information</Button>
+        </CardActions>
+      )}
     </Wrapper>
   );
 }

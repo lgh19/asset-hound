@@ -11,10 +11,6 @@ export const scope = 'app.components.WelcomeInfo';
 export default defineMessages({
   header: {
     id: `${scope}.header`,
-    defaultMessage: "Welcome...",
-  },
-  subHeader: {
-    id: `${scope}.subHeader`,
-    defaultMessage: "to the Asset Map!",
+    defaultMessage: 'Welcome to the asset map!',
   },
 });

@@ -7,71 +7,64 @@
  *
  */
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
-
-import HomePage from 'containers/Explorer/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
-
-import { CssBaseline } from '@material-ui/core';
-import { ThemeProvider } from 'styled-components';
-import {
-  StylesProvider,
-  ThemeProvider as MuiThemProvider,
-} from '@material-ui/core/styles';
-import { createSelector, createStructuredSelector } from 'reselect';
+import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import GlobalStyle from '../../global-styles';
-import Header from '../../components/Header';
-import Footer from '../../components/Footer';
-import AppWrapper from './AppWrapper';
-import ContentWrapper from './ContentWrapper';
-import switchableTheme from '../../theme';
-import { setDarkMode } from './actions';
-import { makeSelectDarkMode } from './selectors';
+import { Provider, defaultTheme, Flex, View } from '@adobe/react-spectrum';
 import { useInjectReducer } from '../../utils/injectReducer';
+import GlobalStyle from '../../global-styles';
+import AppHeader from '../../components/AppHeader';
+import { setDarkMode } from './actions';
+import { makeSelectColorScheme } from './selectors';
 import reducer from './reducer';
+import Explorer from '../Explorer';
+import Footer from '../../components/Footer';
 
-function App({ darkMode, handleDarkModeChange }) {
+function App({ colorScheme, handleDarkModeChange }) {
   useInjectReducer({ key: 'global', reducer });
-  // const theme = React.useMemo(() => switchableTheme(darkMode), [darkMode]);
-  const theme = switchableTheme(darkMode);
+
   return (
-    <StylesProvider injectFirst>
-      <MuiThemProvider theme={theme}>
-        <ThemeProvider theme={theme}>
-          {/* Actual rendered stuff */}
-          <AppWrapper>
-            <Header
-              darkMode={darkMode}
-              onDarkModeChange={handleDarkModeChange}
-            />
-            <ContentWrapper>
-              <Switch>
-                <Route exact path="/" component={HomePage} />
-                <Route component={NotFoundPage} />
-              </Switch>
-            </ContentWrapper>
-            <Footer />
-            <GlobalStyle />
-            <CssBaseline />
-          </AppWrapper>
-          {/* End actual rendered stuff */}
-        </ThemeProvider>
-      </MuiThemProvider>
-    </StylesProvider>
+    <Provider theme={defaultTheme} colorScheme={colorScheme} width="100%">
+      <Flex direction="column" height="100%" maxHeight="100%'">
+        <View height="size-1000">
+          <AppHeader
+            colorScheme={colorScheme}
+            onDarkModeChange={handleDarkModeChange}
+          />
+        </View>
+
+        <Flex
+          direction="column"
+          flex="1"
+          minHeight="size-0"
+          borderWidth="thickest"
+          borderColor="blue-400"
+        >
+          <Switch>
+            <Route exact path="/" component={Explorer} />
+            <Route component={NotFoundPage} />
+          </Switch>
+        </Flex>
+        <View flexShrink={1}>
+          <Footer />
+        </View>
+      </Flex>
+      <GlobalStyle />
+    </Provider>
   );
 }
 
 App.propTypes = {
-  darkMode: PropTypes.bool,
+  colorScheme: PropTypes.string,
   handleDarkModeChange: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = createStructuredSelector({
-  darkMode: makeSelectDarkMode(),
+  colorScheme: makeSelectColorScheme(),
 });
 
 function mapDispatchToProps(dispatch) {

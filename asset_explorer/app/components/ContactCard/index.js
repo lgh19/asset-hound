@@ -8,99 +8,92 @@ import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import EmailIcon from '@material-ui/icons/Mail';
-import PhoneIcon from '@material-ui/icons/Phone';
-import WebsiteIcon from '@material-ui/icons/Link';
-import AddressIcon from '@material-ui/icons/LocationOn';
+import {
+  View,
+  Header,
+  ListBox,
+  Text,
+  Flex,
+  Link,
+  Divider,
+} from '@adobe/react-spectrum';
 
-import Typography from '@material-ui/core/Typography';
-import useTheme from '@material-ui/core/styles/useTheme';
-import PanelDiv from '../PanelDiv';
-import Link from '../Link';
-import SectionHeader from '../SectionHeader';
+import Location from '@spectrum-icons/workflow/Location';
+import Phone from '@spectrum-icons/workflow/DevicePhone';
+import WebPage from '@spectrum-icons/workflow/Link';
+import Email from '@spectrum-icons/workflow/Email';
 
-const LineWrapper = styled.div`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing(1)}px;
-  `}
-  & span {
-    vertical-align: middle;
-  }
+const ShortenedText = styled.div`
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: inherit;
+  max-width: 100%;
 `;
 
-function ContactCard({ email, phone, website, address }) {
-  const theme = useTheme();
-  const iconStyle = {
-    marginRight: theme.spacing(theme.itemSpacing),
-    verticalAlign: 'middle',
-  };
-
+function Item({ Icon, title, label, href }) {
   return (
-    <PanelDiv>
-      <SectionHeader>Contact Information</SectionHeader>
-      {!!address && (
-        <LineWrapper>
-          <Typography variant="body1">
-            <Link
-              target="_blank"
-              rel="noreferrer"
-              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-                address,
-              )}`}
-            >
-              <AddressIcon
-                color="action"
-                titleAccess="navigate to address"
-                style={iconStyle}
-              />
-              {address}
+    <View
+      borderWidth="thin"
+      borderColor="dark"
+      borderRadius="medium"
+      marginBottom="size-75"
+      aria-label={label}
+    >
+      <Flex direection="row" width="100%">
+        <View
+          flex="0 1 small-500"
+          padding="size-75"
+          borderEndWidth="thin"
+          borderColor="dark"
+          backgroundColor="gray-300"
+          borderTopStartRadius="medium"
+          borderBottomStartRadius="medium"
+        >
+          <Icon size="S" variant="overBackground" />
+        </View>
+        <View padding="size-75" flex overflow="auto" d>
+          <ShortenedText>
+            <Link variant="secondary">
+              <a href={href} title={title}>
+                {title}
+              </a>
             </Link>
-          </Typography>
-        </LineWrapper>
+          </ShortenedText>
+        </View>
+      </Flex>
+    </View>
+  );
+}
+
+function ContactCard({ email, phone, website, address }) {
+  return (
+    <View>
+      {!!address && (
+        <Item
+          Icon={Location}
+          title={address}
+          label="Address"
+          href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+            address,
+          )}`}
+        />
       )}
       {!!phone && (
-        <LineWrapper>
-          <Typography variant="body1">
-            <Link href={`tel:${phone}`}>
-              <PhoneIcon
-                color="action"
-                titleAccess="asset's phone number"
-                style={iconStyle}
-              />
-              {phone}
-            </Link>
-          </Typography>
-        </LineWrapper>
-      )}
-      {!!email && (
-        <LineWrapper>
-          <Typography variant="body1">
-            <Link href={`mailto:${email}`}>
-              <EmailIcon
-                color="action"
-                titleAccess="asset's primary email"
-                style={iconStyle}
-              />
-              {email}
-            </Link>
-          </Typography>
-        </LineWrapper>
+        <Item Icon={Phone} title={phone} label="Phone" href={`tel:${phone}`} />
       )}
       {!!website && (
-        <LineWrapper>
-          <Typography variant="body1">
-            <Link target="_blank" rel="noreferrer" href={website}>
-              <WebsiteIcon
-                color="action"
-                titleAccess="asset's website"
-                style={iconStyle}
-              />
-              {website}
-            </Link>
-          </Typography>
-        </LineWrapper>
+        <Item Icon={WebPage} title={website} label="Web Site" href={website} />
       )}
-    </PanelDiv>
+      {!!email && (
+        <Item
+          Icon={Email}
+          title={email}
+          label="Email"
+          href={`mailto:${email}`}
+        />
+      )}
+    </View>
   );
 }
 
@@ -108,6 +101,7 @@ ContactCard.propTypes = {
   email: PropTypes.string,
   phone: PropTypes.string,
   website: PropTypes.string,
+  address: PropTypes.string,
 };
 
 export default memo(ContactCard);

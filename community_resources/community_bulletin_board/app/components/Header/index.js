@@ -4,7 +4,7 @@
  *
  */
 
-import React, { memo } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { PropTypes as MuiPropTypes } from '@material-ui/core';
@@ -15,6 +15,9 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Typography from '@material-ui/core/Typography';
 import Hidden from '@material-ui/core/Hidden';
 import CloseIcon from '@material-ui/icons/Close';
+import Button from '@material-ui/core/Button';
+
+import BackIcon from '@material-ui/icons/ArrowBack';
 import SearchBar from '../SearchBar';
 
 const MenuButton = styled(IconButton)`
@@ -40,7 +43,17 @@ const ActionSection = styled.div`
 
 const SearchSection = styled.div``;
 
-function Header({ title, color, onMenuClick, onClose }) {
+function Header({
+  title,
+  color,
+  onMenuClick,
+  onClose,
+  location,
+  onSearch,
+  searchResults,
+  isSearching,
+  goToPage,
+}) {
   return (
     <AppBar color={color} position="static">
       <Toolbar>
@@ -52,14 +65,42 @@ function Header({ title, color, onMenuClick, onClose }) {
         <TitleSection>
           <Title>{title}</Title>
         </TitleSection>
-        {onClose && (
-          <ActionSection>
+
+        {!onSearch && !onClose && (
+          <Button onClick={() => goToPage('/')}>
+            <BackIcon />
+            Go back to the list
+          </Button>
+        )}
+        {!!onSearch && (
+          <Hidden xsDown implementation="js">
+            <SearchSection>
+              <SearchBar
+                onChange={onSearch}
+                results={searchResults}
+                isSearching={isSearching}
+              />
+            </SearchSection>
+          </Hidden>
+        )}
+
+        <ActionSection>
+          {!!onClose && (
             <IconButton onClick={onClose}>
               <CloseIcon />
             </IconButton>
-          </ActionSection>
-        )}
+          )}
+        </ActionSection>
       </Toolbar>
+      <Hidden smUp implementation="js">
+        <Toolbar>
+          <SearchBar
+            onChange={onSearch}
+            results={searchResults}
+            isSearching={isSearching}
+          />
+        </Toolbar>
+      </Hidden>
     </AppBar>
   );
 }
@@ -68,10 +109,13 @@ Header.propTypes = {
   title: PropTypes.node,
   color: PropTypes.oneOf(['primary', 'secondary', 'default']),
   onMenuClick: PropTypes.func,
+  onSearch: PropTypes.func,
+  searchResults: PropTypes.array, // todo: define this type
+  isSearching: PropTypes.bool,
 };
 
 Header.defaultProps = {
   color: 'primary',
 };
 
-export default memo(Header);
+export default Header;

@@ -1,19 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import { View, StatusLight } from '@adobe/react-spectrum';
 import styled, { css } from 'styled-components';
-import Paper from '@material-ui/core/Paper';
-
-const Wrapper = styled(Paper)`
-  position: absolute;
-  right: 16px;
-
-  bottom: 32px;
-  max-width: max-content;
-  ${({ theme }) => css`
-    padding: ${theme.spacing(1, 2)};
-  `}
-`;
 
 const List = styled.ul`
   list-style: none;
@@ -21,20 +9,34 @@ const List = styled.ul`
   padding: 0;
 `;
 
-function Legend({ colors, categories }) {
+function Legend({ colors, categories, ...props }) {
   return (
-    <Wrapper>
+    <View
+      position="absolute"
+      bottom="size-400"
+      right="size-250"
+      borderWidth="thin"
+      borderColor="dark"
+      borderRadius="medium"
+      width="size-1600"
+      padding="size-100"
+      backgroundColor="default"
+      display="inline-block"
+    >
       <List>
         {categories.map(category => (
           <li key={category.name} style={{ color: colors[category.name] }}>
-            {category.name}
+            {category.title}
           </li>
         ))}
       </List>
-    </Wrapper>
+    </View>
   );
 }
 
-Legend.propTypes = {};
+Legend.propTypes = {
+  colors: PropTypes.object,
+  categories: PropTypes.arrayOf(PropTypes.object),
+};
 
 export default Legend;

@@ -64,9 +64,10 @@
     "babel-core": "7.0.0-bridge.0"
   },
   "dependencies": {
+    "@adobe/react-spectrum": "^3.1.0",
     "@babel/polyfill": "7.4.3",
-    "@material-ui/core": "^4.9.3",
-    "@material-ui/icons": "^4.9.1",
+    "@react-stately/data": "^3.1.0",
+    "@spectrum-icons/workflow": "^3.1.0",
     "chalk": "^2.4.2",
     "compression": "1.7.4",
     "connected-react-router": "6.4.0",

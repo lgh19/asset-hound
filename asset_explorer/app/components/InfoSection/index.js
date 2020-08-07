@@ -10,15 +10,15 @@ import styled, { css } from 'styled-components';
 
 // import { FormattedMessage } from 'react-intl';
 // import messages from './messages';
+import { View } from '@adobe/react-spectrum';
 import SectionHeader from '../SectionHeader';
-import PanelDiv from '../PanelDiv';
 
 function InfoSection({ title, subtitle, children }) {
   return (
-    <PanelDiv>
+    <View>
       <SectionHeader>{title}</SectionHeader>
-      {children}
-    </PanelDiv>
+      <View paddingStart="size-150">{children}</View>
+    </View>
   );
 }
 

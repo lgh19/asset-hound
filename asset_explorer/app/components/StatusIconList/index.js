@@ -6,37 +6,32 @@
 
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
 
-// import { FormattedMessage } from 'react-intl';
-import Grid from '@material-ui/core/Grid';
-// import messages from './messages';
-import Box from '@material-ui/core/Box';
-import { useTheme } from '@material-ui/core';
-import PanelDiv from '../PanelDiv';
+import {
+  View,
+  StatusLight,
+  Heading,
+  Header,
+  Link,
+  ListBox,
+  Item,
+  Text,
+} from '@adobe/react-spectrum';
 
 function StatusIconList({ items }) {
-  const theme = useTheme();
-
-  const offMessage = (name, status, disableMsg) => {
+  function getMessage(name, status, disableMsg) {
     if (status) return name;
     return disableMsg || `Not ${name}`;
-  };
+  }
 
   return (
-    <Box pt={theme.itemSpacing * 2}>
-      <Grid container spacing={1} alignContent="stretch">
-        {items.map(({ name, icon: Icon, status, disabledMsg }) => (
-          <Grid item key={name}>
-            <Icon
-              fontSize="large"
-              color={status ? 'secondary' : 'disabled'}
-              titleAccess={offMessage(name, status, disabledMsg)}
-            />
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+    <View>
+      {items.map(({ name, icon: Icon, status, disabledMsg }) => (
+        <StatusLight variant={status ? 'positive' : 'negative'}>
+          {getMessage(name, status, disabledMsg)}
+        </StatusLight>
+      ))}
+    </View>
   );
 }
 

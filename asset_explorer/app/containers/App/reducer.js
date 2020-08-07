@@ -13,7 +13,7 @@ const prefersDarkMode =
   window.matchMedia('(prefers-color-scheme: dark)').matches;
 
 export const initialState = {
-  darkMode: prefersDarkMode,
+  colorScheme: prefersDarkMode ? 'dark' : 'light',
 };
 
 /* eslint-disable default-case, no-param-reassign */
@@ -21,7 +21,7 @@ const globalReducer = (state = initialState, action) =>
   produce(state, draft => {
     switch (action.type) {
       case SET_DARK_MODE:
-        draft.darkMode = action.payload.on;
+        draft.colorScheme = action.payload.on ? 'dark' : 'light';
         break;
     }
   });

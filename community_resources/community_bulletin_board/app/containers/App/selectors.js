@@ -48,8 +48,22 @@ const makeSelectCommunity = () =>
     substate => substate.community,
   );
 
+const makeSelectSearchResults = () =>
+  createSelector(
+    selectGlobalDomain,
+    substate => substate.searchResults,
+  );
+
+const makeSelectIsSearching = () =>
+  createSelector(
+    selectGlobalDomain,
+    substate => substate.isSearching,
+  );
+
 export {
   makeSelectLocation,
   makeSelectCommunity,
+  makeSelectSearchResults,
+  makeSelectIsSearching,
   makeSelectAllLocationsGeoJSON,
 };

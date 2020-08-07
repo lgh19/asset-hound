@@ -1,7 +1,7 @@
 /*
  * Explorer
  *
- * This is the first thing users see of our App, at the '/' route
+ *
  *
  */
 
@@ -12,13 +12,19 @@ import { createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
+import {
+  Flex,
+  Item,
+  View,
+  SearchField,
+  Divider,
+  Header,
+  Heading,
+} from '@adobe/react-spectrum';
 import { useInjectReducer } from '../../utils/injectReducer';
 import { useInjectSaga } from '../../utils/injectSaga';
 import reducer from './reducer';
 import saga from './saga';
-import Wrapper from './Wrapper';
-import MainPane from './MainPane';
-import SidePane from './SidePane';
 import InfoPanel from '../InfoPanel';
 import {
   makeSelectAllAssets,
@@ -26,55 +32,44 @@ import {
   makeSelectExplorerCurrentAsset,
   makeSelectAssetListOffset,
   makeSelectLoadingAssets,
-  makeSelectMoreAssetsRemain,
   makeSelectSearchTerm,
 } from './selectors';
 import {
-  clearSearchTerm,
   getAssetDetailsRequest,
   getCategoriesRequest,
   getNextAssetPageRequest,
   setSearchTerm,
 } from './actions';
 import Map from '../../components/Map';
-import { makeSelectDarkMode } from '../App/selectors';
-import { categorySchema } from '../../schemas';
-import AssetList from '../../components/AssetList';
-import SideSheet from '../../components/SideSheet';
-import SearchBox from '../../components/SearchBox';
+import { makeSelectColorScheme } from '../App/selectors';
+import { assetSchema, categorySchema } from '../../schemas';
 import MapFilter from '../../components/MapFilter';
-
-function reduceDefaultCategories(acc, cur) {
-  return { ...acc, [cur.name]: true };
-}
+import AssetList from '../../components/AssetList';
+// import AssetList from '../../components/AssetList';
 
 function makeAssetFilter(newFilters) {
-  const filterCats = Object.entries(newFilters)
-    .filter(([filter, value]) => value)
-    .map(([filter, value]) => filter);
-  return ['in', ['get', 'category'], ['literal', filterCats]];
+  return ['in', ['get', 'category'], ['literal', newFilters]];
 }
 
-const categoryFilter = filters => category => filters[category.name];
+const categoryFilter = filters => category => filters.includes(category.name);
 
 function Explorer({
   allAssets,
   getCategories,
   getAsset,
   categories,
-  darkMode,
+  colorScheme,
   assetListOffset,
   loadingAssets,
-  moreAssetsRemain,
   getNextAssetPage,
   handleSearch,
-  handleClearSearch,
   searchTerm,
+  currentAsset,
 }) {
   useInjectReducer({ key: 'explorer', reducer });
   useInjectSaga({ key: 'explorer', saga });
   const [filters, setFilters] = useState(
-    categories ? categories.reduce(reduceDefaultCategories, {}) : undefined,
+    categories ? categories.map(c => c.name) : undefined,
   );
   const [mbFilter, setMbFilter] = useState(['has', 'name']);
   const [currCategories, setCurrCategories] = useState(
@@ -82,6 +77,7 @@ function Explorer({
       ? categories.filter(categoryFilter(filters))
       : undefined,
   );
+
   /**
    * Initialization happens here
    */
@@ -101,7 +97,7 @@ function Explorer({
 
   useEffect(() => {
     if (categories) {
-      const tempFilters = categories.reduce(reduceDefaultCategories, {});
+      const tempFilters = categories.map(c => c.name);
       setFilters(tempFilters);
       setMbFilter(makeAssetFilter(tempFilters));
       setCurrCategories(categories.filter(categoryFilter(tempFilters)));
@@ -115,42 +111,80 @@ function Explorer({
   }
 
   return (
-    <Wrapper>
-      <SidePane>
-        <SideSheet variant="nav">
-          <SearchBox
+    <Flex direction="row" flex="1" minHeight={0}>
+      <Flex
+        direction="column"
+        width="size-3600"
+        minHeight={0}
+        maxHeight="100vh"
+        overflow="auto"
+      >
+        <Header>
+          <View paddingX="size-150">
+            <Heading marginBottom={0} level={2}>
+              Explore community assets near you
+            </Heading>
+          </View>
+        </Header>
+
+        <View width="100%" paddingX="size-150">
+          <Heading level={3} id="searchLabel">
+            Search for Assets
+          </Heading>
+          <SearchField
+            value={searchTerm}
+            aria-labelledby="searchLabel"
+            placeholder="Start typing to search for assets"
             onChange={handleSearch}
-            onClear={handleClearSearch}
-            term={searchTerm}
+            width="100%"
           />
+        </View>
+
+        <View paddingX="size-150">
+          <Heading level={3} id="filterLabel">
+            Filter By Category
+          </Heading>
           <MapFilter
             categories={categories}
             filters={filters}
             onChange={handleFilterChange}
+            aria-labelledby="filterLabel"
           />
-          <AssetList
-            hasNextPage={moreAssetsRemain}
-            isNextPageLoading={loadingAssets}
-            items={allAssets}
-            loadNextPage={getNextAssetPage(assetListOffset)}
-            onAssetClick={getAsset}
-            searchTerm={searchTerm}
-          />
-        </SideSheet>
-      </SidePane>
-      <MainPane>
+        </View>
+        <Divider size="M" />
+        <View paddingX="size-150">
+          <Heading level={3} id="assetListLabel">
+            Assets
+          </Heading>
+        </View>
+        <AssetList
+          aria-labelledby="assetListLabel"
+          assets={allAssets}
+          currentAsset={currentAsset}
+          onSelectAsset={getAsset}
+          isLoading={loadingAssets}
+          onLoadMore={getNextAssetPage(assetListOffset)}
+        >
+          {item => <Item key={item.name}>{item.name}</Item>}
+        </AssetList>
+      </Flex>
+      <Divider size="M" orientation="vertical" />
+      {/* Map */}
+      <View flex>
         <Map
-          darkMode={darkMode}
+          colorScheme={colorScheme}
           onAssetClick={getAsset}
           categories={currCategories}
           filter={mbFilter}
           searchTerm={searchTerm}
         />
-      </MainPane>
-      <SidePane>
+      </View>
+      <Divider size="M" orientation="vertical" />
+      {/* Details */}
+      <View width="size-4600">
         <InfoPanel />
-      </SidePane>
-    </Wrapper>
+      </View>
+    </Flex>
   );
 }
 
@@ -158,28 +192,24 @@ Explorer.propTypes = {
   allAssets: PropTypes.arrayOf(PropTypes.object),
   getAsset: PropTypes.func.isRequired,
   getCategories: PropTypes.func.isRequired,
-  darkMode: PropTypes.bool,
+  colorScheme: PropTypes.string,
   categories: PropTypes.arrayOf(PropTypes.shape(categorySchema)),
-
   assetListOffset: PropTypes.number,
   loadingAssets: PropTypes.bool,
-  moreAssetsRemain: PropTypes.bool,
   getNextAssetPage: PropTypes.func,
   handleSearch: PropTypes.func,
-  handleClearSearch: PropTypes.func,
   searchTerm: PropTypes.string,
+  currentAsset: PropTypes.shape(assetSchema),
 };
 
 const mapStateToProps = createStructuredSelector({
   allAssets: makeSelectAllAssets(),
   currentAsset: makeSelectExplorerCurrentAsset(),
   categories: makeSelectAssetCategories(),
-  darkMode: makeSelectDarkMode(),
+  colorScheme: makeSelectColorScheme(),
   searchTerm: makeSelectSearchTerm(),
-
   assetListOffset: makeSelectAssetListOffset(),
   loadingAssets: makeSelectLoadingAssets(),
-  moreAssetsRemain: makeSelectMoreAssetsRemain(),
 });
 
 function mapDispatchToProps(dispatch) {
@@ -189,7 +219,6 @@ function mapDispatchToProps(dispatch) {
     getNextAssetPage: nextOffset => () =>
       dispatch(getNextAssetPageRequest(nextOffset)),
     handleSearch: term => dispatch(setSearchTerm(term)),
-    handleClearSearch: () => dispatch(clearSearchTerm()),
   };
 }
 

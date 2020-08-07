@@ -20,7 +20,7 @@ const ASSET_DIR = `${VERSION}/assets`;
  */
 const Endpoints = {
   COMMUNITY: `${RESOURCE_DIR}/community`,
-  RESOURCE: `${RESOURCE_DIR}/resources/resource`,
+  RESOURCE: `${RESOURCE_DIR}/resource`,
   ASSET: `${ASSET_DIR}/asset`,
 };
 
@@ -124,4 +124,8 @@ function requestCommunityData(id, params = {}) {
   return callApi(Endpoints.COMMUNITY, Methods.get, { id, params });
 }
 
-export default { requestCommunityData };
+function searchResources(text) {
+  return callApi(Endpoints.RESOURCE, Methods.get, { params: { search: text } });
+}
+
+export default { requestCommunityData, searchResources };
