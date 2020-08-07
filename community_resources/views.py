@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
 from rest_framework import viewsets, filters
@@ -10,7 +11,6 @@ from community_resources.serializers import CommunitySerializer, ResourceSeriali
 CACHE_TTL = 15 * 60  # 15 mins
 
 
-@cache_page(CACHE_TTL)
 class CommunityViewSet(viewsets.ModelViewSet):
     queryset = Community.objects.all()
     pagination_class = LimitOffsetPagination
@@ -18,10 +18,14 @@ class CommunityViewSet(viewsets.ModelViewSet):
     search_fields = ['name', ]
     serializer_class = CommunitySerializer
 
+    @method_decorator(cache_page(CACHE_TTL))
+    def retrieve(self, request, *args, **kwargs):
+        super(CommunityViewSet, self).retrieve(request, *args, **kwargs)
+
 
 class ResourceViewSet(viewsets.ModelViewSet):
     queryset = Resource.objects.all()
     pagination_class = LimitOffsetPagination
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name',]
+    search_fields = ['name', ]
     serializer_class = ResourceSerializer
