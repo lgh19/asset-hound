@@ -20,7 +20,7 @@ class CommunityViewSet(viewsets.ModelViewSet):
 
     @method_decorator(cache_page(CACHE_TTL))
     def retrieve(self, request, *args, **kwargs):
-        super(CommunityViewSet, self).retrieve(request, *args, **kwargs)
+        return super(CommunityViewSet, self).retrieve(request, *args, **kwargs)
 
 
 class ResourceViewSet(viewsets.ModelViewSet):
