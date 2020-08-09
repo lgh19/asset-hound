@@ -2,7 +2,7 @@ from rest_framework import viewsets, filters
 from rest_framework.pagination import LimitOffsetPagination
 
 from rest_framework.settings import api_settings
-#from rest_framework_csv.renderers import CSVRenderer
+from rest_framework_csv.renderers import CSVRenderer
 
 from assets.models import RawAsset, Asset, AssetType, Category, Tag, TargetPopulation, ProvidedService, Location, Organization
 from assets.serializers import AssetSerializer, AssetGeoJsonSerializer, AssetListSerializer, AssetTypeSerializer, \
@@ -321,6 +321,7 @@ def upload_file(request):
 
 
 class AssetViewSet(viewsets.ModelViewSet):
+    renderer_classes = (CSVRenderer, ) + tuple(api_settings.DEFAULT_RENDERER_CLASSES)
     queryset = Asset.objects.all()
     pagination_class = LimitOffsetPagination
     filter_backends = [filters.SearchFilter]
@@ -336,10 +337,12 @@ class AssetViewSet(viewsets.ModelViewSet):
 
 
 class AssetTypeViewSet(viewsets.ModelViewSet):
+    renderer_classes = (CSVRenderer, ) + tuple(api_settings.DEFAULT_RENDERER_CLASSES)
     queryset = AssetType.objects.all()
     serializer_class = AssetTypeSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
+    renderer_classes = (CSVRenderer, ) + tuple(api_settings.DEFAULT_RENDERER_CLASSES)
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
