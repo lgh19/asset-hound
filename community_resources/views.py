@@ -18,7 +18,7 @@ class CommunityViewSet(viewsets.ModelViewSet):
     search_fields = ['name', ]
     serializer_class = CommunitySerializer
 
-    # @method_decorator(cache_page(CACHE_TTL))
+    @method_decorator(cache_page(CACHE_TTL))
     def retrieve(self, request, *args, **kwargs):
         return super(CommunityViewSet, self).retrieve(request, *args, **kwargs)
 
