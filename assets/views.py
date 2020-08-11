@@ -246,7 +246,7 @@ def handle_uploaded_file(f, mode):
                 new_value = non_blank_type_or_none(row, source_field_name, str)
                 old_value = organization.name
                 if new_value != old_value:
-                    more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                    more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                     organization.name = new_value
 
                 # check_or_update_value() can not be used without adding separate handling of source_field_name and destination_field_name.
@@ -256,7 +256,7 @@ def handle_uploaded_file(f, mode):
                     new_value = non_blank_type_or_none(row, source_field_name, str)
                     old_value = organization.email
                     if new_value != old_value:
-                        more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                        more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                         organization.email = new_value
 
                 source_field_name = 'organization_phone'
@@ -264,7 +264,7 @@ def handle_uploaded_file(f, mode):
                     new_value = standardize_phone(non_blank_type_or_none(row, source_field_name, str))
                     old_value = organization.phone
                     if new_value != old_value:
-                        more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                        more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                         organization.phone = new_value
 
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
