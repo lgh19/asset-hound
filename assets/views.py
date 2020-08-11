@@ -234,9 +234,9 @@ def handle_uploaded_file(f, mode):
                 if ('organization_phone' in row and row['organization_phone'] != '') or ('organization_email' in row and row['organization_email'] != ''):
                     more_results.append(f"The organization's name or ID value is required if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
                     break
-                else:
-                    destination_asset.organization = None # Set ForiegnKey to None.
-                    more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;Since organization_name == '', the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
+                #else: This is being removed for now since it seems like it could accidentally delete extant organizations.
+                #    destination_asset.organization = None # Set ForiegnKey to None.
+                #    more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;Since the organization has not been clearly identified by name or ID, the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
             else:
                 if organization is None:
                     organization = Organization() # Create new organization instance.
