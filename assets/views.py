@@ -220,46 +220,51 @@ def handle_uploaded_file(f, mode):
                     more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                     destination_asset.accessibility = boolify(new_value)
 
-            if 'organization_name' in row:
-                if row['organization_name'] == '':
-                    if ('organization_phone' in row and row['organization_phone'] != '') or ('organization_email' in row and row['organization_email'] != ''):
-                        more_results.append(f"The organization's name is a required field if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
-                        break
-                    else:
-                        destination_asset.organization = None # Set ForiegnKey to None.
-                        more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;Since organization_name == '', the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
-                else:
-                    some_organization_field_changed = False
-                    source_field_name = 'organization_name'
-                    destination_field_name = 'name'
-                    new_value = non_blank_type_or_none(row, source_field_name, str)
-                    if organization is None:
-                        organization = Organization() # Create new organization instance.
+            missing_organization_identifier = True
+            if 'organization_name' in row and row['organization_name'] not in ['', None]:
+                missing_organization_identifier = False
+            elif 'organization_id' in row and row['organization_id'] not in ['', None]:
+                missing_organization_identifier = False
+            # Which is about the same as what I originally wrote:
+            #   missing_organization_identifier = (('organization_name' not in row) or (row['organization_name'] == '')) and (('organization_id' not in row) or (row['organization_id'] == ''))
+            # but whatever.
 
-                    old_value = organization.name
+            if missing_organization_identifier:
+                # The organization can be identified EITHER by the organization_id value or by the organization_name value.
+                if ('organization_phone' in row and row['organization_phone'] != '') or ('organization_email' in row and row['organization_email'] != ''):
+                    more_results.append(f"The organization's name is a required field if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
+                    break
+                else:
+                    destination_asset.organization = None # Set ForiegnKey to None.
+                    more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;Since organization_name == '', the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
+            else:
+                if organization is None:
+                    organization = Organization() # Create new organization instance.
+
+                source_field_name = 'organization_name'
+                destination_field_name = 'name'
+                new_value = non_blank_type_or_none(row, source_field_name, str)
+                old_value = organization.name
+                if new_value != old_value:
+                    more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                    organization.name = new_value
+
+                source_field_name = 'organization_email'
+                if source_field_name in row:
+                    destination_field_name = 'email'
+                    new_value = non_blank_type_or_none(row, source_field_name, str)
+                    old_value = organization.email
                     if new_value != old_value:
                         more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                        organization.name = new_value
-                        some_organization_field_changed = True
+                        organization.email = new_value
 
-                    source_field_name = 'organization_email'
-                    if source_field_name in row:
-                        destination_field_name = 'email'
-                        new_value = non_blank_type_or_none(row, source_field_name, str)
-                        old_value = organization.email
-                        if new_value != old_value:
-                            more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                            organization.email = new_value
-                            some_organization_field_changed = True
-
-                    source_field_name = 'organization_phone'
-                    if source_field_name in row:
-                        new_value = standardize_phone(non_blank_type_or_none(row, source_field_name, str))
-                        old_value = organization.phone
-                        if new_value != old_value:
-                            more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                            organization.phone = new_value
-                            some_organization_field_changed = True
+                source_field_name = 'organization_phone'
+                if source_field_name in row:
+                    new_value = standardize_phone(non_blank_type_or_none(row, source_field_name, str))
+                    old_value = organization.phone
+                    if new_value != old_value:
+                        more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                        organization.phone = new_value
 
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'unit', field_type=str)
