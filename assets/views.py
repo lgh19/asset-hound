@@ -249,6 +249,7 @@ def handle_uploaded_file(f, mode):
                     more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                     organization.name = new_value
 
+                # check_or_update_value() can not be used without adding separate handling of source_field_name and destination_field_name.
                 source_field_name = 'organization_email'
                 if source_field_name in row:
                     destination_field_name = 'email'
