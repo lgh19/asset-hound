@@ -232,7 +232,7 @@ def handle_uploaded_file(f, mode):
             if missing_organization_identifier:
                 # The organization can be identified EITHER by the organization_id value or by the organization_name value.
                 if ('organization_phone' in row and row['organization_phone'] != '') or ('organization_email' in row and row['organization_email'] != ''):
-                    more_results.append(f"The organization's name is a required field if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
+                    more_results.append(f"The organization's name or ID value is required if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
                     break
                 else:
                     destination_asset.organization = None # Set ForiegnKey to None.
