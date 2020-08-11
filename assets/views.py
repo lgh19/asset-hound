@@ -112,8 +112,37 @@ def handle_uploaded_file(f, mode):
             for raw_asset in raw_assets:
                 raw_asset.asset = destination_asset
 
-            location = destination_asset.location
-            organization = destination_asset.organization
+            if 'location_id' in row:
+                location_id = row['location_id']
+                if location_id in ['', None, 'new']:
+                    # Create a new Location instance to be populated.
+                    location = None
+                else:
+                    location = Location.objects.get(pk=location_id)
+            else: # If the location_id field is omitted from the merge instructions,
+                # fall back to the destination asset's location (which may be None).
+                location = destination_asset.location
+
+            # I'm choosing to not update the Location.name field here since we may want to manually name Location instances,
+            # particularly to deal with cases like the two restaurant locations in Schenley Plaza that have the same
+            # street address and parcel ID but slightly different geocoordinates.
+            if location is None:
+                if there_is_a_field_to_update(row, ['street_address', 'municipality', 'city', 'state', 'zip_code', 'parcel_id', 'latitude', 'longitude']):
+                    location = Location()
+                elif there_is_a_field_to_update(row, ['residence', 'iffy_geocoding', 'unit', 'unit_type', 'available_transportation', 'geocoding_properties']):
+                    more_results.append("There is not enough information to create a new location for this Asset, but there are fields in the merge-instructions file which need to be assigned to a Location. Does not compute! ABORTING!!!<hr>")
+                    break
+
+            if 'organization_id' in row:
+                organization_id = row['organization_id']
+                if organization_id in ['', None, 'new']:
+                    # Create a new Organization instance to be populated.
+                    organization = None
+                else:
+                    organization = Organization.objects.get(pk=location_id)
+            else: # If the organization_id field is omitted from the merge instructions,
+                # fall back to the destination asset's organization (which may be None).
+                organization = destination_asset.organization
 
 
             if len(raw_assets) == 1:
@@ -232,21 +261,6 @@ def handle_uploaded_file(f, mode):
                             organization.phone = new_value
                             some_organization_field_changed = True
 
-                    if mode == 'update' and some_organization_field_changed:
-                        more_results.append("Updating Organization.")
-                        organization.save()
-
-
-            # I'm choosing to not update the Location.name field here since we may want to manually name Location instances,
-            # particularly to deal with cases like the two restaurant locations in Schenley Plaza that have the same
-            # street address and parcel ID but slightly different geocoordinates.
-            if location is None:
-                if there_is_a_field_to_update(row, ['street_address', 'municipality', 'city', 'state', 'zip_code', 'parcel_id', 'latitude', 'longitude']):
-                    location = Location()
-                elif there_is_a_field_to_update(row, ['residence', 'iffy_geocoding', 'unit', 'unit_type', 'available_transportation', 'geocoding_properties']):
-                    more_results.append("There is not enough information to create a new location for this Asset, but there are fields in the merge-instructions file which need to be assigned to a Location. Does not compute! ABORTING!!!<hr>")
-                    break
-
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'unit', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'unit_type', field_type=str)
@@ -301,6 +315,7 @@ def handle_uploaded_file(f, mode):
                 more_results.append(f'&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://assets.wprdc.org/api/dev/assets/assets/{asset_id}/" target="_blank">Updated Asset</a>\n<hr>')
                 destination_asset.save()
                 location.save()
+                organization.save()
                 for raw_asset in raw_assets:
                     raw_asset.save()
             else:
