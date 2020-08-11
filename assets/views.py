@@ -241,18 +241,22 @@ def handle_uploaded_file(f, mode):
             # particularly to deal with cases like the two restaurant locations in Schenley Plaza that have the same
             # street address and parcel ID but slightly different geocoordinates.
             if location is None:
-                if there_is_a_field_to_update(row, ['street_address', 'city', 'state', 'zip_code', 'parcel_id', 'latitude', 'longitude']):
+                if there_is_a_field_to_update(row, ['street_address', 'municipality', 'city', 'state', 'zip_code', 'parcel_id', 'latitude', 'longitude']):
                     location = Location()
-                elif there_is_a_field_to_update(row, ['residence', 'available_transportation', 'geocoding_properties']):
+                elif there_is_a_field_to_update(row, ['residence', 'iffy_geocoding', 'unit', 'unit_type', 'available_transportation', 'geocoding_properties']):
                     more_results.append("There is not enough information to create a new location for this Asset, but there are fields in the merge-instructions file which need to be assigned to a Location. Does not compute! ABORTING!!!<hr>")
                     break
 
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'unit', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'unit_type', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'municipality', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'city', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'state', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'zip_code', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'parcel_id', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'residence', field_type=bool)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'iffy_geocoding', field_type=bool)
 
             if 'latitude' in row or 'longitude' in row:
                 old_latitude, old_longitude = location.latitude, location.longitude
