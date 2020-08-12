@@ -10,7 +10,9 @@ Upload a merge-instructions CSV file here to attempt to execute asset merges (sp
 <details>
     <summary>Documentation</summary>
     <ul>
-        <li>To create a new Location (instead of linking to the Asset's default Location), include a field called <code>location_id<code> and make its value blank for the Asset which needs a new location. This is useful when splitting up a Location to which multiple Assets are incorrectly pointing. [The same trick works for Organizations by using a blank <code>organization_id</code> field.]
+        <li>To create a new Location (instead of linking to the Asset's default Location), include a field called <code>location_id</code> and make its value blank for the Asset which needs a new location. This is useful when splitting up a Location to which multiple Assets are incorrectly pointing. [The same trick works for Organizations by using a blank <code>organization_id</code> field.]</li>
+        <li>The <code>location_id</code> field can also be used to reassign an Asset to a different existing location. (There is currently only the basic 'Validate' validation in place to make sure this option does not accidentally overwrite the wrong Location, so please use this carefully.)
+        <li>Set <code>iffy_geocoding</code> to True to indicate that a particular Asset's geocoordinates should be reviewed later to check them or make them more precise.</li>
     </ul>
 </details>
     <form method="post" enctype="multipart/form-data" novalidate>
