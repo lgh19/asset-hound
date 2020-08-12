@@ -346,7 +346,7 @@ def upload_file(request):
 
 
 class AssetViewSet(viewsets.ModelViewSet):
-    renderer_classes = uple(api_settings.DEFAULT_RENDERER_CLASSES) + (CSVRenderer, )
+    renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (CSVRenderer, )
     queryset = Asset.objects.all()
     pagination_class = LimitOffsetPagination
     filter_backends = [filters.SearchFilter]
