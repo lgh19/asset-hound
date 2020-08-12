@@ -112,8 +112,37 @@ def handle_uploaded_file(f, mode):
             for raw_asset in raw_assets:
                 raw_asset.asset = destination_asset
 
-            location = destination_asset.location
-            organization = destination_asset.organization
+            if 'location_id' in row:
+                location_id = row['location_id']
+                if location_id in ['', None, 'new']:
+                    # Create a new Location instance to be populated.
+                    location = None
+                else:
+                    location = Location.objects.get(pk=location_id)
+            else: # If the location_id field is omitted from the merge instructions,
+                # fall back to the destination asset's location (which may be None).
+                location = destination_asset.location
+
+            # I'm choosing to not update the Location.name field here since we may want to manually name Location instances,
+            # particularly to deal with cases like the two restaurant locations in Schenley Plaza that have the same
+            # street address and parcel ID but slightly different geocoordinates.
+            if location is None:
+                if there_is_a_field_to_update(row, ['street_address', 'municipality', 'city', 'state', 'zip_code', 'parcel_id', 'latitude', 'longitude']):
+                    location = Location()
+                elif there_is_a_field_to_update(row, ['residence', 'iffy_geocoding', 'unit', 'unit_type', 'available_transportation', 'geocoding_properties']):
+                    more_results.append("There is not enough information to create a new location for this Asset, but there are fields in the merge-instructions file which need to be assigned to a Location. Does not compute! ABORTING!!!<hr>")
+                    break
+
+            if 'organization_id' in row:
+                organization_id = row['organization_id']
+                if organization_id in ['', None, 'new']:
+                    # Create a new Organization instance to be populated.
+                    organization = None
+                else:
+                    organization = Organization.objects.get(pk=location_id)
+            else: # If the organization_id field is omitted from the merge instructions,
+                # fall back to the destination asset's organization (which may be None).
+                organization = destination_asset.organization
 
 
             if len(raw_assets) == 1:
@@ -191,68 +220,63 @@ def handle_uploaded_file(f, mode):
                     more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                     destination_asset.accessibility = boolify(new_value)
 
-            if 'organization_name' in row:
-                if row['organization_name'] == '':
-                    if ('organization_phone' in row and row['organization_phone'] != '') or ('organization_email' in row and row['organization_email'] != ''):
-                        more_results.append(f"The organization's name is a required field if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
-                        break
-                    else:
-                        destination_asset.organization = None # Set ForiegnKey to None.
-                        more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;Since organization_name == '', the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
-                else:
-                    some_organization_field_changed = False
-                    source_field_name = 'organization_name'
-                    destination_field_name = 'name'
-                    new_value = non_blank_type_or_none(row, source_field_name, str)
-                    if organization is None:
-                        organization = Organization() # Create new organization instance.
+            missing_organization_identifier = True
+            if 'organization_name' in row and row['organization_name'] not in ['', None]:
+                missing_organization_identifier = False
+            elif 'organization_id' in row and row['organization_id'] not in ['', None]:
+                missing_organization_identifier = False
+            # Which is about the same as what I originally wrote:
+            #   missing_organization_identifier = (('organization_name' not in row) or (row['organization_name'] == '')) and (('organization_id' not in row) or (row['organization_id'] == ''))
+            # but whatever.
 
-                    old_value = organization.name
-                    if new_value != old_value:
-                        more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                        organization.name = new_value
-                        some_organization_field_changed = True
-
-                    source_field_name = 'organization_email'
-                    if source_field_name in row:
-                        destination_field_name = 'email'
-                        new_value = non_blank_type_or_none(row, source_field_name, str)
-                        old_value = organization.email
-                        if new_value != old_value:
-                            more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                            organization.email = new_value
-                            some_organization_field_changed = True
-
-                    source_field_name = 'organization_phone'
-                    if source_field_name in row:
-                        new_value = standardize_phone(non_blank_type_or_none(row, source_field_name, str))
-                        old_value = organization.phone
-                        if new_value != old_value:
-                            more_results.append(f"{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                            organization.phone = new_value
-                            some_organization_field_changed = True
-
-                    if mode == 'update' and some_organization_field_changed:
-                        more_results.append("Updating Organization.")
-                        organization.save()
-
-
-            # I'm choosing to not update the Location.name field here since we may want to manually name Location instances,
-            # particularly to deal with cases like the two restaurant locations in Schenley Plaza that have the same
-            # street address and parcel ID but slightly different geocoordinates.
-            if location is None:
-                if there_is_a_field_to_update(row, ['street_address', 'city', 'state', 'zip_code', 'parcel_id', 'latitude', 'longitude']):
-                    location = Location()
-                elif there_is_a_field_to_update(row, ['residence', 'available_transportation', 'geocoding_properties']):
-                    more_results.append("There is not enough information to create a new location for this Asset, but there are fields in the merge-instructions file which need to be assigned to a Location. Does not compute! ABORTING!!!<hr>")
+            if missing_organization_identifier:
+                # The organization can be identified EITHER by the organization_id value or by the organization_name value.
+                if ('organization_phone' in row and row['organization_phone'] != '') or ('organization_email' in row and row['organization_email'] != ''):
+                    more_results.append(f"The organization's name or ID value is required if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
                     break
+                #else: This is being removed for now since it seems like it could accidentally delete extant organizations.
+                #    destination_asset.organization = None # Set ForiegnKey to None.
+                #    more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;Since the organization has not been clearly identified by name or ID, the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
+            else:
+                if organization is None:
+                    organization = Organization() # Create new organization instance.
+
+                source_field_name = 'organization_name'
+                destination_field_name = 'name'
+                new_value = non_blank_type_or_none(row, source_field_name, str)
+                old_value = organization.name
+                if new_value != old_value:
+                    more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                    organization.name = new_value
+
+                # check_or_update_value() can not be used without adding separate handling of source_field_name and destination_field_name.
+                source_field_name = 'organization_email'
+                if source_field_name in row:
+                    destination_field_name = 'email'
+                    new_value = non_blank_type_or_none(row, source_field_name, str)
+                    old_value = organization.email
+                    if new_value != old_value:
+                        more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                        organization.email = new_value
+
+                source_field_name = 'organization_phone'
+                if source_field_name in row:
+                    new_value = standardize_phone(non_blank_type_or_none(row, source_field_name, str))
+                    old_value = organization.phone
+                    if new_value != old_value:
+                        more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                        organization.phone = new_value
 
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'unit', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'unit_type', field_type=str)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'municipality', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'city', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'state', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'zip_code', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'parcel_id', field_type=str)
             location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'residence', field_type=bool)
+            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'iffy_geocoding', field_type=bool)
 
             if 'latitude' in row or 'longitude' in row:
                 old_latitude, old_longitude = location.latitude, location.longitude
@@ -297,6 +321,7 @@ def handle_uploaded_file(f, mode):
                 more_results.append(f'&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://assets.wprdc.org/api/dev/assets/assets/{asset_id}/" target="_blank">Updated Asset</a>\n<hr>')
                 destination_asset.save()
                 location.save()
+                organization.save()
                 for raw_asset in raw_assets:
                     raw_asset.save()
             else:

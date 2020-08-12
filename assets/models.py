@@ -49,6 +49,9 @@ class Tag(models.Model):
 class Location(models.Model):
     name = models.CharField(max_length=255, editable=False)
     street_address = models.CharField(max_length=100, null=True, blank=True)
+    unit = models.CharField(max_length=20, null=True, blank=True)
+    unit_type = models.CharField(max_length=20, null=True, blank=True)
+    municipality = models.CharField(max_length=50, null=True, blank=True)
     city = models.CharField(max_length=50, null=True, blank=True)
     state = models.CharField(max_length=50, null=True, blank=True)
     zip_code = models.CharField(max_length=10, null=True, blank=True)
@@ -66,22 +69,33 @@ class Location(models.Model):
     longitude = models.FloatField(null=True, blank=True)
     geom = models.PointField(null=True, blank=True)
     geocoding_properties = models.TextField(null=True, blank=True)
+    iffy_geocoding = models.BooleanField(null=True, blank=True) # If False, this means that
+    # someone has decided that the location's geocoordinates are unambiguously correct.
+    # Making this True flags this Location's geocoordinates for review. Examples of
+    # iffy geocoding: A Location that has a street address for which other Locations
+    # have Suites or other units, but this one doesn't. A Location where multiple
+    # different assets have about the same geocoordinates, so it's likely that
+    # some are wrong (or at least need to be checked).
+
+    # Notes about this or other things (like missing Suite numbers) may be added to
+    # the geocoding_properties field.
 
     history = HistoricalRecords()
 
     @property
     def full_address(self):
         if self.street_address:
-            return f'{self.street_address or ""}, {self.city or ""} {self.state or ""} {self.zip_code or ""}'
+            return f'{self.street_address or ""}, {self.unit or ""} {self.unit_type or ""}, {self.city or ""}, {self.state or ""} {self.zip_code or ""}'
         return ""
 
     def save(self, *args, **kwargs):
         """ When the model is saved, attempt to geocode it based on address """
         if not self.pk or self.name == 'None, None None None':
             if self.street_address is not None:
-                self.name = f'{self.street_address} {self.city}, {self.state} {self.zip_code}'
-            elif self.parcel_id is not None:
-                self.name = f'{self.parcel_id}'
+                self.name = f'{self.street_address}, {self.unit or ""} {self.unit_type or ""}, {self.city}, {self.state} {self.zip_code}'
+                # Note that using parcel_id is not good for two reasons: 1) It's not very
+                # human-readable. 2) It's sometimes LESS precise than street address since
+                # many house numbers may be included in one giant parcel.
             elif self.latitude is not None:
                 self.name = f'({self.latitude}, {self.longitude})'
             else:

@@ -322,7 +322,6 @@ class Command(BaseCommand):
                             organization.save()
                             # END primitive Organization object handling
 
-
                             location, location_created = update_or_create_location(row)
 
                             asset_types = [AssetType.objects.get_or_create(name=asset_type)[0] for asset_type in
