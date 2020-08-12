@@ -8,7 +8,7 @@ from assets.models import RawAsset, Asset, AssetType, Category, Tag, TargetPopul
 from assets.serializers import AssetSerializer, AssetGeoJsonSerializer, AssetListSerializer, AssetTypeSerializer, \
     CategorySerializer
 
-from assets.management.commands.load_assets import parse_cell, standardize_phone
+from assets.management.commands.util import parse_cell, standardize_phone
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -26,7 +26,7 @@ def there_is_a_field_to_update(row, fields_to_check):
             return True
     return update_is_needed
 
-def boolify(x): # This differs from the assets.management.commands.load_assets versiion of boolify.
+def boolify(x): # This differs from the assets.management.commands.util versiion of boolify.
     if x.lower() in ['true', 't']:
         return True
     if x.lower() in ['false', 'f']:
