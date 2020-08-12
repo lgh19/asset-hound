@@ -91,7 +91,9 @@ class Command(BaseCommand):
                                 print(f"No assets with type '{asset_type}' found.")
 
                     ## Upload the raw assets. ##
-                    auto_link = True
+                    auto_link = False # auto_link = True was used to transition to having both RawAsset and Asset tables.
+                    # Now auto_link = False because raw assets will go through a deduplication stage to match them up
+                    # with the correct Assets.
                     for row in dr:
                         if row['asset_type'] == asset_type:
                             if auto_link:
