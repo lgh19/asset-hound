@@ -18,12 +18,12 @@ from assets.models import (Asset,
                            TargetPopulation,
                            DataSource)
 
-from assets.management.commands.load_assets import parse_cell, get_localizability, boolify, standardize_phone
+from assets.management.commands.util import parse_cell, get_localizability, boolify, standardize_phone
 
 from pprint import pprint
 
 
-def boolify(x): # This differs from the assets.management.commands.load_assets versiion of boolify.
+def boolify(x): # This differs from the assets.management.commands.util versiion of boolify.
     if x.lower() in ['true', 't']:
         return True
     if x.lower() in ['false', 'f']:
