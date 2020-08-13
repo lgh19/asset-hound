@@ -16,7 +16,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from assets.forms import UploadFileForm
 from assets.utils import distance
 
-import os, threading
+import os, threading, pytz
 from datetime import datetime, timedelta
 
 def there_is_a_field_to_update(row, fields_to_check):
