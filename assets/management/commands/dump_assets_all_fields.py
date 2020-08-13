@@ -80,8 +80,12 @@ class Command(BaseCommand):
             chosen_asset_types = args
             print(f"Dumping just the assets of these types: {chosen_asset_types}")
             raise ValueError("Still need to implement filtering of assets to multiple types.")
-            
+
         output_file = os.path.join(settings.BASE_DIR, filename)
+
+        if len(options) > 0:
+            if 'filepath' in options:
+                output_file = filepath
 
         with open(output_file, 'w') as f:
             writer = csv.DictWriter(

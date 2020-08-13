@@ -16,6 +16,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from assets.forms import UploadFileForm
 from assets.utils import distance
 
+import os
+from datetime import datetime, timedelta
+
 def there_is_a_field_to_update(row, fields_to_check):
     """Scan record for certain fields and see if any exist
     and are non-null (meaning that a Location could be
@@ -344,6 +347,25 @@ def upload_file(request):
         form = UploadFileForm()
     return render(request, 'update.html', {'form': form, 'results': []})
 
+def dump_assets(filepath):
+    call_command('dump_assets_all_fields', filepath=filepath)
+
+@staff_member_required
+def request_asset_dump(request):
+    from django.core.management import call_command
+    filepath = '/home/david/downloads/asset_dump.csv'
+    if os.path.exists(filepath): # Clear the file if it exists.
+        os.remove(filepath)
+
+    # This should run the process as a separate thread, allowing it to
+    # complete after the page is rendered.
+    t = threading.Thread(target=dump_assets,args=[filepath],daemon=True)
+    t.start()
+
+    record_count = len(Asset.objects.all())
+    minutes = record_count/32731*7 + 1
+    estimated_completion_time = (datetime.now() + timedelta(minutes=minutes)).time().strftime("%H:%m")
+    return render(request, 'dump.html', {'url': 'https://assets.wprdc.org/asset_dump.csv', 'eta': estimated_completion_time})
 
 class AssetViewSet(viewsets.ModelViewSet):
     renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (CSVRenderer, )
