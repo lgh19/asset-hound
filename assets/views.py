@@ -364,8 +364,9 @@ def request_asset_dump(request):
 
     record_count = len(Asset.objects.all())
     minutes = record_count/32731*7 + 1
-    estimated_completion_time = (datetime.now() + timedelta(minutes=minutes)).time().strftime("%H:%m")
-    return render(request, 'dump.html', {'url': 'https://assets.wprdc.org/asset_dump.csv', 'eta': estimated_completion_time})
+    estimated_completion_time_utc = (datetime.utcnow() + timedelta(minutes=minutes))
+    eta_local = estimated_completion_time_utc.astimezone(pytz.timezone('America/New_York')).time().strftime("%H:%M")
+    return render(request, 'dump.html', {'url': 'https://assets.wprdc.org/asset_dump.csv', 'eta': eta_local})
 
 class AssetViewSet(viewsets.ModelViewSet):
     renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (CSVRenderer, )
