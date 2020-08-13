@@ -351,16 +351,84 @@ def dump_assets(filepath):
     from django.core.management import call_command
     call_command('dump_assets_all_fields', filepath)
 
+def dump_assets_differently(filepath):
+    from utils import assets_to_dict_for_csv
+    assets_iterator = Asset.objects.all()
+    if filepath is None:
+        filename = 'asset_dump.csv'
+        output_file = os.path.join(settings.BASE_DIR, filename)
+    else:
+        output_file = filepath
+
+    with open(output_file, 'w') as f:
+        writer = csv.DictWriter(
+            f,
+            ['id',
+             'name',
+             'asset_type',
+             'raw_asset_ids', # Replaces asset_id in raw asset dump.
+             'tags',
+             'location_id', # Not present in raw asset dump.
+             'street_address',
+             'unit',
+             'unit_type',
+             'municipality',
+             'city',
+             'state',
+             'zip_code',
+             'latitude',
+             'longitude',
+             'parcel_id',
+             'residence',
+             'iffy_geocoding',
+             'available_transportation',
+             'parent_location',
+             'url',
+             'email',
+             'phone',
+             'hours_of_operation',
+             'holiday_hours_of_operation',
+             'periodicity',
+             'capacity',
+             'wifi_network',
+             'internet_access',
+             'computers_available',
+             'accessibility',
+             'open_to_public',
+             'child_friendly',
+             'sensitive',
+             'do_not_display',
+             'localizability',
+             'services',
+             'hard_to_count_population',
+             'data_source_name',
+             'data_source_url',
+             'organization_name',
+             'organization_phone',
+             'organization_email',
+             'etl_notes',
+              'geocoding_properties',
+             ],
+        )
+        writer.writeheader()
+        for k,asset in enumerate(assets_iterator.iterator()): # Use the "iterator()" method to lazily evaluate the query in chunks (to save memory)
+            writer.writerow(assets_to_dict_for_csv(asset))
+            if k % 2000 == 2000-1:
+                print(f"Wrote {k+1} raw assets so far.")
+
 @staff_member_required
 def request_asset_dump(request):
     filepath = '/home/david/downloads/asset_dump.csv'
     if os.path.exists(filepath): # Clear the file if it exists.
         os.remove(filepath)
 
-    # This should run the process as a separate thread, allowing it to
+    # This SHOULD run the process as a separate thread, allowing it to
     # complete after the page is rendered.
-    t = threading.Thread(target=dump_assets, args=[filepath], daemon=True)
+    t = threading.Thread(target=dump_assets_differently, args=[filepath], daemon=True)
     t.start()
+    # but it doesn't.
+    #dump_assets(filepath) # This works, though it results in a broken web page.
+    # Maybe the call_command function is to blame.
 
     record_count = len(Asset.objects.all())
     minutes = record_count/32731*7 + 1
