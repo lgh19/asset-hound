@@ -16,7 +16,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from assets.forms import UploadFileForm
 from assets.utils import distance
 
-import os, threading, pytz
+import os, pytz
 from datetime import datetime, timedelta
 
 def there_is_a_field_to_update(row, fields_to_check):
@@ -357,11 +357,12 @@ def request_asset_dump(request):
     if os.path.exists(filepath): # Clear the file if it exists.
         os.remove(filepath)
 
-    # This should run the process as a separate thread, allowing it to
+    # This SHOULD run the process as a separate thread, allowing it to
     # complete after the page is rendered.
-    t = threading.Thread(target=dump_assets, args=[filepath], daemon=True)
-    t.start()
-
+    #   t = threading.Thread(target=dump_assets, args=[filepath], daemon=True)
+    #   t.start()
+    # but it doesn't. Only 30 lines are written (though the web page does render).
+    dump_assets(filepath) # This works but results in a broken web page.
     record_count = len(Asset.objects.all())
     minutes = record_count/32731*7 + 1
     estimated_completion_time_utc = (datetime.utcnow() + timedelta(minutes=minutes))
