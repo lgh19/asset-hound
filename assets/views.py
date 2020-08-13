@@ -10,7 +10,8 @@ from assets.serializers import AssetSerializer, AssetGeoJsonSerializer, AssetLis
 
 from assets.management.commands.util import parse_cell, standardize_phone
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.template import loader
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from assets.forms import UploadFileForm
@@ -416,6 +417,19 @@ def dump_assets_differently(filepath):
             if k % 2000 == 2000-1:
                 print(f"Wrote {k+1} raw assets so far.")
 
+class ResponseButOneMoreThing(HttpResponse):
+    """Use a custom response class to override HttpResponse.close()."""
+    def __init__(self, *args, **kwargs):
+        super(ResponseButOneMoreThing, self).__init__(*args, **kwargs)
+        self.filepath = kwargs.get('filepath', '/home/david/downloads/asset_dump.csv')
+
+    def close(self):
+        super(ResponseButOneMoreThing, self).close()
+        # Do whatever you want here. This is the last codepoint in request handling.
+        dump_assets(self.filepath)
+        if self.status_code == 200:
+            print('HttpResponse successful: %s' % self.status_code)
+
 @staff_member_required
 def request_asset_dump(request):
     filepath = '/home/david/downloads/asset_dump.csv'
@@ -424,17 +438,22 @@ def request_asset_dump(request):
 
     # This SHOULD run the process as a separate thread, allowing it to
     # complete after the page is rendered.
-    t = threading.Thread(target=dump_assets_differently, args=[filepath], daemon=True)
-    t.start()
+    #t = threading.Thread(target=dump_assets_differently, args=[filepath], daemon=True)
+    #t.start()
     # but it doesn't.
+    # Using dump_assets renders the web page, but only ~30 lines are written to the file.
+    # Using dump_assets_differently gets up to 4000 lines, but the web page never renders
+    # and instead times out.
     #dump_assets(filepath) # This works, though it results in a broken web page.
-    # Maybe the call_command function is to blame.
-
+    # Setting daemon=False with dump_assets_differently resulted in an Internal Server Error
+    # and general, persistent system freak-outs.
     record_count = len(Asset.objects.all())
     minutes = record_count/32731*7 + 1
     estimated_completion_time_utc = (datetime.utcnow() + timedelta(minutes=minutes))
     eta_local = estimated_completion_time_utc.astimezone(pytz.timezone('America/New_York')).time().strftime("%H:%M")
-    return render(request, 'dump.html', {'url': 'https://assets.wprdc.org/asset_dump.csv', 'eta': eta_local})
+    t = loader.get_template('dump.html')
+    c = {'url': 'https://assets.wprdc.org/asset_dump.csv', 'eta': eta_local}
+    return ResponseButOneMoreThing(t.render(c, request), content_type='application/xhtml+xml')
 
 class AssetViewSet(viewsets.ModelViewSet):
     renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (CSVRenderer, )
