@@ -4,7 +4,7 @@ import os
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from assets.models import RawAsset, Asset
+from assets.models import RawAsset, Asset, AssetType
 
 
 def to_dict_for_csv(asset: Asset):
@@ -66,26 +66,30 @@ class Command(BaseCommand):
         parser.add_argument('args', nargs='*')
 
     def handle(self, *args, **options):
-
+        filepath = None
         filename = 'asset_dump.csv'
-        if len(args) == 0:
-            print("Dumping all assets.")
-            assets_iterator = Asset.objects.all()
-        elif len(args) == 1:
-            chosen_asset_types = args
+        extant_asset_types = [a.name for a in AssetType.objects.all()]
+        chosen_asset_types = []
+        for arg in args:
+            if arg in extant_asset_types:
+                chosen_asset_types.append(arg)
+            elif re.match('/home/david/downloads', arg) is not None and os.path.isdir('/'.join(arg.split('/')[:-1])):
+                filepath = arg
+            else:
+                print(f"Well, it's really not clear what to with this argument: '{arg}'".)
+
+        if len(chosen_asset_types) > 0:
             print(f"Dumping just the assets of type {chosen_asset_types[0]}.")
             assets_iterator = Asset.objects.filter(asset_types__name = chosen_asset_types[0])
             filename = f'asset_dump_{chosen_asset_types[0]}.csv'
         else:
-            chosen_asset_types = args
-            print(f"Dumping just the assets of these types: {chosen_asset_types}")
-            raise ValueError("Still need to implement filtering of assets to multiple types.")
+            print("Dumping all assets.")
+            assets_iterator = Asset.objects.all()
 
-        output_file = os.path.join(settings.BASE_DIR, filename)
-
-        if len(options) > 0:
-            if 'filepath' in options:
-                output_file = filepath
+        if filepath is None:
+            output_file = os.path.join(settings.BASE_DIR, filename)
+        else:
+            output_file = filepath
 
         with open(output_file, 'w') as f:
             writer = csv.DictWriter(
