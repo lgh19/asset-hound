@@ -1,6 +1,6 @@
 from django.urls import re_path
 
-from assets.views import upload_file
+from assets.views import upload_file, request_asset_dump
 
 urlpatterns = []
 
@@ -9,4 +9,5 @@ urlpatterns = []
 # and that handle bulk database edits.
 urlpatterns = [
     re_path(r'^update-assets/', upload_file, name='update-assets'),
+    re_path(r'^dump_assets/', request_asset_dump, name='request_asset_dump'),
 ]
