@@ -1,5 +1,4 @@
-import csv
-import os
+import os, csv, re
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -76,7 +75,7 @@ class Command(BaseCommand):
             elif re.match('/home/david/downloads', arg) is not None and os.path.isdir('/'.join(arg.split('/')[:-1])):
                 filepath = arg
             else:
-                print(f"Well, it's really not clear what to with this argument: '{arg}'".)
+                print(f"It is not clear what to with this argument: '{arg}'.")
 
         if len(chosen_asset_types) > 0:
             print(f"Dumping just the assets of type {chosen_asset_types[0]}.")

@@ -349,7 +349,7 @@ def upload_file(request):
 
 def dump_assets(filepath):
     from django.core.management import call_command
-    call_command('dump_assets_all_fields', filepath=filepath)
+    call_command('dump_assets_all_fields', filepath)
 
 @staff_member_required
 def request_asset_dump(request):
