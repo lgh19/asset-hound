@@ -84,16 +84,17 @@ def get_location_by_keys(row, keys):
     else: # Floating point values are not good ones to query on directly.
         # Options include using the DecimalField or (as chosen here)
         # filtering on ranges.
-        assert set(keys) == set(['latitude', 'longitude'])
-        latitude = non_blank_type_or_none(row, 'latitude', float)
-        longitude = non_blank_type_or_none(row, 'longitude', float)
-        if latitude is None or longitude is None:
-            return None, False
-        resolution = 10**-6 # This value should be thought through some more.
-        locations = Location.objects.filter(latitude__gte = latitude - resolution,
-                latitude__lte = latitude + resolution,
-                longitude__gte = longitude - resolution,
-                longitude__lte = longitude + resolution).order_by('-id')
+        if 'geocoding_properties' not in row or 'centroid' not in row['geocoding_properties']:
+            assert set(keys) == set(['latitude', 'longitude'])
+            latitude = non_blank_type_or_none(row, 'latitude', float)
+            longitude = non_blank_type_or_none(row, 'longitude', float)
+            if latitude is None or longitude is None:
+                return None, False
+            resolution = 10**-6 # This value should be thought through some more.
+            locations = Location.objects.filter(latitude__gte = latitude - resolution,
+                    latitude__lte = latitude + resolution,
+                    longitude__gte = longitude - resolution,
+                    longitude__lte = longitude + resolution).order_by('-id')
 
     if len(locations) == 0:
         return None, False
