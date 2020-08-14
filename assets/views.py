@@ -142,7 +142,7 @@ def handle_uploaded_file(f, mode):
                     # Create a new Organization instance to be populated.
                     organization = None
                 else:
-                    organization = Organization.objects.get(pk=location_id)
+                    organization = Organization.objects.get(pk=organization_id)
             else: # If the organization_id field is omitted from the merge instructions,
                 # fall back to the destination asset's organization (which may be None).
                 organization = destination_asset.organization
