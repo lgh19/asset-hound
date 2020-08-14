@@ -101,9 +101,12 @@ def handle_uploaded_file(f, mode):
             primary_raw_asset = primary_raw_asset_iterator[0]
 
             asset_id = row['asset_id']
-            destination_asset_iterator = Asset.objects.filter(id = asset_id)
-            assert len(destination_asset_iterator) == 1 # To ensure it exists in the database.
-            destination_asset = destination_asset_iterator[0]
+            if asset_id in ['', None]:
+                destination_asset = Asset()
+            else:
+                destination_asset_iterator = Asset.objects.filter(id = asset_id)
+                assert len(destination_asset_iterator) == 1 # To ensure there is exactly one in the database.
+                destination_asset = destination_asset_iterator[0]
 
             ids_to_merge = row['ids_to_merge']
             if ids_to_merge == '':
@@ -119,7 +122,7 @@ def handle_uploaded_file(f, mode):
                 location_id = row['location_id']
                 if location_id in ['', None, 'new']:
                     # Create a new Location instance to be populated.
-                    location = None
+                    location = None # Location creation happens below.
                 else:
                     location = Location.objects.get(pk=location_id)
             else: # If the location_id field is omitted from the merge instructions,
@@ -140,7 +143,7 @@ def handle_uploaded_file(f, mode):
                 organization_id = row['organization_id']
                 if organization_id in ['', None, 'new']:
                     # Create a new Organization instance to be populated.
-                    organization = None
+                    organization = None # Organization creation happens below.
                 else:
                     organization = Organization.objects.get(pk=organization_id)
             else: # If the organization_id field is omitted from the merge instructions,
