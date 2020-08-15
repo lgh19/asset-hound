@@ -332,4 +332,4 @@ class Asset(models.Model):
     def save(self, *args, **kwargs):
         if len(self.rawasset_set.all()) == 0: # Hide Assets that are
             self.do_not_display = True # not linked to by RawAssets.
-        super(Model, self).save(*args, **kwargs)
+        super(Asset, self).save(*args, **kwargs)
