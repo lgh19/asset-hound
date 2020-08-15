@@ -12,7 +12,7 @@ def to_dict_for_csv(asset: RawAsset):
         'id': asset.id,
         'name': asset.name,
         'asset_type': '|'.join([t.name for t in asset.asset_types.all()]),
-        'asset_id': asset.asset.id,
+        'asset_id': asset.asset.id if asset.asset is not None else None,
         'tags': '|'.join([t.name for t in asset.tags.all()]),
         'street_address': asset.street_address,
         'city': asset.city,
