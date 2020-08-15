@@ -328,3 +328,8 @@ class Asset(models.Model):
 
     def __str__(self):
         return self.name or '<MISSING NAME>'
+
+    def save(self, *args, **kwargs):
+        if len(self.rawasset_set.all()) == 0: # Hide Assets that are
+            self.do_not_display = True # not linked to by RawAssets.
+        super(Model, self).save(*args, **kwargs)
