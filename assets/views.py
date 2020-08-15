@@ -172,6 +172,7 @@ def handle_uploaded_file(f, mode):
                     break
                 try:
                     validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in new_values] # Change get to get_or_create to allow creation of new asset types.
+                    # It's better to require manual creation of new asset types for now since that encourages us to specify a Category (necessary for mapping).
                     if mode == 'update':
                         destination_asset.asset_types.set(validated_asset_types)
                 except AssetType.DoesNotExist:

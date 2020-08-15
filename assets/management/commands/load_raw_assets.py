@@ -36,10 +36,10 @@ class Command(BaseCommand):
 
         if len(args) == 0:
             print("Unable to load assets without knowing the source file. Try:")
-            print("   > python manage.py clear_and_add_by_asset [filename] [list of asset types]")
+            print("   > python manage.py load_raw_assets [filename] [list of asset types]")
             print("Here the list of asset types is optional. Without that list, this command")
             print("will default to iterating over all types in the source file, sequentially")
-            print("clearing and uploading them.")
+            print("uploading them (clearing them before uploading if override_clearing = False.")
             return
         else:
             file_name = os.path.join(settings.BASE_DIR, args[0])
@@ -111,7 +111,9 @@ class Command(BaseCommand):
                             else:
                                 asset_to_link_to = None
 
-
+                            # Since the next line uses get_or_create, it will create new asset types, without insisting that they
+                            # be manually entered (along with a Category). Without the Category, a dot representing this type
+                            # of assets will not appear on the map.
                             asset_types = [AssetType.objects.get_or_create(name=asset_type)[0] for asset_type in
                                            parse_cell(row['asset_type'])] if row['asset_type'] else []
 
