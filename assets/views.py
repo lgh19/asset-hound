@@ -1,4 +1,5 @@
 from rest_framework import viewsets, filters
+from rest_framework.renderers import JSONRenderer
 from rest_framework.pagination import LimitOffsetPagination
 
 from rest_framework.settings import api_settings
@@ -402,6 +403,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 class LocationViewSet(viewsets.ModelViewSet):
-    renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (CSVRenderer, )
+    # Note that this view is designed for easy access to the full model from a Python
+    # script, so it uses a full-model serializer and the Django REST Framework's
+    # default snake-case JSON renderer.
+    renderer_classes = (JSONRenderer, CSVRenderer)
     queryset = Location.objects.all()
     serializer_class = FullLocationSerializer
