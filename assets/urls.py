@@ -9,6 +9,7 @@ router = routers.DefaultRouter()
 router.register(r'assets', AssetViewSet)
 router.register(r'asset-types', AssetTypeViewSet)
 router.register(r'categories', CategoryViewSet)
+router.register(r'locations', LocationViewSet)
 
 urlpatterns = [ ]
 

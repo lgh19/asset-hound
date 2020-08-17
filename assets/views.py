@@ -6,7 +6,7 @@ from rest_framework_csv.renderers import CSVRenderer
 
 from assets.models import RawAsset, Asset, AssetType, Category, Tag, TargetPopulation, ProvidedService, Location, Organization
 from assets.serializers import AssetSerializer, AssetGeoJsonSerializer, AssetListSerializer, AssetTypeSerializer, \
-    CategorySerializer
+    CategorySerializer, LocationSerializer
 
 from assets.management.commands.util import parse_cell, standardize_phone
 
@@ -399,3 +399,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
     renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (CSVRenderer, )
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+class LocationViewSet(viewsets.ModelViewSet):
+    renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (CSVRenderer, )
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
