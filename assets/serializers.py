@@ -49,7 +49,7 @@ class FullLocationSerializer(GeoFeatureModelSerializer):
     class Meta:
         model = Location
         geo_field = 'geom'
-        fields = ['name', 'street_address', 'unit', 'unit_type', 'municipality', 'city', 'state', 'zip_code', 'parcel_id', 'residence', 'geocoding_properties', 'iffy_geocoding', 'available_transportation', 'parent_location', 'full_address']
+        fields = ['name', 'street_address', 'unit', 'unit_type', 'municipality', 'city', 'state', 'zip_code', 'parcel_id', 'residence', 'available_transportation', 'parent_location', 'latitude', 'longitude', 'geocoding_properties', 'iffy_geocoding', 'full_address']
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
