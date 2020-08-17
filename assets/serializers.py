@@ -43,6 +43,14 @@ class LocationSerializer(GeoFeatureModelSerializer):
         geo_field = 'geom'
         fields = ['name', 'available_transportation', 'parent_location', 'full_address']
 
+class FullLocationSerializer(GeoFeatureModelSerializer):
+    parent_location = RecursiveField()
+
+    class Meta:
+        model = Location
+        geo_field = 'geom'
+        fields = ['name', 'street_address', 'unit', 'unit_type', 'municipality', 'city', 'state', 'zip_code', 'parcel_id', 'residence', 'geocoding_properties', 'iffy_geocoding', 'available_transportation', 'parent_location', 'full_address']
+
 
 class OrganizationSerializer(serializers.ModelSerializer):
     location = LocationSerializer()
