@@ -2,7 +2,7 @@ from django.urls import re_path
 
 from rest_framework import routers
 
-from assets.views import AssetViewSet, AssetTypeViewSet, CategoryViewSet
+from assets.views import AssetViewSet, AssetTypeViewSet, CategoryViewSet, LocationViewSet
 
 # register DRF Views and ViewSets
 router = routers.DefaultRouter()
