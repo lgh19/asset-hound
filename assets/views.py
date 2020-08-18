@@ -26,7 +26,7 @@ def there_is_a_field_to_update(row, fields_to_check):
     created."""
     update_is_needed = False
     for field in fields_to_check:
-        if field in row and row['field'] not in ['', None]:
+        if field in row and row[field] not in ['', None]:
             return True
     return update_is_needed
 
