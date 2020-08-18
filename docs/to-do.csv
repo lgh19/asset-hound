@@ -9,6 +9,7 @@ Add a new map dot color for multi-type Assets (maybe to handle the 1500-Asset lo
 Implement solution to float precision issues on geocoordinates (probably switch to Decimal type),
 Design re-geocoding interface and worflow,
 Fix ~3500 assets geocoded by Pelias with centroids,
+Research taxonomies (e.g., https://www.census.gov/eos/www/naics/downloadables/downloadables.html),
 Mine https://www.alltheplaces.xyz/ for assets,
 Use Geomancer Prime to add parcel IDs to assets (for subsequent by-parcel clustering and deduplication),
 Assign and actually use parent locations,
