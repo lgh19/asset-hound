@@ -103,8 +103,10 @@ def handle_uploaded_file(f, mode):
 
             asset_id = row['asset_id']
             if asset_id in ['', None]:
+                created_new_asset = True
                 destination_asset = Asset()
             else:
+                created_new_asset = False
                 destination_asset_iterator = Asset.objects.filter(id = asset_id)
                 assert len(destination_asset_iterator) == 1 # To ensure there is exactly one in the database.
                 destination_asset = destination_asset_iterator[0]
@@ -335,10 +337,15 @@ def handle_uploaded_file(f, mode):
             if mode == 'update':
                 more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n")
                 more_results.append(f'&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://assets.wprdc.org/api/dev/assets/assets/{asset_id}/" target="_blank">Updated Asset</a>\n<hr>')
+                change_reason = f'Asset Updater: {"Creating new " if created_new_asset else "Updating "}Asset'
+                destination_asset._change_reason = change_reason
                 destination_asset.save()
+                location._change_reason = change_reason
                 location.save()
+                organization._change_reason = change_reason
                 organization.save()
                 for raw_asset in raw_assets:
+                    raw_asset._change_reason = f'Asset Updater: Linking to {"new " if created_new_asset else ""}Asset'
                     raw_asset.save()
             else:
                 more_results.append(f"\n<hr>")
