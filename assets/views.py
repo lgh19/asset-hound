@@ -135,6 +135,7 @@ def handle_uploaded_file(f, mode):
             # street address and parcel ID but slightly different geocoordinates.
             if location is None:
                 if there_is_a_field_to_update(row, ['street_address', 'municipality', 'city', 'state', 'zip_code', 'parcel_id', 'latitude', 'longitude']):
+                    more_results.append(f"Creating a new Location for this asset.")
                     location = Location()
                 elif there_is_a_field_to_update(row, ['residence', 'iffy_geocoding', 'unit', 'unit_type', 'available_transportation', 'geocoding_properties']):
                     more_results.append("There is not enough information to create a new location for this Asset, but there are fields in the merge-instructions file which need to be assigned to a Location. Does not compute! ABORTING!!!<hr>")
@@ -247,6 +248,7 @@ def handle_uploaded_file(f, mode):
                 #    more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;Since the organization has not been clearly identified by name or ID, the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
             else:
                 if organization is None:
+                    more_results.append(f"Creating a new Organization for this asset.")
                     organization = Organization() # Create new organization instance.
 
                 source_field_name = 'organization_name'
