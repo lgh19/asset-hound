@@ -171,7 +171,7 @@ def handle_uploaded_file(f, mode):
 
             source_field_name = 'asset_type'
             new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-            list_of_old_values = list_of(destination_asset.asset_types)
+            list_of_old_values = list_of(destination_asset.asset_types) if not created_new_asset else []
             if set(new_values) != set(list_of_old_values):
                 more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
                 if new_values == []:
@@ -189,7 +189,7 @@ def handle_uploaded_file(f, mode):
             source_field_name = 'tags'
             if source_field_name in row:
                 new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-                list_of_old_values = list_of(destination_asset.tags)
+                list_of_old_values = list_of(destination_asset.tags) if not created_new_asset else []
                 if set(new_values) != set(list_of_old_values):
                     more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
                     if mode == 'update':
@@ -202,7 +202,7 @@ def handle_uploaded_file(f, mode):
             source_field_name = 'services'
             if source_field_name in row:
                 new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-                list_of_old_values = list_of(destination_asset.services)
+                list_of_old_values = list_of(destination_asset.services) if not created_new_asset else []
                 if set(new_values) != set(list_of_old_values):
                     more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
                     if mode == 'update':
@@ -215,7 +215,7 @@ def handle_uploaded_file(f, mode):
             source_field_name = 'hard_to_count_population'
             if source_field_name in row:
                 new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-                list_of_old_values = list_of(destination_asset.hard_to_count_population)
+                list_of_old_values = list_of(destination_asset.hard_to_count_population) if not created_new_asset else []
                 if set(new_values) != set(list_of_old_values):
                     more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
                     if mode == 'update':
