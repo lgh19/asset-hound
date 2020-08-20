@@ -23,7 +23,7 @@ from assets.management.commands.util import parse_cell, get_localizability, bool
 from pprint import pprint
 
 
-def boolify(x): # This differs from the assets.management.commands.util versiion of boolify.
+def boolify(x): # This differs from the assets.management.commands.util version of boolify.
     if x.lower() in ['true', 't']:
         return True
     if x.lower() in ['false', 'f']:

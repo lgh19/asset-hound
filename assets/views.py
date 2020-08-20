@@ -105,7 +105,7 @@ def handle_uploaded_file(f, mode):
             if asset_id in ['', None]:
                 created_new_asset = True
                 destination_asset = Asset()
-                more_results.append("A new Asset {'would' if mode == 'validate' else 'will'} be created.")
+                more_results.append(f"A new Asset {'would' if mode == 'validate' else 'will'} be created.")
             else:
                 created_new_asset = False
                 destination_asset_iterator = Asset.objects.filter(id = asset_id)
