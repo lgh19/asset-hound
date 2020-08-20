@@ -348,10 +348,12 @@ def handle_uploaded_file(f, mode):
                 change_reason = f'Asset Updater: {"Creating new " if created_new_asset else "Updating "}Asset'
                 destination_asset._change_reason = change_reason
                 destination_asset.save()
-                location._change_reason = change_reason
-                location.save()
-                organization._change_reason = change_reason
-                organization.save()
+                if location is not None:
+                    location._change_reason = change_reason
+                    location.save()
+                if organization is not None:
+                    organization._change_reason = change_reason
+                    organization.save()
                 for raw_asset in raw_assets:
                     raw_asset._change_reason = f'Asset Updater: Linking to {"new " if created_new_asset else ""}Asset'
                     raw_asset.save()
