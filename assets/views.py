@@ -355,7 +355,7 @@ def handle_uploaded_file(f, mode):
                     organization._change_reason = change_reason
                     organization.save()
                 for raw_asset in raw_assets:
-                    raw_asset._change_reason = f'Asset Updater: Linking to {"new " if created_new_asset else ""}Asset'
+                    raw_asset._change_reason = 'Testing Asset Updater' #f'Asset Updater: Linking to {"new " if created_new_asset else ""}Asset'
                     raw_asset.save()
             else:
                 more_results.append(f"\n<hr>")
