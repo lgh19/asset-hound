@@ -168,7 +168,7 @@ def handle_uploaded_file(f, mode):
             asset_name = row['name']
             if asset_name != destination_asset.name:
                 more_results.append(f"asset_name {'will be ' if mode == 'validate' else ''}changed from {destination_asset.name} to {asset_name}.")
-                destination_asset.asset_name = asset_name
+                destination_asset.name = asset_name
 
             # Oddball legacy conversion to be deleted:
             source_field_name = 'accessibility_features'
