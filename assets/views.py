@@ -170,62 +170,6 @@ def handle_uploaded_file(f, mode):
                 more_results.append(f"asset_name {'will be ' if mode == 'validate' else ''}changed from {destination_asset.name} to {asset_name}.")
                 destination_asset.asset_name = asset_name
 
-            source_field_name = 'asset_type'
-            new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-            list_of_old_values = list_of(destination_asset.asset_types) if not created_new_asset else []
-            if set(new_values) != set(list_of_old_values):
-                more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                if new_values == []:
-                    more_results.append(f"asset_type can not be empty\n ABORTING!!!\n<hr>")
-                    break
-                try:
-                    validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in new_values] # Change get to get_or_create to allow creation of new asset types.
-                    # It's better to require manual creation of new asset types for now since that encourages us to specify a Category (necessary for mapping).
-                    if mode == 'update':
-                        destination_asset.asset_types.set(validated_asset_types)
-                except AssetType.DoesNotExist:
-                    more_results.append(f"Unable to find one of these asset types: {new_values}.\n ABORTING!!!\n<hr>")
-                    break
-
-            source_field_name = 'tags'
-            if source_field_name in row:
-                new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-                list_of_old_values = list_of(destination_asset.tags) if not created_new_asset else []
-                if set(new_values) != set(list_of_old_values):
-                    more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                    if mode == 'update':
-                        if new_values == []:
-                            destination_asset.tags.clear()
-                        else:
-                            validated_values = [Tag.objects.get_or_create(name=value)[0] for value in new_values]
-                            destination_asset.tags.set(validated_values)
-
-            source_field_name = 'services'
-            if source_field_name in row:
-                new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-                list_of_old_values = list_of(destination_asset.services) if not created_new_asset else []
-                if set(new_values) != set(list_of_old_values):
-                    more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                    if mode == 'update':
-                        if new_values == []:
-                            destination_asset.services.clear()
-                        else:
-                            validated_values = [ProvidedService.objects.get_or_create(name=value)[0] for value in new_values]
-                            destination_asset.services.set(validated_values)
-
-            source_field_name = 'hard_to_count_population'
-            if source_field_name in row:
-                new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-                list_of_old_values = list_of(destination_asset.hard_to_count_population) if not created_new_asset else []
-                if set(new_values) != set(list_of_old_values):
-                    more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                    if mode == 'update':
-                        if new_values == []:
-                            destination_asset.hard_to_count_population.clear()
-                        else:
-                            validated_values = [TargetPopulation.objects.get_or_create(name=value)[0] for value in new_values]
-                            destination_asset.hard_to_count_population.set(validated_values)
-
             # Oddball legacy conversion to be deleted:
             source_field_name = 'accessibility_features'
             if source_field_name in row:
@@ -334,6 +278,69 @@ def handle_uploaded_file(f, mode):
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'sensitive', field_type=bool)
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'localizability', field_type=str)
             destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'etl_notes', field_type=str)
+
+            # Unfortunately the many-to-many relations that follow can not be set on an Asset until it has been saved,
+            # so for cases where created_new_asset == True, we have to save the Asset once at this point so it has an
+            # id value.
+            if created_new_asset and mode == 'update':
+                destination_asset._change_reason = "Asset Updater: Initial save of Asset to allow many-to-many relationships"
+                destination_asset.save()
+
+            source_field_name = 'asset_type'
+            new_values = eliminate_empty_strings(row[source_field_name].split('|'))
+            list_of_old_values = list_of(destination_asset.asset_types) if not created_new_asset else []
+            if set(new_values) != set(list_of_old_values):
+                more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
+                if new_values == []:
+                    more_results.append(f"asset_type can not be empty\n ABORTING!!!\n<hr>")
+                    break
+                try:
+                    validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in new_values] # Change get to get_or_create to allow creation of new asset types.
+                    # It's better to require manual creation of new asset types for now since that encourages us to specify a Category (necessary for mapping).
+                    if mode == 'update':
+                        destination_asset.asset_types.set(validated_asset_types)
+                except AssetType.DoesNotExist:
+                    more_results.append(f"Unable to find one of these asset types: {new_values}.\n ABORTING!!!\n<hr>")
+                    break
+
+            source_field_name = 'tags'
+            if source_field_name in row:
+                new_values = eliminate_empty_strings(row[source_field_name].split('|'))
+                list_of_old_values = list_of(destination_asset.tags) if not created_new_asset else []
+                if set(new_values) != set(list_of_old_values):
+                    more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
+                    if mode == 'update':
+                        if new_values == []:
+                            destination_asset.tags.clear()
+                        else:
+                            validated_values = [Tag.objects.get_or_create(name=value)[0] for value in new_values]
+                            destination_asset.tags.set(validated_values)
+
+            source_field_name = 'services'
+            if source_field_name in row:
+                new_values = eliminate_empty_strings(row[source_field_name].split('|'))
+                list_of_old_values = list_of(destination_asset.services) if not created_new_asset else []
+                if set(new_values) != set(list_of_old_values):
+                    more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
+                    if mode == 'update':
+                        if new_values == []:
+                            destination_asset.services.clear()
+                        else:
+                            validated_values = [ProvidedService.objects.get_or_create(name=value)[0] for value in new_values]
+                            destination_asset.services.set(validated_values)
+
+            source_field_name = 'hard_to_count_population'
+            if source_field_name in row:
+                new_values = eliminate_empty_strings(row[source_field_name].split('|'))
+                list_of_old_values = list_of(destination_asset.hard_to_count_population) if not created_new_asset else []
+                if set(new_values) != set(list_of_old_values):
+                    more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
+                    if mode == 'update':
+                        if new_values == []:
+                            destination_asset.hard_to_count_population.clear()
+                        else:
+                            validated_values = [TargetPopulation.objects.get_or_create(name=value)[0] for value in new_values]
+                            destination_asset.hard_to_count_population.set(validated_values)
 
             if mode == 'update':
                 more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n")
