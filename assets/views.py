@@ -359,6 +359,8 @@ def handle_uploaded_file(f, mode):
                 if location is not None:
                     location._change_reason = change_reason
                     location.save()
+                destination_asset.location = location
+                destination_asset.organization = organization
                 destination_asset._change_reason = change_reason
                 destination_asset.save()
             else:
