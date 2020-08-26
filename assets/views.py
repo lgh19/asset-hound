@@ -359,6 +359,7 @@ def handle_uploaded_file(f, mode):
                 if location is not None:
                     location._change_reason = change_reason
                     location.save()
+                    more_results.append(f'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://assets.wprdc.org/api/dev/assets/locations/{location.id}/" target="_blank">Linked Location</a>\n<hr>')
                 destination_asset.location = location
                 destination_asset.organization = organization
                 destination_asset._change_reason = change_reason
