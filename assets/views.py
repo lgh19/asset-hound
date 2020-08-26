@@ -347,7 +347,7 @@ def handle_uploaded_file(f, mode):
 
             if mode == 'update':
                 more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n")
-                more_results.append(f'&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://assets.wprdc.org/api/dev/assets/assets/{destination_asset.id}/" target="_blank">Updated Asset</a>\n<hr>')
+                more_results.append(f'&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://assets.wprdc.org/api/dev/assets/assets/{destination_asset.id}/" target="_blank">Updated Asset</a>\n')
                 change_reason = f'Asset Updater: {"Creating new " if created_new_asset else "Updating "}Asset'
                 for raw_asset in raw_assets: # RawAssets must be saved first because Assets need at least one
                     # linked RawAsset or else it will automatically have do_not_display set to True.
