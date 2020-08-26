@@ -111,6 +111,7 @@ class AssetSerializer(serializers.ModelSerializer):
             'services',
             'open_to_public',
             'hard_to_count_population',
+            'do_not_display',
             'sensitive',
             'date_entered',
             'last_updated',
