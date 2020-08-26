@@ -97,7 +97,7 @@ class Location(models.Model):
     def save(self, *args, **kwargs):
         """ When the model is saved, add geom and name (if needed). """
         if not self.pk or self.name == 'None, None None None':
-            if self.street_address not in [None '']:
+            if self.street_address not in [None, '']:
                 parts = [self.street_address] # The next few lines are just full_address.
                 if self.unit not in [None, ''] or self.unit_type not in [None, '']:
                     parts.append('{self.unit or ""} {self.unit_type or ""}')
