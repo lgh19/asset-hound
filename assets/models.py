@@ -86,9 +86,9 @@ class Location(models.Model):
     def full_address(self):
         if self.street_address:
             parts = [self.street_address]
-            if self.unit is not None or self.unit_type is not None:
+            if self.unit not in [None, ''] or self.unit_type not in [None, '']:
                 parts.append('{self.unit or ""} {self.unit_type or ""}')
-            if self.municipality is not None:
+            if self.municipality not in [None, '']:
                 parts.append(self.municipality)
             parts.append(f'{self.city or ""}, {self.state or ""} {self.zip_code or ""}')
             return ', '.join(parts)
@@ -97,8 +97,15 @@ class Location(models.Model):
     def save(self, *args, **kwargs):
         """ When the model is saved, add geom and name (if needed). """
         if not self.pk or self.name == 'None, None None None':
-            if self.street_address is not None:
-                return self.full_address()
+            if self.street_address not in [None '']:
+                parts = [self.street_address] # The next few lines are just full_address.
+                if self.unit not in [None, ''] or self.unit_type not in [None, '']:
+                    parts.append('{self.unit or ""} {self.unit_type or ""}')
+                if self.municipality not in [None, '']:
+                    parts.append(self.municipality)
+                parts.append(f'{self.city or ""}, {self.state or ""} {self.zip_code or ""}')
+                self.name = ', '.join(parts)
+
                 # Note that using parcel_id is not good for two reasons: 1) It's not very
                 # human-readable. 2) It's sometimes LESS precise than street address since
                 # many house numbers may be included in one giant parcel.
