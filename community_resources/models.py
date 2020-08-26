@@ -148,7 +148,7 @@ class Community(models.Model, WithNameSlug):
 
     @property
     def resource_categories(self):
-        return ResourceCategory.objects.filter(resources__in=self.resources.all()).distinct()
+        return ResourceCategory.objects.all()
 
     class Meta:
         verbose_name_plural = 'Communities'
