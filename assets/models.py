@@ -85,14 +85,20 @@ class Location(models.Model):
     @property
     def full_address(self):
         if self.street_address:
-            return f'{self.street_address or ""}, {self.unit or ""} {self.unit_type or ""}, {self.city or ""}, {self.state or ""} {self.zip_code or ""}'
+            parts = [self.street_address]
+            if self.unit is not None or self.unit_type is not None:
+                parts.append('{self.unit or ""} {self.unit_type or ""}')
+            if self.municipality is not None:
+                parts.append(self.municipality)
+            parts.append(f'{self.city or ""}, {self.state or ""} {self.zip_code or ""}')
+            return ', '.join(parts)
         return ""
 
     def save(self, *args, **kwargs):
-        """ When the model is saved, attempt to geocode it based on address """
+        """ When the model is saved, add geom and name (if needed). """
         if not self.pk or self.name == 'None, None None None':
             if self.street_address is not None:
-                self.name = f'{self.street_address}, {self.unit or ""} {self.unit_type or ""}, {self.city}, {self.state} {self.zip_code}'
+                return self.full_address()
                 # Note that using parcel_id is not good for two reasons: 1) It's not very
                 # human-readable. 2) It's sometimes LESS precise than street address since
                 # many house numbers may be included in one giant parcel.
