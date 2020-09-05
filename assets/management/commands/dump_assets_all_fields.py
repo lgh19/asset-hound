@@ -46,8 +46,8 @@ def to_dict_for_csv(asset: Asset):
         'do_not_display': asset.do_not_display,
         'services': '|'.join([s.name for s in asset.services.all()]),
         'hard_to_count_population': '|'.join([p.name for p in asset.hard_to_count_population.all()]),
-        'data_source_name': asset.data_source.name,
-        'data_source_url': asset.data_source.url,
+        'data_source_names': '|'.join([str(r.data_source.name) for r in asset.rawasset_set.all()]), # Another field that differs from the RawAsset dump.
+        'data_source_urls': '|'.join([str(r.data_source.url) for r in asset.rawasset_set.all()]), # Another field that differs from the RawAsset dump.
         'organization_name': asset.organization.name if asset.organization is not None else '',
         'organization_phone': asset.organization.phone if asset.organization is not None else '',
         'organization_email': asset.organization.email if asset.organization is not None else '',
@@ -131,8 +131,8 @@ class Command(BaseCommand):
                  'localizability',
                  'services',
                  'hard_to_count_population',
-                 'data_source_name',
-                 'data_source_url',
+                 'data_source_names',
+                 'data_source_urls',
                  'organization_name',
                  'organization_phone',
                  'organization_email',
