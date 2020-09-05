@@ -176,7 +176,7 @@ class BaseAsset(models.Model):
     # category = models.ManyToManyField('Category')
     services = models.ManyToManyField('ProvidedService', blank=True)
     hard_to_count_population = models.ManyToManyField('TargetPopulation', blank=True)
-    data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True)
+    #data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True) # [ ] Move to RawAsset. # &MIGRATE
 
     tags = models.ManyToManyField('Tag', blank=True)
     etl_notes = models.TextField(null=True, blank=True)  # notes from Rocket
@@ -255,6 +255,8 @@ class RawAsset(BaseAsset):
     organization_phone = PhoneNumberField(null=True, blank=True)
 
     # END flattened Organization
+    data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True)
+
     raw_asset_notes = models.TextField(max_length=1000, null=True, blank=True)  # This is named
     # to distinguish it from the Asset-level notes field, which should not be produced by merging # these RawAsset-level notes.
 
