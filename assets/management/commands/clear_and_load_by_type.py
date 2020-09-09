@@ -110,6 +110,7 @@ def get_location_by_keys(row, keys):
         return locations[0], True
     # Otherwise pick the one with the largest id value, which is the first
     # one because of the order_by('-id') part of the query.
+    print(f"Found {len(locations)}. Returning the one with the highest ID.")
     return locations[0], True
 
 
