@@ -109,39 +109,34 @@ def update_or_create_location(row):
     # Try to find a pre-existing record by keys. Otherwise create it.
     # Any other fields should be used to fill in gaps and (maybe someday used in clever updating).
 
-    keys = ['parcel_id']
     location_created = False
-    location, location_obtained = get_location_by_keys(row, ['parcel_id'])
+    keys = ['street_address', 'city', 'state', 'zip_code']
+    location, location_obtained = get_location_by_keys(row, keys)
+
     if location_obtained:
         effective_keys = list(keys)
     else:
-        keys = ['street_address', 'city', 'state', 'zip_code']
+        keys = ['latitude', 'longitude']
         location, location_obtained = get_location_by_keys(row, keys)
 
         if location_obtained:
             effective_keys = list(keys)
-        else:
-            keys = ['latitude', 'longitude']
-            location, location_obtained = get_location_by_keys(row, keys)
-
-            if location_obtained:
-                effective_keys = list(keys)
-            else: # Create a location instance.
-                kwargs = {}
-                kwargs['street_address'] = non_blank_value_or_none(row, 'street_address')
-                kwargs['city'] = non_blank_value_or_none(row, 'city')
-                kwargs['state'] = non_blank_value_or_none(row, 'state')
-                kwargs['zip_code'] = non_blank_value_or_none(row, 'zip_code')
-                kwargs['available_transportation'] = non_blank_value_or_none(row, 'location_transportation')
-                kwargs['latitude'] = non_blank_type_or_none(row, 'latitude', float)
-                kwargs['longitude'] = non_blank_type_or_none(row, 'longitude', float)
-                kwargs['residence'] = boolify(non_blank_value_or_none(row, 'residence'))
-                kwargs['geocoding_properties'] = non_blank_value_or_none(row, 'geocoding_properties')
-                kwargs['parcel_id'] = non_blank_value_or_none(row, 'parcel_id')
-                location = Location(**kwargs)
-                location.save()
-                location_obtained = True
-                location_created = True
+        else: # Create a location instance.
+            kwargs = {}
+            kwargs['street_address'] = non_blank_value_or_none(row, 'street_address')
+            kwargs['city'] = non_blank_value_or_none(row, 'city')
+            kwargs['state'] = non_blank_value_or_none(row, 'state')
+            kwargs['zip_code'] = non_blank_value_or_none(row, 'zip_code')
+            kwargs['available_transportation'] = non_blank_value_or_none(row, 'location_transportation')
+            kwargs['latitude'] = non_blank_type_or_none(row, 'latitude', float)
+            kwargs['longitude'] = non_blank_type_or_none(row, 'longitude', float)
+            kwargs['residence'] = boolify(non_blank_value_or_none(row, 'residence'))
+            kwargs['geocoding_properties'] = non_blank_value_or_none(row, 'geocoding_properties')
+            kwargs['parcel_id'] = non_blank_value_or_none(row, 'parcel_id')
+            location = Location(**kwargs)
+            location.save()
+            location_obtained = True
+            location_created = True
 
     assert location_obtained
 
