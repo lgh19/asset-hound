@@ -61,7 +61,15 @@ def get_location_by_keys(row, keys):
     kwargs = {}
     for key in keys:
         assert key not in ['residence']
-        kwargs[key] = non_blank_value_or_none(row, key)
+        actual_key = key.split('__')[0]
+        if key == 'zip_code__startswith':
+            full_zip_code = non_blank_value_or_none(row, actual_key)
+            if full_zip_code is not None:
+                kwargs[key] = full_zip_code[:5]
+        else:
+            value = non_blank_value_or_none(row, actual_key)
+            if value is not None:
+                kwargs[key] = value
 
     #  [ ] Where is boolify used on residence?
     #  Do I need to do something like this?
@@ -76,7 +84,7 @@ def get_location_by_keys(row, keys):
     # If all values are None, return None, False
     if all([v is None for v in kwargs.values()]):
         return None, False
-    if any([v is None for v in kwargs.values()]):
+    if any([v is None for v in kwargs.values()]): # This should no longer trigger based on the above reworking (e.g., "if value is not None").
         print(f"There are some null values in this query: {kwargs}.")
 
     if 'latitude' not in keys and 'longitude' not in keys:
@@ -110,7 +118,8 @@ def update_or_create_location(row):
     # Any other fields should be used to fill in gaps and (maybe someday used in clever updating).
 
     location_created = False
-    keys = ['street_address', 'city', 'state', 'zip_code']
+    keys = ['street_address__iexact', 'city__iexact', 'state__iexact', 'zip_code__startswith']
+    # Sneak better querying in through the keys.
     location, location_obtained = get_location_by_keys(row, keys)
 
     if location_obtained:
