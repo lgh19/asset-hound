@@ -81,7 +81,8 @@ class Command(BaseCommand):
             # Try to find a matching extant location
             keys = ['street_address__iexact', 'city__iexact', 'state__iexact', 'zip_code__startswith']
             location, location_obtained = get_location_by_keys(row, keys)
-            if not location_obtained: # If none comes up, create a new one.
+            if not location_obtained: # If none comes up, create a new one. # But shouldn't one always come up?
+                raise ValueError("This shouldn't ever happen since the existing Location should always be findable.")
                 kwargs = row
                 if 'street_address' in row and row['street_address'] not in [None, '']:
                     full_address = form_full_address(row)
@@ -98,6 +99,16 @@ class Command(BaseCommand):
                     location_created = True
 
             if location_obtained:
+                if 'street_address' in row and row['street_address'] not in [None, '']:
+                    full_address = form_full_address(row)
+                    latitude, longitude = geocode_address(full_address)
+                    # Try to geocode with Geocod.io
+                    kwargs['latitude'] = latitude
+                    kwargs['longitude'] = longitude
+                    kwargs['geocoding_properties'] = 'Geocoded by Geocodio'
+                    location._change_reason = 'Regenerating locations (bad initial Location assignment)'
+                    if not dry_run:
+                        location.save()
                 asset.location = location
                 asset._change_reason = 'Regenerating locations (bad initial Location assignment)'
                 if not dry_run:
