@@ -46,12 +46,14 @@ class Command(BaseCommand):
         parser.add_argument('args', nargs='*')
 
     def handle(self, *args, **options):
-        dry_run = True ############ [ ] Remove
+        dry_run = False
         if len(args) != 1:
             raise ValueError("This script accepts exactly one command-line argument, which should be a valid Location ID.")
         overloaded_location = Location.objects.get(pk=args[0])
+        total = len(overloaded_location.asset_set.all())
+        print(f"Attempting to generate better Locations for {total} Assets.")
 
-        locations_handled = 0
+        assets_handled = 0
         for asset in overloaded_location.asset_set.all():
             raw_assets = list(asset.rawasset_set.all())
             if len(raw_assets) == 0:
@@ -90,15 +92,16 @@ class Command(BaseCommand):
                     kwargs['geocoding_properties'] = 'Geocoded by Geocodio'
                     location = Location(**kwargs)
                     location._change_reason = 'Regenerating locations (bad initial Location assignment)'
-                    if not dry_run: ################# [ ] Remove
+                    if not dry_run:
                         location.save()
                     location_obtained = True
                     location_created = True
 
-            if not dry_run and location_obtained: ############## [ ] Remove
+            if location_obtained:
                 asset.location = location
                 asset._change_reason = 'Regenerating locations (bad initial Location assignment)'
-                asset.save()
-                locations_handled += 1
+                if not dry_run:
+                    asset.save()
+                assets_handled += 1
 
-        print(f"Handled {locations_handled} asset locations. (Some may have been pre-existing.)")
+        print(f"Handled {assets_handled}/{total} asset locations. (Some may have been pre-existing.)")
