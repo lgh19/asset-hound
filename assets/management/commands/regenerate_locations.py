@@ -86,8 +86,8 @@ class Command(BaseCommand):
                 kwargs = row
                 if 'street_address' in row and row['street_address'] not in [None, '']:
                     full_address = form_full_address(row)
-                    latitude, longitude = geocode_address(full_address)
                     # Try to geocode with Geocod.io
+                    latitude, longitude = geocode_address(full_address)
                     kwargs['latitude'] = latitude
                     kwargs['longitude'] = longitude
                     kwargs['geocoding_properties'] = 'Geocoded by Geocodio'
@@ -101,11 +101,13 @@ class Command(BaseCommand):
             if location_obtained:
                 if 'street_address' in row and row['street_address'] not in [None, '']:
                     full_address = form_full_address(row)
-                    latitude, longitude = geocode_address(full_address)
                     # Try to geocode with Geocod.io
-                    kwargs['latitude'] = latitude
-                    kwargs['longitude'] = longitude
-                    kwargs['geocoding_properties'] = 'Geocoded by Geocodio'
+                    latitude, longitude = geocode_address(full_address)
+                    if latitude is None:
+                        print(f"Geocoordinates for Location ID {location.id} are being set to (None, None).")
+                    location.latitude = latitude
+                    location.longitude = longitude
+                    location.geocoding_properties = 'Geocoded by Geocodio'
                     location._change_reason = 'Regenerating locations (bad initial Location assignment)'
                     if not dry_run:
                         location.save()
