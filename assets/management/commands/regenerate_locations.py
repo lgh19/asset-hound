@@ -68,17 +68,18 @@ class Command(BaseCommand):
                     #'municipality' = raw_asset.municipality, # not yet supported
                     'city': raw_asset.city,
                     'state': raw_asset.state,
-                    'zip_code': raw_assets.zip_code,
-                    'available_transportation': non_blank_value_or_none(row, 'location_transportation'),
-                    'latitude': non_blank_type_or_none(row, 'latitude', float),
-                    'longitude': non_blank_type_or_none(row, 'longitude', float),
-                    'residence': boolify(non_blank_value_or_none(row, 'residence')),
-                    'geocoding_properties': non_blank_value_or_none(row, 'geocoding_properties'),
-                    'parcel_id': non_blank_value_or_none(row, 'parcel_id'),
+                    'zip_code': raw_asset.zip_code,
+                    'available_transportation': raw_asset.available_transportation,
+                    'latitude': raw_asset.latitude,
+                    'longitude': raw_asset.longitude,
+                    'residence': raw_asset.residence,
+                    'geocoding_properties': raw_asset.geocoding_properties,
+                    'parcel_id': raw_asset.parcel_id,
+                    }
             # Try to find a matching extant location
             keys = ['street_address__iexact', 'city__iexact', 'state__iexact', 'zip_code__startswith']
             location, location_obtained = get_location_by_keys(row, keys)
-            if not location.obtained: # If none comes up, create a new one.
+            if not location_obtained: # If none comes up, create a new one.
                 kwargs = row
                 if 'street_address' in row and row['street_address'] not in [None, '']:
                     full_address = form_full_address(row)
