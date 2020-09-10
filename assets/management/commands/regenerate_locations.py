@@ -109,7 +109,10 @@ class Command(BaseCommand):
                             print(f"Geocoordinates for Location ID {location.id} are being set to (None, None).")
                         location.latitude = latitude
                         location.longitude = longitude
-                        location.geocoding_properties = 'Geocoded by Geocodio'
+                        if latitude is None:
+                            location.geocoding_properties = 'Unsuccessfully geocoded by Geocodio'
+                        else:
+                            location.geocoding_properties = 'Geocoded by Geocodio'
                         location._change_reason = 'Regenerating locations (bad initial Location assignment)'
                         if not dry_run:
                             location.save()
