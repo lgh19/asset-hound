@@ -99,18 +99,20 @@ class Command(BaseCommand):
                     location_created = True
 
             if location_obtained:
-                if 'street_address' in row and row['street_address'] not in [None, '']:
-                    full_address = form_full_address(row)
-                    # Try to geocode with Geocod.io
-                    latitude, longitude = geocode_address(full_address)
-                    if latitude is None:
-                        print(f"Geocoordinates for Location ID {location.id} are being set to (None, None).")
-                    location.latitude = latitude
-                    location.longitude = longitude
-                    location.geocoding_properties = 'Geocoded by Geocodio'
-                    location._change_reason = 'Regenerating locations (bad initial Location assignment)'
-                    if not dry_run:
-                        location.save()
+                if location.latitude is None or "'confidence'" in location.geocoding_properties: # That is, if it's a Pelias geocoding (and therefore questionable).
+                # If polygon boundaries are added to the Location model, a check for those should also possibly be added here.
+                    if 'street_address' in row and row['street_address'] not in [None, '']:
+                        full_address = form_full_address(row)
+                        # Try to geocode with Geocod.io
+                        latitude, longitude = geocode_address(full_address)
+                        if latitude is None:
+                            print(f"Geocoordinates for Location ID {location.id} are being set to (None, None).")
+                        location.latitude = latitude
+                        location.longitude = longitude
+                        location.geocoding_properties = 'Geocoded by Geocodio'
+                        location._change_reason = 'Regenerating locations (bad initial Location assignment)'
+                        if not dry_run:
+                            location.save()
                 asset.location = location
                 asset._change_reason = 'Regenerating locations (bad initial Location assignment)'
                 if not dry_run:
