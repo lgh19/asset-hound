@@ -99,23 +99,35 @@ def split_location(location_id, dry_run):
                 location_obtained = True
 
         if not location_obtained: # If none comes up, create a new one. # But shouldn't one always come up?
-            # This can happen if (for instance), there's no street address but somehow Pelias came up
-            # with some coordinates anyhow?
-            raise ValueError("This shouldn't ever happen since the existing Location should always be findable.")
-            kwargs = row
-            if 'street_address' in row and row['street_address'] not in [None, '']:
-                full_address = form_full_address(row)
-                # Try to geocode with Geocod.io
-                latitude, longitude = geocode_address(full_address)
-                kwargs['latitude'] = latitude
-                kwargs['longitude'] = longitude
-                kwargs['geocoding_properties'] = 'Geocoded by Geocodio'
-                location = Location(**kwargs)
-                location._change_reason = 'Regenerating locations (bad initial Location assignment)'
-                if not dry_run:
-                    location.save()
-                location_obtained = True
-                location_created = True
+            print("This shouldn't ever happen since the existing Location should always be findable (but it does happen).")
+            # Example of when this can happen:
+            #    I don't know why, but this fails
+            #    >> get_location_by_keys({'street_address__iexact': '1501 Buena Vista  Road'}, ['street_address__iexact'])
+            #    (None, False)
+
+            #    while this succeeds:
+            #    >>> get_location_by_keys({'street_address': '1501 Buena Vista  Road'}, ['street_address'])
+            #    (<Location: 1501 Buena Vista  Road Pittsburgh, PA >, True)
+
+            # In this instance, just try falling back to the original location.
+            assert total == 1
+            location = overloaded_location
+            location_obtained = True
+
+            #kwargs = row
+            #if 'street_address' in row and row['street_address'] not in [None, '']:
+            #    full_address = form_full_address(row)
+            #    # Try to geocode with Geocod.io
+            #    latitude, longitude = geocode_address(full_address)
+            #    kwargs['latitude'] = latitude
+            #    kwargs['longitude'] = longitude
+            #    kwargs['geocoding_properties'] = 'Geocoded by Geocodio'
+            #    location = Location(**kwargs)
+            #    location._change_reason = 'Regenerating locations (bad initial Location assignment)'
+            #    if not dry_run:
+            #        location.save()
+            #    location_obtained = True
+            #    location_created = True
 
         if location_obtained:
             if location is not None:
