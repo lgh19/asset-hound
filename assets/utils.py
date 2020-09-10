@@ -49,6 +49,17 @@ def distance(lat1, long1, lat2, long2):
     # in your favorite set of units to get length.
     return R*arc
 
+def geocode_address_with_geomancer(address):
+    url = "https://tools.wprdc.org/geo/geocode?addr={}".format(address)
+    r = requests.get(url)
+    result = r.json()
+    time.sleep(0.1)
+    if result['data']['status'] == "OK":
+        longitude, latitude = result['data']['geom']['coordinates']
+        return longitude, latitude
+    print("Unable to geocode {}, failing with status code {}.".format(address, result['data']['status']))
+    return None, None
+
 def geocode_address(address):
     """ Takes a string address and attempts to geocode it using a remote geocoder
 
