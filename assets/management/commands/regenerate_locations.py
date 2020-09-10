@@ -101,7 +101,7 @@ def split_location(location_id, dry_run):
                 location_obtained = True
 
         if not location_obtained: # If none comes up, create a new one. # But shouldn't one always come up?
-            print("This shouldn't ever happen since the existing Location should always be findable (but it does happen).")
+            print("This can happen since the address in the existing Location can deviate from that in the RawAsset due to editing.")
             # Example of when this can happen:
             #    I don't know why, but this fails
             #    >> get_location_by_keys({'street_address__iexact': '1501 Buena Vista  Road'}, ['street_address__iexact'])
@@ -112,13 +112,18 @@ def split_location(location_id, dry_run):
             #    (<Location: 1501 Buena Vista  Road Pittsburgh, PA >, True)
 
             # In this instance, just try falling back to the original location.
-            if total == 1:
-                location = overloaded_location
-                location_obtained = True
-            else: # However, sometimes there are more, so this should work:
-                keys = ['street_address', 'city__iexact', 'state__iexact', 'zip_code__startswith']
-                location, location_obtained = get_location_by_keys(row, keys)
-                assert location_obtained
+            if total > 1:
+                print(f"  Check whether the Assets at location ID {location_id} should really be together (which is what is being assumed here because it looks like some hand-editing has occurred).")
+            location = overloaded_location
+            location_obtained = True
+            # This can happen when the address information in the RawAsset has been edited
+            # to get the address information in the Location.
+            # Basically this is where consistent address standardization would be a big help.
+
+            #else: # However, sometimes there are more, so this should work:
+            #    keys = ['street_address', 'city__iexact', 'state__iexact', 'zip_code__startswith']
+            #    location, location_obtained = get_location_by_keys(row, keys)
+            #    assert location_obtained
 
 
             #kwargs = row
