@@ -120,6 +120,7 @@ def split_location(location_id):
             assets_handled += 1
 
     print(f"Handled {assets_handled}/{total} asset locations. (Some may have been pre-existing.)")
+    return assets_handled
 
 class Command(BaseCommand):
     help = """For a given location_id, find all the linked Assets, pull their RawAssets and attempt to
