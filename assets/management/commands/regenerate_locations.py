@@ -92,10 +92,10 @@ def split_location(location_id, dry_run):
                 print(row)
                 assert "'confidence'" in row['geocoding_properties']
                 assert row['street_address'] is None
-                assert row['city'] is None
-                assert row['state'] is None
-                assert row['zip_code'] is None
-                # This is just a RawAsset that has no valid location information. Therefore we should set location = None.
+                #assert row['city'] is None
+                #assert row['state'] is None
+                #assert row['zip_code'] is None
+                # This is just a RawAsset that has insufficient valid location information. Therefore we should set location = None.
                 # (This is kind of a fix for an assignment that never should have happened in the first place.)
                 location = None
                 location_obtained = True
