@@ -26,7 +26,8 @@ from assets.utils import geocode_address # This uses Geocod.io
 
 def regeocode(location_id, dry_run):
     location = Location.objects.get(pk=location_id)
-    total = len(overloaded_location.asset_set.all())
+    total = len(location.asset_set.all())
+    print(f"The location has name '{location.name}', street_address '{location.street_address}', and {total} linked Assets.")
 
     if location.street_address not in [None, '']:
         
