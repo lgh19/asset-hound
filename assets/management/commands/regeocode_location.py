@@ -20,9 +20,22 @@ csv.field_size_limit(sys.maxsize)  # looks like this:
 
 from assets.management.commands.util import parse_cell
 from assets.management.commands.clear_and_load_by_type import get_location_by_keys, update_or_create_location
-from assets.management.commands.regenerate_locations import form_full_address
 from assets.utils import geocode_address # This uses Geocod.io
 # _csv.Error: field larger than field limit (131072)
+
+def form_full_address_from_location(location):
+    maybe_malformed = False
+    if location.city not in ['', None]:
+        city = location.city
+    else:
+        city = location.municipality
+
+    if location.state not in ['', None]:
+        state = location.state
+    else:
+        state = 'PA'
+
+    return "{}, {}, {} {}".format(location.street_address, city, state, location.zip_code)
 
 def regeocode(location_id, dry_run):
     location = Location.objects.get(pk=location_id)
@@ -31,7 +44,7 @@ def regeocode(location_id, dry_run):
 
     if location.street_address not in [None, '']:
         
-        full_address = form_full_address(row)
+        full_address = form_full_address_from_location(location)
         # Try to geocode with Geocod.io/Geomancer
         latitude, longitude, properties = geocode_address(full_address)
         if latitude is None:
