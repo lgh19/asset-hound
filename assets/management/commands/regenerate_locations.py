@@ -38,7 +38,7 @@ def form_full_address(row):
 
     return "{}, {}, {} {}".format(row['street_address'], city, state, row['zip_code'])
 
-def split_location(location_id):
+def split_location(location_id, dry_run):
     """Split the Location with ID location_id, by finding all the associated Assets,
     pulling their correct address information from the RawAsset (assuming there's
     just 1), and finding or generating a suitable new location to link to and
@@ -133,4 +133,4 @@ class Command(BaseCommand):
         dry_run = False
         if len(args) != 1:
             raise ValueError("This script accepts exactly one command-line argument, which should be a valid Location ID.")
-        split_location(args[0])
+        split_location(args[0], dry_run)

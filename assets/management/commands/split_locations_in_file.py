@@ -35,5 +35,5 @@ class Command(BaseCommand):
             cumulative_assets_handled = 0
             for row in dr:
                 if 'location_id' in row:
-                    cumulative_assets_handled += split_location(row['location_id'])
+                    cumulative_assets_handled += split_location(row['location_id'], dry_run=False)
             print(f"\nAfter all of that, a total of {cumulative_assets_handled} assets were handled.")
