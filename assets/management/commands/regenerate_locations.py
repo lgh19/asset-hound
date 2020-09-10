@@ -112,9 +112,14 @@ def split_location(location_id, dry_run):
             #    (<Location: 1501 Buena Vista  Road Pittsburgh, PA >, True)
 
             # In this instance, just try falling back to the original location.
-            assert total == 1
-            location = overloaded_location
-            location_obtained = True
+            if total == 1:
+                location = overloaded_location
+                location_obtained = True
+            else: # However, sometimes there are more, so this should work:
+                keys = ['street_address', 'city__iexact', 'state__iexact', 'zip_code__startswith']
+                location, location_obtained = get_location_by_keys(row, keys)
+                assert location_obtained
+
 
             #kwargs = row
             #if 'street_address' in row and row['street_address'] not in [None, '']:
