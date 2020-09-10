@@ -69,6 +69,12 @@ def geocode_address(address):
     try:
         r = requests.get(url, params={'q': address, 'api_key': GEOCODER_API_KEY})
         response_data = r.json()
+        if 'error' in response_data:
+            print(f"Geocodio response: {error}")
+            longitude, latitude = geocode_address_with_geomancer(address)
+            if longitude is not None:
+                return latitude, longitude, "Geocoded with Geomancer"
+            return None, None, None
         lat = response_data['results'][0]['location']['lat']
         lng = response_data['results'][0]['location']['lng']
         first_result = response_data['results'][0]
@@ -79,5 +85,5 @@ def geocode_address(address):
     except Exception as e:
         # todo: handle different exceptions differently
         print(e)
-        return None, None
+        return None, None, None
 
