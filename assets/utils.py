@@ -70,7 +70,7 @@ def geocode_address(address):
         r = requests.get(url, params={'q': address, 'api_key': GEOCODER_API_KEY})
         response_data = r.json()
         if 'error' in response_data:
-            print(f"Geocodio response: {error}")
+            print(f"Geocodio response: {response_data['error']}")
             longitude, latitude = geocode_address_with_geomancer(address)
             if longitude is not None:
                 return latitude, longitude, "Geocoded with Geomancer"
