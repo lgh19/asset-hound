@@ -51,6 +51,8 @@ def split_location(location_id, dry_run):
 
     assets_handled = 0
     for asset in overloaded_location.asset_set.all():
+        if asset.do_not_display is True: # These may not have RawAssets
+            continue # and we don't need to worry about these Assets.
         raw_assets = list(asset.rawasset_set.all())
         if len(raw_assets) == 0:
             raise ValueError(f"The asset with ID {asset.id} has no linked raw assets!")
