@@ -117,25 +117,26 @@ def split_location(location_id, dry_run):
                 location_obtained = True
                 location_created = True
 
-        if location is not None and location_obtained:
-            if location.latitude is None or (location.geocoding_properties is not None and "'confidence'" in location.geocoding_properties): # That is,
-            #if it's a Pelias geocoding (and therefore questionable).
-            # If polygon boundaries are added to the Location model, a check for those should also possibly be added here.
-                if 'street_address' in row and row['street_address'] not in [None, '']:
-                    full_address = form_full_address(row)
-                    # Try to geocode with Geocod.io
-                    latitude, longitude = geocode_address(full_address)
-                    if latitude is None:
-                        print(f"Geocoordinates for Location ID {location.id} are being set to (None, None).")
-                    location.latitude = latitude
-                    location.longitude = longitude
-                    if latitude is None:
-                        location.geocoding_properties = 'Unsuccessfully geocoded by Geocodio'
-                    else:
-                        location.geocoding_properties = 'Geocoded by Geocodio'
-                    location._change_reason = 'Regenerating locations (bad initial Location assignment)'
-                    if not dry_run:
-                        location.save()
+        if location_obtained:
+            if location is not None:
+                if location.latitude is None or (location.geocoding_properties is not None and "'confidence'" in location.geocoding_properties): # That is,
+                #if it's a Pelias geocoding (and therefore questionable).
+                # If polygon boundaries are added to the Location model, a check for those should also possibly be added here.
+                    if 'street_address' in row and row['street_address'] not in [None, '']:
+                        full_address = form_full_address(row)
+                        # Try to geocode with Geocod.io
+                        latitude, longitude = geocode_address(full_address)
+                        if latitude is None:
+                            print(f"Geocoordinates for Location ID {location.id} are being set to (None, None).")
+                        location.latitude = latitude
+                        location.longitude = longitude
+                        if latitude is None:
+                            location.geocoding_properties = 'Unsuccessfully geocoded by Geocodio'
+                        else:
+                            location.geocoding_properties = 'Geocoded by Geocodio'
+                        location._change_reason = 'Regenerating locations (bad initial Location assignment)'
+                        if not dry_run:
+                            location.save()
             asset.location = location
             asset._change_reason = 'Regenerating locations (bad initial Location assignment)'
             if not dry_run:
