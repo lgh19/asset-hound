@@ -28,7 +28,7 @@ class Command(BaseCommand):
         parser.add_argument('args', nargs='*')
 
     def handle(self, *args, **options):
-        if len(args) != 1 or os.path.isfile(args[0]):
+        if len(args) != 1 or not os.path.isfile(args[0]):
             raise ValueError("This script accepts exactly one command-line argument, which should be a valid filepath.")
         with open(args[0], 'r') as f:
             dr = csv.DictReader(f)
