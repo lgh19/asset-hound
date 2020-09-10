@@ -130,7 +130,7 @@ def split_location(location_id, dry_run):
             #if 'street_address' in row and row['street_address'] not in [None, '']:
             #    full_address = form_full_address(row)
             #    # Try to geocode with Geocod.io
-            #    latitude, longitude = geocode_address(full_address)
+            #    latitude, longitude, properties = geocode_address(full_address)
             #    kwargs['latitude'] = latitude
             #    kwargs['longitude'] = longitude
             #    kwargs['geocoding_properties'] = 'Geocoded by Geocodio'
@@ -149,7 +149,7 @@ def split_location(location_id, dry_run):
                     if 'street_address' in row and row['street_address'] not in [None, '']:
                         full_address = form_full_address(row)
                         # Try to geocode with Geocod.io
-                        latitude, longitude = geocode_address(full_address)
+                        latitude, longitude, properties = geocode_address(full_address)
                         if latitude is None:
                             print(f"Geocoordinates for Location ID {location.id} are being set to (None, None).")
                         location.latitude = latitude
@@ -157,7 +157,7 @@ def split_location(location_id, dry_run):
                         if latitude is None:
                             location.geocoding_properties = 'Unsuccessfully geocoded by Geocodio'
                         else:
-                            location.geocoding_properties = 'Geocoded by Geocodio'
+                            location.geocoding_properties = properties
                         location._change_reason = 'Regenerating locations (bad initial Location assignment)'
                         if not dry_run:
                             location.save()

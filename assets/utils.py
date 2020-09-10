@@ -60,7 +60,11 @@ def geocode_address(address):
         response_data = r.json()
         lat = response_data['results'][0]['location']['lat']
         lng = response_data['results'][0]['location']['lng']
-        return lat, lng
+        first_result = response_data['results'][0]
+        wanted_keys = ['accuracy', 'accuracy_type', 'address_components']
+        properties = dict((k, first_result[k]) for k in wanted_keys if k in first_result)
+        properties['geocoder'] = 'Geocodio'
+        return lat, lng, properties
     except Exception as e:
         # todo: handle different exceptions differently
         print(e)
