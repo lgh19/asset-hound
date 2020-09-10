@@ -86,8 +86,21 @@ def split_location(location_id, dry_run):
                     location.save()
                 location_obtained = True
                 location_created = True
+            else:
+                print(row)
+                assert "'confidence'" in row['geocoding_properties']
+                assert row['street_address'] is None
+                assert row['city'] is None
+                assert row['state'] is None
+                assert row['zip_code'] is None
+                # This is just a RawAsset that has no valid location information. Therefore we should set location = None.
+                # (This is kind of a fix for an assignment that never should have happened in the first place.)
+                location = None
+                location_obtained = True
 
         if not location_obtained: # If none comes up, create a new one. # But shouldn't one always come up?
+            # This can happen if (for instance), there's no street address but somehow Pelias came up
+            # with some coordinates anyhow?
             raise ValueError("This shouldn't ever happen since the existing Location should always be findable.")
             kwargs = row
             if 'street_address' in row and row['street_address'] not in [None, '']:
@@ -104,7 +117,7 @@ def split_location(location_id, dry_run):
                 location_obtained = True
                 location_created = True
 
-        if location_obtained:
+        if location is not None and location_obtained:
             if location.latitude is None or (location.geocoding_properties is not None and "'confidence'" in location.geocoding_properties): # That is,
             #if it's a Pelias geocoding (and therefore questionable).
             # If polygon boundaries are added to the Location model, a check for those should also possibly be added here.
