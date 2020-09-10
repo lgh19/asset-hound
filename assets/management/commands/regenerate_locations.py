@@ -39,7 +39,7 @@ def form_full_address(row):
     return "{}, {}, {} {}".format(row['street_address'], city, state, row['zip_code'])
 
 class Command(BaseCommand):
-    help = """For a given location_id, find all the linked Assets, pull their RawAssets and attempt to 
+    help = """For a given location_id, find all the linked Assets, pull their RawAssets and attempt to
     generate new Location instances from the location fields in the RawAsset."""
 
     def add_arguments(self, parser): # Necessary boilerplate for accessing args.
@@ -60,7 +60,7 @@ class Command(BaseCommand):
                 raise ValueError(f"The asset with ID {asset.id} has no linked raw assets!")
             if len(raw_assets) > 1:
                 raise ValueError(f"The asset with ID {asset.id} has multiple linked raw assets!")
-                # Next step here is to pull all the location data and see if it's consistent 
+                # Next step here is to pull all the location data and see if it's consistent
                 # enough to be auto-joined into a single location.
             raw_asset = raw_assets[0]
             row = {'parcel_id': raw_asset.parcel_id,
@@ -99,7 +99,8 @@ class Command(BaseCommand):
                     location_created = True
 
             if location_obtained:
-                if location.latitude is None or "'confidence'" in location.geocoding_properties: # That is, if it's a Pelias geocoding (and therefore questionable).
+                if location.latitude is None or (location.geocoding_properties is not None and "'confidence'" in location.geocoding_properties): # That is,
+                #if it's a Pelias geocoding (and therefore questionable).
                 # If polygon boundaries are added to the Location model, a check for those should also possibly be added here.
                     if 'street_address' in row and row['street_address'] not in [None, '']:
                         full_address = form_full_address(row)
