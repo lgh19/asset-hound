@@ -77,6 +77,16 @@ def split_location(location_id, dry_run):
         # Try to find a matching extant location
         keys = ['street_address__iexact', 'city__iexact', 'state__iexact', 'zip_code__startswith']
         location, location_obtained = get_location_by_keys(row, keys)
+        if row['street_address'] in [None, '']:
+            if row['latitude'] not in [None, ''] and (row['geocoding_properties'] is None or "'confidence'" not in row['geocoding_properties']):
+                # If there's no street address, but there are legit coordinates in the RawAsset, just generate a Location from that.
+                location = Location(**row)
+                location._change_reason = 'Regenerating locations (bad initial Location assignment)'
+                if not dry_run:
+                    location.save()
+                location_obtained = True
+                location_created = True
+
         if not location_obtained: # If none comes up, create a new one. # But shouldn't one always come up?
             raise ValueError("This shouldn't ever happen since the existing Location should always be findable.")
             kwargs = row
