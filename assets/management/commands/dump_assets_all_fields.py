@@ -10,9 +10,9 @@ def to_dict_for_csv(asset: Asset):
     return {
         'id': asset.id,
         'name': asset.name,
-        'asset_type': '|'.join([get_attr(t, 'name', 'None') for t in asset.asset_types.all()]),
+        'asset_type': '|'.join([getattr(t, 'name', 'None') for t in asset.asset_types.all()]),
         'raw_asset_ids': '|'.join([str(r.id) for r in asset.rawasset_set.all()]), # This is one field that differs from the RawAsset dump.
-        'tags': '|'.join([get_attr(t, 'name', 'None') for t in asset.tags.all()]),
+        'tags': '|'.join([getattr(t, 'name', 'None') for t in asset.tags.all()]),
         'location_id': getattr(asset.location, 'id', None),
         'street_address': getattr(asset.location, 'street_address', None),
         'unit': getattr(asset.location, 'unit', None),
@@ -44,13 +44,13 @@ def to_dict_for_csv(asset: Asset):
         'localizability': asset.localizability,
         'sensitive': asset.sensitive,
         'do_not_display': asset.do_not_display,
-        'services': '|'.join([get_attr(s, 'name', None) for s in asset.services.all()]),
-        'hard_to_count_population': '|'.join([get_attr(p, 'name', 'None') for p in asset.hard_to_count_population.all()]),
-        'data_source_names': '|'.join([get_attr(r.data_source, 'name', 'None') for r in asset.rawasset_set.all()]), # Another field that differs from the RawAsset dump.
-        'data_source_urls': '|'.join([get_attr(r.data_source, 'url', 'None') for r in asset.rawasset_set.all()]), # Another field that differs from the RawAsset dump.
-        'organization_name': get_attr(asset.organization, 'name', ''),
-        'organization_phone': get_attr(asset.organization, 'phone', ''),
-        'organization_email': get_attr(asset.organization, 'email', ''),
+        'services': '|'.join([getattr(s, 'name', None) for s in asset.services.all()]),
+        'hard_to_count_population': '|'.join([getattr(p, 'name', 'None') for p in asset.hard_to_count_population.all()]),
+        'data_source_names': '|'.join([getattr(r.data_source, 'name', 'None') for r in asset.rawasset_set.all()]), # Another field that differs from the RawAsset dump.
+        'data_source_urls': '|'.join([getattr(r.data_source, 'url', 'None') for r in asset.rawasset_set.all()]), # Another field that differs from the RawAsset dump.
+        'organization_name': getattr(asset.organization, 'name', ''),
+        'organization_phone': getattr(asset.organization, 'phone', ''),
+        'organization_email': getattr(asset.organization, 'email', ''),
         'etl_notes': asset.etl_notes,
         #'primary_key_from_rocket': asset.primary_key_from_rocket,
         #'synthesized_key': asset.synthesized_key,
