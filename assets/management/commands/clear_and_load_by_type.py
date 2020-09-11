@@ -61,7 +61,15 @@ def get_location_by_keys(row, keys):
     kwargs = {}
     for key in keys:
         assert key not in ['residence']
-        kwargs[key] = non_blank_value_or_none(row, key)
+        actual_key = key.split('__')[0]
+        if key == 'zip_code__startswith':
+            full_zip_code = non_blank_value_or_none(row, actual_key)
+            if full_zip_code is not None:
+                kwargs[key] = full_zip_code[:5]
+        else:
+            value = non_blank_value_or_none(row, actual_key)
+            if value is not None:
+                kwargs[key] = value
 
     #  [ ] Where is boolify used on residence?
     #  Do I need to do something like this?
@@ -76,7 +84,7 @@ def get_location_by_keys(row, keys):
     # If all values are None, return None, False
     if all([v is None for v in kwargs.values()]):
         return None, False
-    if any([v is None for v in kwargs.values()]):
+    if any([v is None for v in kwargs.values()]): # This should no longer trigger based on the above reworking (e.g., "if value is not None").
         print(f"There are some null values in this query: {kwargs}.")
 
     if 'latitude' not in keys and 'longitude' not in keys:
@@ -102,6 +110,7 @@ def get_location_by_keys(row, keys):
         return locations[0], True
     # Otherwise pick the one with the largest id value, which is the first
     # one because of the order_by('-id') part of the query.
+    print(f"Found {len(locations)}. Returning the one with the highest ID.")
     return locations[0], True
 
 
@@ -109,39 +118,35 @@ def update_or_create_location(row):
     # Try to find a pre-existing record by keys. Otherwise create it.
     # Any other fields should be used to fill in gaps and (maybe someday used in clever updating).
 
-    keys = ['parcel_id']
     location_created = False
-    location, location_obtained = get_location_by_keys(row, ['parcel_id'])
+    keys = ['street_address__iexact', 'city__iexact', 'state__iexact', 'zip_code__startswith']
+    # Sneak better querying in through the keys.
+    location, location_obtained = get_location_by_keys(row, keys)
+
     if location_obtained:
         effective_keys = list(keys)
     else:
-        keys = ['street_address', 'city', 'state', 'zip_code']
+        keys = ['latitude', 'longitude']
         location, location_obtained = get_location_by_keys(row, keys)
 
         if location_obtained:
             effective_keys = list(keys)
-        else:
-            keys = ['latitude', 'longitude']
-            location, location_obtained = get_location_by_keys(row, keys)
-
-            if location_obtained:
-                effective_keys = list(keys)
-            else: # Create a location instance.
-                kwargs = {}
-                kwargs['street_address'] = non_blank_value_or_none(row, 'street_address')
-                kwargs['city'] = non_blank_value_or_none(row, 'city')
-                kwargs['state'] = non_blank_value_or_none(row, 'state')
-                kwargs['zip_code'] = non_blank_value_or_none(row, 'zip_code')
-                kwargs['available_transportation'] = non_blank_value_or_none(row, 'location_transportation')
-                kwargs['latitude'] = non_blank_type_or_none(row, 'latitude', float)
-                kwargs['longitude'] = non_blank_type_or_none(row, 'longitude', float)
-                kwargs['residence'] = boolify(non_blank_value_or_none(row, 'residence'))
-                kwargs['geocoding_properties'] = non_blank_value_or_none(row, 'geocoding_properties')
-                kwargs['parcel_id'] = non_blank_value_or_none(row, 'parcel_id')
-                location = Location(**kwargs)
-                location.save()
-                location_obtained = True
-                location_created = True
+        else: # Create a location instance.
+            kwargs = {}
+            kwargs['street_address'] = non_blank_value_or_none(row, 'street_address')
+            kwargs['city'] = non_blank_value_or_none(row, 'city')
+            kwargs['state'] = non_blank_value_or_none(row, 'state')
+            kwargs['zip_code'] = non_blank_value_or_none(row, 'zip_code')
+            kwargs['available_transportation'] = non_blank_value_or_none(row, 'location_transportation')
+            kwargs['latitude'] = non_blank_type_or_none(row, 'latitude', float)
+            kwargs['longitude'] = non_blank_type_or_none(row, 'longitude', float)
+            kwargs['residence'] = boolify(non_blank_value_or_none(row, 'residence'))
+            kwargs['geocoding_properties'] = non_blank_value_or_none(row, 'geocoding_properties')
+            kwargs['parcel_id'] = non_blank_value_or_none(row, 'parcel_id')
+            location = Location(**kwargs)
+            location.save()
+            location_obtained = True
+            location_created = True
 
     assert location_obtained
 

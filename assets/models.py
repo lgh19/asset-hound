@@ -131,7 +131,7 @@ class Location(models.Model):
 
 class Organization(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
-    location = models.ForeignKey('Location', on_delete=models.CASCADE, null=True, blank=True)
+    location = models.ForeignKey('Location', on_delete=models.CASCADE, null=True, blank=True) # [ ] Change this from models.CASCADE to models.PROTECT.
     email = models.EmailField(null=True, blank=True)
     phone = PhoneNumberField(null=True, blank=True)
 
@@ -189,7 +189,7 @@ class BaseAsset(models.Model):
     # category = models.ManyToManyField('Category')
     services = models.ManyToManyField('ProvidedService', blank=True)
     hard_to_count_population = models.ManyToManyField('TargetPopulation', blank=True)
-    data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True) # [ ] Move to RawAsset. # &MIGRATE
+    data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True) # [ ] Move to RawAsset after switching to an abstract template model.
 
     tags = models.ManyToManyField('Tag', blank=True)
     etl_notes = models.TextField(null=True, blank=True)  # notes from Rocket
@@ -197,13 +197,17 @@ class BaseAsset(models.Model):
     synthesized_key = models.TextField(null=True, blank=True)
     date_entered = models.DateTimeField(editable=False, auto_now_add=True)  # As implemented, these are
     last_updated = models.DateTimeField(editable=False, auto_now=True)  # just for tracking history of
-
     # these records. These may be retirable if the django-simple-history approach is sufficiently
     # convenient.
 
     def __str__(self):
         return self.name or '<MISSING NAME>'
 
+# [ ] This should have been defined as an abstract model, like this:
+#   class Meta:
+#       abstract = True
+# That probably would have made moving fields from the abstract model to the concrete model
+# that inherits it easy.
 
 class RawAsset(BaseAsset):
     # Location and Organization information is all represented in a flat manner here
@@ -322,7 +326,7 @@ class Asset(models.Model):
 
     asset_types = models.ManyToManyField('AssetType')
     location = models.ForeignKey('Location', on_delete=models.SET_NULL, null=True, blank=True)
-    organization = models.ForeignKey('Organization', on_delete=models.PROTECT, null=True, blank=True)
+    organization = models.ForeignKey('Organization', on_delete=models.PROTECT, null=True, blank=True) # [ ] Maybe change this to SET_NULL (Organizations should be deletable).
     services = models.ManyToManyField('ProvidedService', blank=True)
     hard_to_count_population = models.ManyToManyField('TargetPopulation', blank=True)
     data_source = models.ForeignKey('DataSource', on_delete=models.PROTECT, null=True, blank=True)

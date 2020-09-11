@@ -170,7 +170,7 @@ def handle_uploaded_file(f, mode):
                 more_results.append(f"asset_name {'will be ' if mode == 'validate' else ''}changed from {destination_asset.name} to {asset_name}.")
                 destination_asset.name = asset_name
 
-            # Oddball legacy conversion to be deleted:
+            # [ ] Oddball legacy conversion to be deleted:
             source_field_name = 'accessibility_features'
             if source_field_name in row:
                 new_value = row[source_field_name]
@@ -178,6 +178,7 @@ def handle_uploaded_file(f, mode):
                 if new_value != old_value:
                     more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
                     destination_asset.accessibility = boolify(new_value)
+
 
             missing_organization_identifier = True
             if 'organization_name' in row and row['organization_name'] not in ['', None]:
@@ -344,6 +345,8 @@ def handle_uploaded_file(f, mode):
                         else:
                             validated_values = [TargetPopulation.objects.get_or_create(name=value)[0] for value in new_values]
                             destination_asset.hard_to_count_population.set(validated_values)
+
+        # Fields that don't need to be updated: primary_key_from_rocket, synthesized_key, data_source_name, data_source_url
 
             if mode == 'update':
                 more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n")
