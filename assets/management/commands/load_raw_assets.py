@@ -30,16 +30,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        override_clearing = True # Sometimes we may not want to clear assets when loading assets.
-        # In fact, eventually loading based on primary_key_from_rocket/synthesized_key will be the default.
-        # Then clearing will be the exception.
+        clear_first = False # Usually we don't want to clear RawAssets when loading them.
 
         if len(args) == 0:
             print("Unable to load assets without knowing the source file. Try:")
             print("   > python manage.py load_raw_assets [filename] [list of asset types]")
             print("Here the list of asset types is optional. Without that list, this command")
             print("will default to iterating over all types in the source file, sequentially")
-            print("uploading them (clearing them before uploading if override_clearing = False.")
+            print("uploading them (clearing them before uploading if clear_first = True).")
             return
         else:
             file_name = os.path.join(settings.BASE_DIR, args[0])
@@ -53,7 +51,7 @@ class Command(BaseCommand):
                 chosen_asset_types = args[1:]
             else:
                 chosen_asset_types = source_asset_types
-                if not override_clearing:
+                if clear_first:
                     raise ValueError(f"Are you really sure you want to clear all these asset types ({chosen_asset_types})? If so, comment out this exception (or just list them when invoking the command).")
             print(f"chosen_asset_types = {chosen_asset_types}")
 
@@ -71,7 +69,7 @@ class Command(BaseCommand):
                     new_types.append(t)
             print(f"New types in the source file that are not currently in the database: {new_types}")
 
-            print(f"About to start{'' if override_clearing else 'cleaning and'} uploading {chosen_asset_types}.")
+            print(f"About to start{'' if not clear_first else 'cleaning and'} uploading {chosen_asset_types}.")
 
             total_count = 0
 
@@ -80,8 +78,8 @@ class Command(BaseCommand):
                 with open(file_name) as f:
                     dr = csv.DictReader(f) # This file needs to be reopened to refresh the dr iterator (used up in the loop below).
 
-                    ## Clear the assets of this type if any are found in the database. ##
-                    if not override_clearing:
+                    if clear_first:
+                        ## Clear the assets of this type if any are found in the database. ##
                         if asset_type in extant_types:
                             selected_assets = RawAsset.objects.filter(asset_types__name=asset_type)
                             if len(selected_assets) > 0:
@@ -97,7 +95,7 @@ class Command(BaseCommand):
                     for row in dr:
                         if row['asset_type'] == asset_type:
                             if auto_link:
-                                # Try to identify which existing Asset this RawAsset should be linked to 
+                                # Try to identify which existing Asset this RawAsset should be linked to
                                 # based on the synthesized_key value.
                                 assert 'synthesized_key' in row
                                 assert row['synthesized_key'] != ''
@@ -164,7 +162,7 @@ class Command(BaseCommand):
                                 residence = boolify(non_blank_value_or_none(row, 'residence')),
                                 available_transportation = non_blank_value_or_none(row, 'location_transportation'),
                                 parent_location = non_blank_value_or_none(row, 'parent_location'),
-                                # Note that parent_location has not yet been added to the Assets (since 
+                                # Note that parent_location has not yet been added to the Assets (since
                                 # the original loader didn't do this), so now it's being added to RawAssets
                                 # as a string, representing the name of the location.
 
@@ -180,7 +178,7 @@ class Command(BaseCommand):
                                 longitude = non_blank_type_or_none(row, 'longitude', float),
                                 #geom =  We're still not uploading the geom field yet because it wasn't
                                 # in the sample_assets.csv field used to populate the Asset model.
-                                # There are only a few features with useful geom values (boundaries of 
+                                # There are only a few features with useful geom values (boundaries of
                                 # parks mostly), and those will be handled later, once the front end
                                 # is ready to use those values.
                                 geocoding_properties = non_blank_value_or_none(row, 'geocoding_properties'),
