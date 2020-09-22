@@ -15,11 +15,11 @@
 
 {% if asset_based %}
     <h1>Asset-based Asset Updater</h1>
-    <small><a href="/edit/update-assets/using-raw-assets/">Switch to RawAsset-based updater</a></small>
+    <small><a href="/edit/update-assets/using-raw-assets/">Switch to RawAsset-based updater</a></small><br>
     Upload a merge-instructions CSV file here to attempt to execute asset merges and other edits (specifying Asset field values).
 {% else %}
     <h1>RawAsset-based Asset Updater</h1>
-    <small><a href="/edit/update-assets/using-assets/">Switch to Asset-based updater</a></small>
+    <small><a href="/edit/update-assets/using-assets/">Switch to Asset-based updater</a></small><br>
     Upload a merge-instructions CSV file here to attempt to execute asset merges and other edits (specifying Asset field values and linking the corresponding RawAsset records to the merged Asset instance).
 {% endif %}
 <details>
@@ -29,6 +29,7 @@
         <li>The <code>id</code> field should give the Asset ID.</li>
         <li>When <code>ids_to_merge</code> is blank, the Asset with ID <code>id</code> gets delisted.</li>
         <li>When <code>ids_to_merge</code> is <code>A+B+C</code> and <id> == <code>B</code>, the Assets with ID <code>A</code> and <code>C</code> get delisted and their RawAssets get reassigned to the Asset with ID <code>B</code>.</li>
+        <li>The <code>asset_id</code> field should either be empty or absent.
         {% endif %}
         <li>To create a new Location (instead of linking to the Asset's default Location), include a field called <code>location_id</code> and make its value blank for the Asset which needs a new location. This is useful when splitting up a Location to which multiple Assets are incorrectly pointing. [The same trick works for Organizations by using a blank <code>organization_id</code> field.]</li>
         <li>The <code>location_id</code> field can also be used to reassign an Asset to a different existing location. (There is currently only the basic 'Validate' validation in place to make sure this option does not accidentally overwrite the wrong Location, so please use this carefully.)
