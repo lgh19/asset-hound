@@ -40,16 +40,22 @@ class Command(BaseCommand):
             print("uploading them (clearing them before uploading if clear_first = True).")
             return
         else:
+            # Get existing types
+            chosen_asset_types = []
+            extant_types = [a.name for a in AssetType.objects.all()]
+            for arg in args:
+                if arg = 'clear_first':
+                    clear_first = True
+                elif arg in extant_types:
+                    chosen_asset_types.append(arg)
+
             file_name = os.path.join(settings.BASE_DIR, args[0])
 
             with open(file_name) as f:
                 dr = csv.DictReader(f)
                 source_asset_types = list(set([row['asset_type'] for row in dr]))
 
-
-            if len(args) > 1:
-                chosen_asset_types = args[1:]
-            else:
+            if chosen_asset_types == []:
                 chosen_asset_types = source_asset_types
                 if clear_first:
                     raise ValueError(f"Are you really sure you want to clear all these asset types ({chosen_asset_types})? If so, comment out this exception (or just list them when invoking the command).")
@@ -59,9 +65,6 @@ class Command(BaseCommand):
                 if re.search('\|', t) is not None and t in chosen_asset_types:
                     print(f"Whoa! Whoa! What are we going to do with an asset of type {t}?")
                     raise ValueError("Whoa! Whoa! What are we going to do with an asset of type {t}?")
-
-            # Get existing types
-            extant_types = [a.name for a in AssetType.objects.all()]
 
             new_types = []
             for t in chosen_asset_types:
@@ -109,6 +112,8 @@ class Command(BaseCommand):
                             else:
                                 asset_to_link_to = None
 
+                            raise ValueError("Replace all this auto_link business with preservation of existing links to Assets.")
+
                             # Since the next line uses get_or_create, it will create new asset types, without insisting that they
                             # be manually entered (along with a Category). Without the Category, a dot representing this type
                             # of assets will not appear on the map.
@@ -128,6 +133,10 @@ class Command(BaseCommand):
                             data_source = DataSource.objects.get_or_create(
                                 name=non_blank_value_or_none(row, 'data_source_name'),
                                 defaults={'url': row['data_source_url']})[0] if row['data_source_name'] else None
+
+
+                            print("See: All this currently does is create new RawAssets not update existing ones.")
+                            print("Consider adding a mandatory insert/update/upsert command-line argument.")
 
                             raw_asset = RawAsset.objects.create(
                                 asset = asset_to_link_to,

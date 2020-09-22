@@ -83,9 +83,236 @@ def check_or_update_value(instance, row, mode, more_results, source_field_name, 
         setattr(instance, source_field_name, new_value)
     return instance, more_results
 
-def handle_uploaded_file(f, mode):
+
+def modify_destination_asset(mode, row, destination_asset, created_new_asset, more_results):
+    error = False
+    if 'location_id' in row:
+        location_id = row['location_id']
+        if location_id in ['', None, 'new']:
+            # Create a new Location instance to be populated.
+            location = None # Location creation happens below.
+        else:
+            location = Location.objects.get(pk=location_id)
+    else: # If the location_id field is omitted from the merge instructions,
+        # fall back to the destination asset's location (which may be None).
+        location = destination_asset.location
+
+    # I'm choosing to not update the Location.name field here since we may want to manually name Location instances,
+    # particularly to deal with cases like the two restaurant locations in Schenley Plaza that have the same
+    # street address and parcel ID but slightly different geocoordinates.
+    if location is None:
+        if there_is_a_field_to_update(row, ['street_address', 'municipality', 'city', 'state', 'zip_code', 'parcel_id', 'latitude', 'longitude']):
+            if mode == 'update':
+                more_results.append(f"Creating a new Location for this Asset.")
+            else:
+                more_results.append(f"A new Location would be created for this Asset.")
+            location = Location()
+        elif there_is_a_field_to_update(row, ['residence', 'iffy_geocoding', 'unit', 'unit_type', 'available_transportation', 'geocoding_properties']):
+            more_results.append("There is not enough information to create a new location for this Asset, but there are fields in the merge-instructions file which need to be assigned to a Location. Does not compute! ABORTING!!!<hr>")
+            return None, more_results, True
+
+    if 'organization_id' in row:
+        organization_id = row['organization_id']
+        if organization_id in ['', None, 'new']:
+            # Create a new Organization instance to be populated.
+            organization = None # Organization creation happens below.
+        else:
+            organization = Organization.objects.get(pk=organization_id)
+    else: # If the organization_id field is omitted from the merge instructions,
+        # fall back to the destination asset's organization (which may be None).
+        organization = destination_asset.organization
+
+
+    asset_name = row['name']
+    if asset_name != destination_asset.name:
+        more_results.append(f"asset_name {'will be ' if mode == 'validate' else ''}changed from {destination_asset.name} to {asset_name}.")
+        destination_asset.name = asset_name
+
+    # [ ] Oddball legacy conversion to be deleted:
+    source_field_name = 'accessibility_features'
+    if source_field_name in row:
+        new_value = boolify(row[source_field_name])
+        old_value = destination_asset.accessibility
+        if new_value != old_value:
+            more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+            destination_asset.accessibility = new_value
+
+
+    missing_organization_identifier = True
+    if 'organization_name' in row and row['organization_name'] not in ['', None]:
+        missing_organization_identifier = False
+    elif 'organization_id' in row and row['organization_id'] not in ['', None]:
+        missing_organization_identifier = False
+    # Which is about the same as what I originally wrote:
+    #   missing_organization_identifier = (('organization_name' not in row) or (row['organization_name'] == '')) and (('organization_id' not in row) or (row['organization_id'] == ''))
+    # but whatever.
+
+    if missing_organization_identifier:
+        # The organization can be identified EITHER by the organization_id value or by the organization_name value.
+        if ('organization_phone' in row and row['organization_phone'] != '') or ('organization_email' in row and row['organization_email'] != ''):
+            more_results.append(f"The organization's name or ID value is required if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
+            return None, more_results, True
+        #else: This is being removed for now since it seems like it could accidentally delete extant organizations.
+        #    destination_asset.organization = None # Set ForiegnKey to None.
+        #    more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;Since the organization has not been clearly identified by name or ID, the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
+    else:
+        if organization is None:
+            if mode == 'update':
+                more_results.append(f"Creating a new Organization for this Asset.")
+            else:
+                more_results.append(f"A new Organization would be created for this Asset.")
+            organization = Organization() # Create new organization instance.
+
+        source_field_name = 'organization_name'
+        destination_field_name = 'name'
+        new_value = non_blank_type_or_none(row, source_field_name, str)
+        old_value = organization.name
+        if new_value != old_value:
+            more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+            organization.name = new_value
+
+        # check_or_update_value() can not be used without adding separate handling of source_field_name and destination_field_name.
+        source_field_name = 'organization_email'
+        if source_field_name in row:
+            destination_field_name = 'email'
+            new_value = non_blank_type_or_none(row, source_field_name, str)
+            old_value = organization.email
+            if new_value != old_value:
+                more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                organization.email = new_value
+
+        source_field_name = 'organization_phone'
+        if source_field_name in row:
+            new_value = standardize_phone(non_blank_type_or_none(row, source_field_name, str))
+            old_value = organization.phone
+            if new_value != old_value:
+                more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+                organization.phone = new_value
+
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'unit', field_type=str)
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'unit_type', field_type=str)
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'municipality', field_type=str)
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'city', field_type=str)
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'state', field_type=str)
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'zip_code', field_type=str)
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'parcel_id', field_type=str)
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'residence', field_type=bool)
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'iffy_geocoding', field_type=bool)
+
+    if 'latitude' in row or 'longitude' in row:
+        old_latitude, old_longitude = location.latitude, location.longitude
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'latitude', field_type=float)
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'longitude', field_type=float)
+    if 'latitude' in row or 'longitude' in row:
+        dist = distance(old_latitude, old_longitude, location.latitude, location.longitude)
+        if dist is not None:
+            more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;The distance between the old and new coordinates is {dist:.2f} feet.")
+
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'available_transportation', field_type=str)
+    location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'geocoding_properties', field_type=str)
+    # Ignore parent location for now.
+
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'url', field_type=str)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'email', field_type=str)
+    source_field_name = 'phone'
+    if source_field_name in row:
+        new_value = standardize_phone(non_blank_type_or_none(row, source_field_name, str))
+        old_value = destination_asset.phone
+        if new_value != old_value:
+            more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+            destination_asset.phone = new_value
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'hours_of_operation', field_type=str)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'holiday_hours_of_operation', field_type=str)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'periodicity', field_type=str)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'capacity', field_type=int)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'periodicity', field_type=str)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'wifi_network', field_type=str)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'internet_access', field_type=bool)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'computers_available', field_type=bool)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'accessibility', field_type=bool)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'open_to_public', field_type=bool)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'child_friendly', field_type=bool)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'sensitive', field_type=bool)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'localizability', field_type=str)
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'etl_notes', field_type=str)
+
+    # Unfortunately the many-to-many relations that follow can not be set on an Asset until it has been saved,
+    # so for cases where created_new_asset == True, we have to save the Asset once at this point so it has an
+    # id value.
+    if created_new_asset and mode == 'update':
+        destination_asset._change_reason = "Asset Updater: Initial save of Asset to allow many-to-many relationships"
+        destination_asset.save()
+    destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'do_not_display', field_type=bool)
+    # do_not_display must be set after the destination aset is initially saved since if
+    # a new asset is created, it could be initially locationless and therefore have
+    # do_not_display auto-set to True.
+
+    source_field_name = 'asset_type'
+    new_values = eliminate_empty_strings(row[source_field_name].split('|'))
+    list_of_old_values = list_of(destination_asset.asset_types) if not created_new_asset else []
+    if set(new_values) != set(list_of_old_values):
+        more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
+        if new_values == []:
+            more_results.append(f"asset_type can not be empty\n ABORTING!!!\n<hr>")
+            return None, more_results, True
+        try:
+            validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in new_values] # Change get to get_or_create to allow creation of new asset types.
+            # It's better to require manual creation of new asset types for now since that encourages us to specify a Category (necessary for mapping).
+            if mode == 'update':
+                destination_asset.asset_types.set(validated_asset_types)
+        except AssetType.DoesNotExist:
+            more_results.append(f"Unable to find one of these asset types: {new_values}.\n ABORTING!!!\n<hr>")
+            return None, more_results, True
+
+    source_field_name = 'tags'
+    if source_field_name in row:
+        new_values = eliminate_empty_strings(row[source_field_name].split('|'))
+        list_of_old_values = list_of(destination_asset.tags) if not created_new_asset else []
+        if set(new_values) != set(list_of_old_values):
+            more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
+            if mode == 'update':
+                if new_values == []:
+                    destination_asset.tags.clear()
+                else:
+                    validated_values = [Tag.objects.get_or_create(name=value)[0] for value in new_values]
+                    destination_asset.tags.set(validated_values)
+
+    source_field_name = 'services'
+    if source_field_name in row:
+        new_values = eliminate_empty_strings(row[source_field_name].split('|'))
+        list_of_old_values = list_of(destination_asset.services) if not created_new_asset else []
+        if set(new_values) != set(list_of_old_values):
+            more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
+            if mode == 'update':
+                if new_values == []:
+                    destination_asset.services.clear()
+                else:
+                    validated_values = [ProvidedService.objects.get_or_create(name=value)[0] for value in new_values]
+                    destination_asset.services.set(validated_values)
+
+    source_field_name = 'hard_to_count_population'
+    if source_field_name in row:
+        new_values = eliminate_empty_strings(row[source_field_name].split('|'))
+        list_of_old_values = list_of(destination_asset.hard_to_count_population) if not created_new_asset else []
+        if set(new_values) != set(list_of_old_values):
+            more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
+            if mode == 'update':
+                if new_values == []:
+                    destination_asset.hard_to_count_population.clear()
+                else:
+                    validated_values = [TargetPopulation.objects.get_or_create(name=value)[0] for value in new_values]
+                    destination_asset.hard_to_count_population.set(validated_values)
+
+    # Fields that don't need to be updated: primary_key_from_rocket, synthesized_key, data_source_name, data_source_url
+    return destination_asset, location, organization, more_results, False
+
+
+def handle_uploaded_file(f, mode, using):
     import csv
     more_results = []
+
+    assert using in ['using-raw-assets', 'using-assets']
 
     if f.size > 2500000:
         raise ValueError("handle_uploaded_file hasn't implemented saving the file for reading/parsing yet.")
@@ -94,268 +321,123 @@ def handle_uploaded_file(f, mode):
         #    destination.write(chunk)
     else:
         decoded_file = f.read().decode('utf-8').splitlines()
+
+        # Validate the file
+        if using == 'using-assets':
+            reader = csv.DictReader(decoded_file)
+            for row in reader:
+                if 'asset_id' in row:
+                    assert row['asset_id'] == ''
+                # Here id could be verified to correspond to an actual Asset id.
+                # Here ids_to_merge could be verified to correspond to actual Asset ids.
+
         reader = csv.DictReader(decoded_file)
         for row in reader:
+
+            created_new_asset = False
+            # Process the 'id' field
             raw_id = row['id']
-            primary_raw_asset_iterator = RawAsset.objects.filter(id = raw_id)
-            assert len(primary_raw_asset_iterator) == 1 # To ensure it exists in the database.
-            primary_raw_asset = primary_raw_asset_iterator[0]
+            if using == 'using-raw-assets':
+                primary_raw_asset_iterator = RawAsset.objects.filter(id = raw_id)
+                assert len(primary_raw_asset_iterator) == 1 # To ensure it exists in the database.
+                primary_raw_asset = primary_raw_asset_iterator[0]
+            elif using == 'using-assets':
+                primary_asset_iterator = Asset.objects.filter(id = raw_id)
+                assert len(primary_asset_iterator) == 1 # To ensure it exists in the database.
+                destination_asset = primary_asset_iterator[0] # Note that here 
+                # the primary asset is also the destination asset.
 
-            asset_id = row['asset_id']
-            if asset_id in ['', None]:
-                created_new_asset = True
-                destination_asset = Asset()
-                more_results.append(f"A new Asset {'would' if mode == 'validate' else 'will'} be created.")
-            else:
-                created_new_asset = False
-                destination_asset_iterator = Asset.objects.filter(id = asset_id)
-                assert len(destination_asset_iterator) == 1 # To ensure there is exactly one in the database.
-                destination_asset = destination_asset_iterator[0]
+            # Process the 'asset_id' field
+            if using == 'using-raw-assets':
+                asset_id = row['asset_id']
+                if asset_id in ['', None]:
+                    created_new_asset = True
+                    destination_asset = Asset()
+                    more_results.append(f"A new Asset {'would' if mode == 'validate' else 'will'} be created.")
+                else:
+                    destination_asset_iterator = Asset.objects.filter(id = asset_id)
+                    assert len(destination_asset_iterator) == 1 # To ensure there is exactly one in the database.
+                    destination_asset = destination_asset_iterator[0]
 
+            # Process the 'ids_to_merge' field
             ids_to_merge = row['ids_to_merge']
-            if ids_to_merge == '':
-                continue # Skip rows with no ids to merge.
-            raw_ids = [int(i) for i in ids_to_merge.split('+')]
-            raw_assets_iterator = RawAsset.objects.filter(id__in = raw_ids)
-            assert len(raw_assets_iterator) > 0 # To ensure some exist in the database.
-            raw_assets = list(raw_assets_iterator)
-            for raw_asset in raw_assets:
-                raw_asset.asset = destination_asset
+            if using == 'using-raw-assets':
+                if ids_to_merge == '':
+                    continue # Skip rows with no ids to merge.
+                raw_ids = [int(i) for i in ids_to_merge.split('+')]
+                raw_assets_iterator = RawAsset.objects.filter(id__in = raw_ids)
+                assert len(raw_assets_iterator) > 0 # To ensure some exist in the database.
+                raw_assets = list(raw_assets_iterator)
+                for raw_asset in raw_assets:
+                    raw_asset.asset = destination_asset
 
-            if 'location_id' in row:
-                location_id = row['location_id']
-                if location_id in ['', None, 'new']:
-                    # Create a new Location instance to be populated.
-                    location = None # Location creation happens below.
+                if len(raw_assets) == 1:
+                    summary = f"{'Validating this process: ' if mode == 'validate' else ''}Editing the Asset with id = {asset_id}, previously named {destination_asset.name}, and linking it to RawAsset with id = {raw_assets[0].id} and name = {raw_assets[0].name}."
                 else:
-                    location = Location.objects.get(pk=location_id)
-            else: # If the location_id field is omitted from the merge instructions,
-                # fall back to the destination asset's location (which may be None).
-                location = destination_asset.location
+                    summary = f"{'Validating this process: ' if mode == 'validate' else ''}Merging RawAssets with ids = {', '.join([str(r.id) for r in raw_assets])} and names = {', '.join([r.name for r in raw_assets])} to Asset with id = {asset_id}, previously named {destination_asset.name}."
+                more_results.append(summary)
 
-            # I'm choosing to not update the Location.name field here since we may want to manually name Location instances,
-            # particularly to deal with cases like the two restaurant locations in Schenley Plaza that have the same
-            # street address and parcel ID but slightly different geocoordinates.
-            if location is None:
-                if there_is_a_field_to_update(row, ['street_address', 'municipality', 'city', 'state', 'zip_code', 'parcel_id', 'latitude', 'longitude']):
-                    if mode == 'update':
-                        more_results.append(f"Creating a new Location for this Asset.")
-                    else:
-                        more_results.append(f"A new Location would be created for this Asset.")
-                    location = Location()
-                elif there_is_a_field_to_update(row, ['residence', 'iffy_geocoding', 'unit', 'unit_type', 'available_transportation', 'geocoding_properties']):
-                    more_results.append("There is not enough information to create a new location for this Asset, but there are fields in the merge-instructions file which need to be assigned to a Location. Does not compute! ABORTING!!!<hr>")
-                    break
+            elif using == 'using-assets':
+                # When merging Assets, the Asset that is not the destination
+                # asset should be delisted.
+                if mode == 'update':
+                    if ids_to_merge == '':
+                        destination_asset.do_not_display = True
+                        destination_asset._change_reason = f'Asset Updater: Delisting Asset'
+                        destination_asset.save()
+                        s = f"Delisting {destination_asset.name}."
+                        more_results.append(s)
+                        continue # Skip rows with no ids to merge.
+                    asset_ids = [int(i) for i in ids_to_merge.split('+')]
+                    assert destination_asset.id in asset_ids
 
-            if 'organization_id' in row:
-                organization_id = row['organization_id']
-                if organization_id in ['', None, 'new']:
-                    # Create a new Organization instance to be populated.
-                    organization = None # Organization creation happens below.
+                    assets_iterator = Asset.objects.filter(id__in = asset_ids)
+                    assert len(assets_iterator) > 0 # To ensure some exist in the database.
+                    if len(assets_iterator) > 1:
+                        s = f"Delisting extra Assets (from the list {ids_to_merge}) and assigning corresponding RawAssets to the destination Asset."
+                        more_results.append(s)
+
+                    for asset in assets_iterator:
+                        if asset.id != destination_asset.id:
+                            asset.do_not_display = True
+                            asset._change_reason = f'Asset Updater: Delisting Asset'
+                            asset.save()
+
+                            # Iterate over raw assets of this asset and point them to destination_asset.
+                            for raw_asset in asset.rawasset_set.all():
+                                raw_asset.asset = destination_asset
+                                raw_asset._change_reason = f'Asset Updater: Linking RawAsset to different Asset because of Asset merge'
+                                raw_asset.save() # This saving couldn't be done below 
+                                # because there can be multiple sets of RawAssets. They'd 
+                                # all have to be collected into raw_assets to do it below.
                 else:
-                    organization = Organization.objects.get(pk=organization_id)
-            else: # If the organization_id field is omitted from the merge instructions,
-                # fall back to the destination asset's organization (which may be None).
-                organization = destination_asset.organization
+                    if '+' in ids_to_merge:
+                        s = f"Extra Assets (from the list {ids_to_merge}) would be delisted and corresponding RawAssets would be assigned to the destination Asset."
+                        more_results.append(s)
+                    elif ids_to_merge == '':
+                        s = f"{destination_asset.name} would be delisted."
+                        more_results.append(s)
 
-
-            if len(raw_assets) == 1:
-                summary = f"{'Validating this process: ' if mode == 'validate' else ''}Editing the Asset with id = {asset_id}, previously named {destination_asset.name}, and linking it to RawAsset with id = {raw_assets[0].id} and name = {raw_assets[0].name}."
-            else:
-                summary = f"{'Validating this process: ' if mode == 'validate' else ''}Merging RawAssets with ids = {', '.join([str(r.id) for r in raw_assets])} and names = {', '.join([r.name for r in raw_assets])} to Asset with id = {asset_id}, previously named {destination_asset.name}."
-            more_results.append(summary)
-
-            asset_name = row['name']
-            if asset_name != destination_asset.name:
-                more_results.append(f"asset_name {'will be ' if mode == 'validate' else ''}changed from {destination_asset.name} to {asset_name}.")
-                destination_asset.name = asset_name
-
-            # [ ] Oddball legacy conversion to be deleted:
-            source_field_name = 'accessibility_features'
-            if source_field_name in row:
-                new_value = row[source_field_name]
-                old_value = destination_asset.accessibility
-                if new_value != old_value:
-                    more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                    destination_asset.accessibility = boolify(new_value)
-
-
-            missing_organization_identifier = True
-            if 'organization_name' in row and row['organization_name'] not in ['', None]:
-                missing_organization_identifier = False
-            elif 'organization_id' in row and row['organization_id'] not in ['', None]:
-                missing_organization_identifier = False
-            # Which is about the same as what I originally wrote:
-            #   missing_organization_identifier = (('organization_name' not in row) or (row['organization_name'] == '')) and (('organization_id' not in row) or (row['organization_id'] == ''))
-            # but whatever.
-
-            if missing_organization_identifier:
-                # The organization can be identified EITHER by the organization_id value or by the organization_name value.
-                if ('organization_phone' in row and row['organization_phone'] != '') or ('organization_email' in row and row['organization_email'] != ''):
-                    more_results.append(f"The organization's name or ID value is required if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
-                    break
-                #else: This is being removed for now since it seems like it could accidentally delete extant organizations.
-                #    destination_asset.organization = None # Set ForiegnKey to None.
-                #    more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;Since the organization has not been clearly identified by name or ID, the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
-            else:
-                if organization is None:
-                    if mode == 'update':
-                        more_results.append(f"Creating a new Organization for this Asset.")
-                    else:
-                        more_results.append(f"A new Organization would be created for this Asset.")
-                    organization = Organization() # Create new organization instance.
-
-                source_field_name = 'organization_name'
-                destination_field_name = 'name'
-                new_value = non_blank_type_or_none(row, source_field_name, str)
-                old_value = organization.name
-                if new_value != old_value:
-                    more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                    organization.name = new_value
-
-                # check_or_update_value() can not be used without adding separate handling of source_field_name and destination_field_name.
-                source_field_name = 'organization_email'
-                if source_field_name in row:
-                    destination_field_name = 'email'
-                    new_value = non_blank_type_or_none(row, source_field_name, str)
-                    old_value = organization.email
-                    if new_value != old_value:
-                        more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                        organization.email = new_value
-
-                source_field_name = 'organization_phone'
-                if source_field_name in row:
-                    new_value = standardize_phone(non_blank_type_or_none(row, source_field_name, str))
-                    old_value = organization.phone
-                    if new_value != old_value:
-                        more_results.append(f"organization.{destination_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                        organization.phone = new_value
-
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'street_address', field_type=str)
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'unit', field_type=str)
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'unit_type', field_type=str)
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'municipality', field_type=str)
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'city', field_type=str)
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'state', field_type=str)
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'zip_code', field_type=str)
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'parcel_id', field_type=str)
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'residence', field_type=bool)
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'iffy_geocoding', field_type=bool)
-
-            if 'latitude' in row or 'longitude' in row:
-                old_latitude, old_longitude = location.latitude, location.longitude
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'latitude', field_type=float)
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'longitude', field_type=float)
-            if 'latitude' in row or 'longitude' in row:
-                dist = distance(old_latitude, old_longitude, location.latitude, location.longitude)
-                if dist is not None:
-                    more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;The distance between the old and new coordinates is {dist:.2f} feet.")
-
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'available_transportation', field_type=str)
-            location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'geocoding_properties', field_type=str)
-            # Ignore parent location for now.
-
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'url', field_type=str)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'email', field_type=str)
-            source_field_name = 'phone'
-            if source_field_name in row:
-                new_value = standardize_phone(non_blank_type_or_none(row, source_field_name, str))
-                old_value = destination_asset.phone
-                if new_value != old_value:
-                    more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-                    destination_asset.phone = new_value
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'hours_of_operation', field_type=str)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'holiday_hours_of_operation', field_type=str)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'periodicity', field_type=str)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'capacity', field_type=int)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'periodicity', field_type=str)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'wifi_network', field_type=str)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'internet_access', field_type=bool)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'computers_available', field_type=bool)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'accessibility', field_type=bool)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'open_to_public', field_type=bool)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'child_friendly', field_type=bool)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'sensitive', field_type=bool)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'localizability', field_type=str)
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'etl_notes', field_type=str)
-
-            # Unfortunately the many-to-many relations that follow can not be set on an Asset until it has been saved,
-            # so for cases where created_new_asset == True, we have to save the Asset once at this point so it has an
-            # id value.
-            if created_new_asset and mode == 'update':
-                destination_asset._change_reason = "Asset Updater: Initial save of Asset to allow many-to-many relationships"
-                destination_asset.save()
-            destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'do_not_display', field_type=bool)
-            # do_not_display must be set after the destination aset is initially saved since if
-            # a new asset is created, it could be initially locationless and therefore have
-            # do_not_display auto-set to True.
-
-            source_field_name = 'asset_type'
-            new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-            list_of_old_values = list_of(destination_asset.asset_types) if not created_new_asset else []
-            if set(new_values) != set(list_of_old_values):
-                more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                if new_values == []:
-                    more_results.append(f"asset_type can not be empty\n ABORTING!!!\n<hr>")
-                    break
-                try:
-                    validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in new_values] # Change get to get_or_create to allow creation of new asset types.
-                    # It's better to require manual creation of new asset types for now since that encourages us to specify a Category (necessary for mapping).
-                    if mode == 'update':
-                        destination_asset.asset_types.set(validated_asset_types)
-                except AssetType.DoesNotExist:
-                    more_results.append(f"Unable to find one of these asset types: {new_values}.\n ABORTING!!!\n<hr>")
-                    break
-
-            source_field_name = 'tags'
-            if source_field_name in row:
-                new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-                list_of_old_values = list_of(destination_asset.tags) if not created_new_asset else []
-                if set(new_values) != set(list_of_old_values):
-                    more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                    if mode == 'update':
-                        if new_values == []:
-                            destination_asset.tags.clear()
-                        else:
-                            validated_values = [Tag.objects.get_or_create(name=value)[0] for value in new_values]
-                            destination_asset.tags.set(validated_values)
-
-            source_field_name = 'services'
-            if source_field_name in row:
-                new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-                list_of_old_values = list_of(destination_asset.services) if not created_new_asset else []
-                if set(new_values) != set(list_of_old_values):
-                    more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                    if mode == 'update':
-                        if new_values == []:
-                            destination_asset.services.clear()
-                        else:
-                            validated_values = [ProvidedService.objects.get_or_create(name=value)[0] for value in new_values]
-                            destination_asset.services.set(validated_values)
-
-            source_field_name = 'hard_to_count_population'
-            if source_field_name in row:
-                new_values = eliminate_empty_strings(row[source_field_name].split('|'))
-                list_of_old_values = list_of(destination_asset.hard_to_count_population) if not created_new_asset else []
-                if set(new_values) != set(list_of_old_values):
-                    more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
-                    if mode == 'update':
-                        if new_values == []:
-                            destination_asset.hard_to_count_population.clear()
-                        else:
-                            validated_values = [TargetPopulation.objects.get_or_create(name=value)[0] for value in new_values]
-                            destination_asset.hard_to_count_population.set(validated_values)
-
-        # Fields that don't need to be updated: primary_key_from_rocket, synthesized_key, data_source_name, data_source_url
+            ### At this point the fields that differentiate Asset-based Asset updates from 
+            ### RawAsset-based Asset updates have been processed.
+            ### What comes out of this stage is destination_asset and raw_assets.
+            destination_asset, location, organization, more_results, error = modify_destination_asset(mode, row, destination_asset, created_new_asset, more_results)
+            if error:
+                break
 
             if mode == 'update':
                 more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n")
                 more_results.append(f'&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://assets.wprdc.org/api/dev/assets/assets/{destination_asset.id}/" target="_blank">Updated Asset</a>\n')
                 change_reason = f'Asset Updater: {"Creating new " if created_new_asset else "Updating "}Asset'
-                for raw_asset in raw_assets: # RawAssets must be saved first because Assets need at least one
-                    # linked RawAsset or else it will automatically have do_not_display set to True.
-                    raw_asset._change_reason = 'Testing Asset Updater' #f'Asset Updater: Linking to {"new " if created_new_asset else ""}Asset'
-                    raw_asset.save()
+                destination_asset._change_reason = change_reason
+                destination_asset.save()
+
+                if using == 'using-raw-assets':
+                    for raw_asset in raw_assets: # RawAssets must be saved first because an Asset needs at least one
+                        # linked RawAsset or else it will automatically have do_not_display set to True.
+                        raw_asset._change_reason = f'Asset Updater: Linking to {"new " if created_new_asset else ""}Asset'
+                        raw_asset.save()
+
                 if organization is not None:
                     organization._change_reason = change_reason
                     organization.save()
@@ -373,7 +455,9 @@ def handle_uploaded_file(f, mode):
     return more_results
 
 @staff_member_required
-def upload_file(request):
+def upload_file(request, using):
+    # The "using" parameter should have either the value "using-raw-assets" or
+    # the value "using-assets".
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -381,11 +465,11 @@ def upload_file(request):
                 mode = "validate"
             else:
                 mode = "update"
-            results = handle_uploaded_file(request.FILES['file'], mode)
-            return render(request, 'update.html', {'form': form, 'results': results})
+            results = handle_uploaded_file(request.FILES['file'], mode, using)
+            return render(request, 'update.html', {'form': form, 'results': results, 'asset_based': using == 'using-assets'})
     else:
         form = UploadFileForm()
-    return render(request, 'update.html', {'form': form, 'results': []})
+    return render(request, 'update.html', {'form': form, 'results': [], 'asset_based': using == 'using-assets'})
 
 def dump_assets(filepath):
     from django.core.management import call_command
