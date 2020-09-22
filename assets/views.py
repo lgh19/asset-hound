@@ -336,6 +336,7 @@ def handle_uploaded_file(f, mode, using):
                 if 'id' in row:
                     # Verify that this matches an Asset in the database.
                     try:
+                        raw_id = row['id']
                         primary_asset_iterator = Asset.objects.filter(id = raw_id)
                         assert len(primary_asset_iterator) == 1 # To ensure it exists in the database.
                     except AssertionError:
