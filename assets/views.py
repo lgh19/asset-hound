@@ -305,7 +305,7 @@ def modify_destination_asset(mode, row, destination_asset, created_new_asset, mo
                     destination_asset.hard_to_count_population.set(validated_values)
 
     # Fields that don't need to be updated: primary_key_from_rocket, synthesized_key, data_source_name, data_source_url
-    return destination_asset, more_results, False
+    return destination_asset, location, organization, more_results, False
 
 
 def handle_uploaded_file(f, mode, using):
@@ -423,7 +423,7 @@ def handle_uploaded_file(f, mode, using):
             ### At this point the fields that differentiate Asset-based Asset updates from 
             ### RawAsset-based Asset updates have been processed.
             ### What comes out of this stage is destination_asset and raw_assets.
-            destination_asset, more_results, error = modify_destination_asset(mode, row, destination_asset, created_new_asset, more_results)
+            destination_asset, location, organization, more_results, error = modify_destination_asset(mode, row, destination_asset, created_new_asset, more_results)
             if error:
                 break
 
