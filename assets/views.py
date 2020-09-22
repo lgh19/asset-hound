@@ -84,7 +84,7 @@ def check_or_update_value(instance, row, mode, more_results, source_field_name, 
     return instance, more_results
 
 
-def modify_destination_asset(row, destination_asset, more_results):
+def modify_destination_asset(mode, row, destination_asset, more_results):
     error = False
     if 'location_id' in row:
         location_id = row['location_id']
@@ -410,7 +410,7 @@ def handle_uploaded_file(f, mode, using):
             ### At this point the fields that differentiate Asset-based Asset updates from 
             ### RawAsset-based Asset updates have been processed.
             ### What comes out of this stage is destination_asset and raw_assets.
-            destination_asset, more_results, error = modify_destination_asset(row, destination_asset, more_results)
+            destination_asset, more_results, error = modify_destination_asset(mode, row, destination_asset, more_results)
             if error:
                 break
 
