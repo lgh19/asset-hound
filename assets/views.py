@@ -463,10 +463,10 @@ def upload_file(request, using):
             else:
                 mode = "update"
             results = handle_uploaded_file(request.FILES['file'], mode, using)
-            return render(request, 'update.html', {'form': form, 'results': results})
+            return render(request, 'update.html', {'form': form, 'results': results, 'asset_based': using == 'using-assets'})
     else:
         form = UploadFileForm()
-    return render(request, 'update.html', {'form': form, 'results': []})
+    return render(request, 'update.html', {'form': form, 'results': [], 'asset_based': using == 'using-assets'})
 
 def dump_assets(filepath):
     from django.core.management import call_command
