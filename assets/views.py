@@ -84,7 +84,7 @@ def check_or_update_value(instance, row, mode, more_results, source_field_name, 
     return instance, more_results
 
 
-def modify_destination_asset(row, destination_asset):
+def modify_destination_asset(row, destination_asset, more_results):
     error = False
     if 'location_id' in row:
         location_id = row['location_id']
@@ -326,7 +326,7 @@ def handle_uploaded_file(f, mode, using):
         if using == 'using-assets':
             reader = csv.DictReader(decoded_file)
             for row in reader:
-                if asset_id in row:
+                if 'asset_id' in row:
                     assert row['asset_id'] == ''
                 # Here id could be verified to correspond to an actual Asset id.
                 # Here ids_to_merge could be verified to correspond to actual Asset ids.
