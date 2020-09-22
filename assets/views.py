@@ -385,6 +385,8 @@ def handle_uploaded_file(f, mode, using):
                         destination_asset.do_not_display = True
                         asset._change_reason = f'Asset Updater: Delisting Asset'
                         destination_asset.save()
+                        s = f"Delisting {destination_asset.name}."
+                        more_results.append(s)
                         continue # Skip rows with no ids to merge.
                     asset_ids = [int(i) for i in ids_to_merge.split('+')]
                     assert destination_asset.id in asset_ids
@@ -408,6 +410,15 @@ def handle_uploaded_file(f, mode, using):
                                 raw_asset.save() # This saving couldn't be done below 
                                 # because there can be multiple sets of RawAssets. They'd 
                                 # all have to be collected into raw_assets to do it below.
+                else:
+                    if '+' in ids_to_merge:
+                        s = f"Extra Assets (from the list {ids_to_merge}) would be delisted and corresponding RawAssets would be assigned to the destination Asset."
+                        more_results.append(s)
+                    elif ids_to_merge == '':
+                        s = f"{destination_asset.name} would be delisted."
+                        more_results.append(s)
+
+
 
             ### At this point the fields that differentiate Asset-based Asset updates from 
             ### RawAsset-based Asset updates have been processed.
