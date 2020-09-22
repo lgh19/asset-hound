@@ -351,7 +351,7 @@ def handle_uploaded_file(f, mode, using):
                         assets_iterator = Asset.objects.filter(id__in = asset_ids)
                         assert len(assets_iterator) == len(asset_ids) # To ensure they all exist in the database.
                     except AssertionError:
-                        more_results.append(f"Failed to find Asset with id == {raw_id}.")
+                        more_results.append(f"Failed to find Assets with ids == {asset_ids}.")
                         return more_results
 
         reader = csv.DictReader(decoded_file)
