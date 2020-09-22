@@ -383,7 +383,7 @@ def handle_uploaded_file(f, mode, using):
                 if mode == 'update':
                     if ids_to_merge == '':
                         destination_asset.do_not_display = True
-                        asset._change_reason = f'Asset Updater: Delisting Asset'
+                        destination_asset._change_reason = f'Asset Updater: Delisting Asset'
                         destination_asset.save()
                         s = f"Delisting {destination_asset.name}."
                         more_results.append(s)
