@@ -305,7 +305,7 @@ def modify_destination_asset(mode, row, destination_asset, created_new_asset, mo
                     destination_asset.hard_to_count_population.set(validated_values)
 
     # Fields that don't need to be updated: primary_key_from_rocket, synthesized_key, data_source_name, data_source_url
-    return destination_asset, more_results
+    return destination_asset, more_results, False
 
 
 def handle_uploaded_file(f, mode, using):
