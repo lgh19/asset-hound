@@ -85,6 +85,7 @@ def check_or_update_value(instance, row, mode, more_results, source_field_name, 
 
 
 def modify_destination_asset(row, destination_asset):
+    error = False
     if 'location_id' in row:
         location_id = row['location_id']
         if location_id in ['', None, 'new']:
@@ -108,7 +109,7 @@ def modify_destination_asset(row, destination_asset):
             location = Location()
         elif there_is_a_field_to_update(row, ['residence', 'iffy_geocoding', 'unit', 'unit_type', 'available_transportation', 'geocoding_properties']):
             more_results.append("There is not enough information to create a new location for this Asset, but there are fields in the merge-instructions file which need to be assigned to a Location. Does not compute! ABORTING!!!<hr>")
-            break
+            return None, more_results, True
 
     if 'organization_id' in row:
         organization_id = row['organization_id']
@@ -150,7 +151,7 @@ def modify_destination_asset(row, destination_asset):
         # The organization can be identified EITHER by the organization_id value or by the organization_name value.
         if ('organization_phone' in row and row['organization_phone'] != '') or ('organization_email' in row and row['organization_email'] != ''):
             more_results.append(f"The organization's name or ID value is required if you want to change either the phone or e-mail address (as a check that the correct Organization instance is being updated. ABORTING!!!!\n<hr>.")
-            break
+            return None, more_results, True
         #else: This is being removed for now since it seems like it could accidentally delete extant organizations.
         #    destination_asset.organization = None # Set ForiegnKey to None.
         #    more_results.append(f"&nbsp;&nbsp;&nbsp;&nbsp;Since the organization has not been clearly identified by name or ID, the Asset's organization is being set to None and other fields (organization_phone and organization email) are being ignored.")
@@ -254,7 +255,7 @@ def modify_destination_asset(row, destination_asset):
         more_results.append(f"asset_type {'will be ' if mode == 'validate' else ''}changed from {pipe_delimit(list_of_old_values)} to {pipe_delimit(new_values)}.")
         if new_values == []:
             more_results.append(f"asset_type can not be empty\n ABORTING!!!\n<hr>")
-            break
+            return None, more_results, True
         try:
             validated_asset_types = [AssetType.objects.get(name=asset_type) for asset_type in new_values] # Change get to get_or_create to allow creation of new asset types.
             # It's better to require manual creation of new asset types for now since that encourages us to specify a Category (necessary for mapping).
@@ -262,7 +263,7 @@ def modify_destination_asset(row, destination_asset):
                 destination_asset.asset_types.set(validated_asset_types)
         except AssetType.DoesNotExist:
             more_results.append(f"Unable to find one of these asset types: {new_values}.\n ABORTING!!!\n<hr>")
-            break
+            return None, more_results, True
 
     source_field_name = 'tags'
     if source_field_name in row:
@@ -409,7 +410,9 @@ def handle_uploaded_file(f, mode, using):
             ### At this point the fields that differentiate Asset-based Asset updates from 
             ### RawAsset-based Asset updates have been processed.
             ### What comes out of this stage is destination_asset and raw_assets.
-            destination_asset, more_results = modify_destination_asset(row, destination_asset, more_results)
+            destination_asset, more_results, error = modify_destination_asset(row, destination_asset, more_results)
+            if error:
+                break
 
             if mode == 'update':
                 more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n")
