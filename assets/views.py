@@ -327,9 +327,30 @@ def handle_uploaded_file(f, mode, using):
             reader = csv.DictReader(decoded_file)
             for row in reader:
                 if 'asset_id' in row:
-                    assert row['asset_id'] == ''
-                # Here id could be verified to correspond to an actual Asset id.
-                # Here ids_to_merge could be verified to correspond to actual Asset ids.
+                    try:
+                        assert row['asset_id'] == ''
+                    except AssertionError:
+                        more_results.append(f"id should be blank but is actually {row['asset_id']}.")
+                        break
+
+                if 'id' in row:
+                    # Verify that this matches an Asset in the database.
+                    try:
+                        primary_asset_iterator = Asset.objects.filter(id = raw_id)
+                        assert len(primary_asset_iterator) == 1 # To ensure it exists in the database.
+                    except AssertionError:
+                        more_results.append(f"Failed to find Asset with id == {raw_id}.")
+                        break
+
+                if 'ids_to_merge' in row:
+                    # Verify that these match Assets in the database.
+                    try:
+                        ids_to_merge = row['ids_to_merge']
+                        asset_ids = [int(i) for i in ids_to_merge.split('+')]
+                        assets_iterator = Asset.objects.filter(id__in = asset_ids)
+                        assert len(assets_iterator) == len(asset_ids) # To ensure they all exist in the database.
+                    except AssertionError:
+                        more_results.append(f"Failed to find Asset with id == {raw_id}.")
 
         reader = csv.DictReader(decoded_file)
         for row in reader:
@@ -344,7 +365,7 @@ def handle_uploaded_file(f, mode, using):
             elif using == 'using-assets':
                 primary_asset_iterator = Asset.objects.filter(id = raw_id)
                 assert len(primary_asset_iterator) == 1 # To ensure it exists in the database.
-                destination_asset = primary_asset_iterator[0] # Note that here 
+                destination_asset = primary_asset_iterator[0] # Note that here
                 # the primary asset is also the destination asset.
 
             # Process the 'asset_id' field
@@ -366,7 +387,7 @@ def handle_uploaded_file(f, mode, using):
                     continue # Skip rows with no ids to merge.
                 raw_ids = [int(i) for i in ids_to_merge.split('+')]
                 raw_assets_iterator = RawAsset.objects.filter(id__in = raw_ids)
-                assert len(raw_assets_iterator) > 0 # To ensure some exist in the database.
+                assert len(raw_assets_iterator) == len(raw_ids) # To ensure they all exist in the database.
                 raw_assets = list(raw_assets_iterator)
                 for raw_asset in raw_assets:
                     raw_asset.asset = destination_asset
@@ -392,7 +413,7 @@ def handle_uploaded_file(f, mode, using):
                     assert destination_asset.id in asset_ids
 
                     assets_iterator = Asset.objects.filter(id__in = asset_ids)
-                    assert len(assets_iterator) > 0 # To ensure some exist in the database.
+                    assert len(assets_iterator) == len(asset_ids) # To ensure they all exist in the database.
                     if len(assets_iterator) > 1:
                         s = f"Delisting extra Assets (from the list {ids_to_merge}) and assigning corresponding RawAssets to the destination Asset."
                         more_results.append(s)
@@ -407,8 +428,8 @@ def handle_uploaded_file(f, mode, using):
                             for raw_asset in asset.rawasset_set.all():
                                 raw_asset.asset = destination_asset
                                 raw_asset._change_reason = f'Asset Updater: Linking RawAsset to different Asset because of Asset merge'
-                                raw_asset.save() # This saving couldn't be done below 
-                                # because there can be multiple sets of RawAssets. They'd 
+                                raw_asset.save() # This saving couldn't be done below
+                                # because there can be multiple sets of RawAssets. They'd
                                 # all have to be collected into raw_assets to do it below.
                 else:
                     if '+' in ids_to_merge:
@@ -418,7 +439,7 @@ def handle_uploaded_file(f, mode, using):
                         s = f"{destination_asset.name} would be delisted."
                         more_results.append(s)
 
-            ### At this point the fields that differentiate Asset-based Asset updates from 
+            ### At this point the fields that differentiate Asset-based Asset updates from
             ### RawAsset-based Asset updates have been processed.
             ### What comes out of this stage is destination_asset and raw_assets.
             destination_asset, location, organization, more_results, error = modify_destination_asset(mode, row, destination_asset, created_new_asset, more_results)
