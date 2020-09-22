@@ -12,6 +12,8 @@ asset_hound/uwsgi_params
 *.swp
 *.pyc
 TODO
+*NOTES
+NOTEBOOK
 notes.txt
 
 data/
