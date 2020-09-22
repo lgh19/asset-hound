@@ -15,9 +15,11 @@
 
 {% if asset_based %}
     <h1>Asset-based Asset Updater</h1>
+    <small><a href="/edit/update-assets/using-raw-assets/">Switch to RawAsset-based updater</a></small>
     Upload a merge-instructions CSV file here to attempt to execute asset merges and other edits (specifying Asset field values).
 {% else %}
     <h1>RawAsset-based Asset Updater</h1>
+    <small><a href="/edit/update-assets/using-assets/">Switch to Asset-based updater</a></small>
     Upload a merge-instructions CSV file here to attempt to execute asset merges and other edits (specifying Asset field values and linking the corresponding RawAsset records to the merged Asset instance).
 {% endif %}
 <details>
