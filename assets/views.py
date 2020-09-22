@@ -84,7 +84,7 @@ def check_or_update_value(instance, row, mode, more_results, source_field_name, 
     return instance, more_results
 
 
-def modify_destination_asset(mode, row, destination_asset, more_results):
+def modify_destination_asset(mode, row, destination_asset, created_new_asset, more_results):
     error = False
     if 'location_id' in row:
         location_id = row['location_id']
@@ -334,6 +334,7 @@ def handle_uploaded_file(f, mode, using):
         reader = csv.DictReader(decoded_file)
         for row in reader:
 
+            created_new_asset = False
             # Process the 'id' field
             raw_id = row['id']
             if using == 'using-raw-assets':
@@ -354,7 +355,6 @@ def handle_uploaded_file(f, mode, using):
                     destination_asset = Asset()
                     more_results.append(f"A new Asset {'would' if mode == 'validate' else 'will'} be created.")
                 else:
-                    created_new_asset = False
                     destination_asset_iterator = Asset.objects.filter(id = asset_id)
                     assert len(destination_asset_iterator) == 1 # To ensure there is exactly one in the database.
                     destination_asset = destination_asset_iterator[0]
@@ -410,7 +410,7 @@ def handle_uploaded_file(f, mode, using):
             ### At this point the fields that differentiate Asset-based Asset updates from 
             ### RawAsset-based Asset updates have been processed.
             ### What comes out of this stage is destination_asset and raw_assets.
-            destination_asset, more_results, error = modify_destination_asset(mode, row, destination_asset, more_results)
+            destination_asset, more_results, error = modify_destination_asset(mode, row, destination_asset, created_new_asset, more_results)
             if error:
                 break
 
