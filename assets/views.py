@@ -331,7 +331,7 @@ def handle_uploaded_file(f, mode, using):
                         assert row['asset_id'] == ''
                     except AssertionError:
                         more_results.append(f"id should be blank but is actually {row['asset_id']}.")
-                        break
+                        return more_results
 
                 if 'id' in row:
                     # Verify that this matches an Asset in the database.
@@ -341,7 +341,7 @@ def handle_uploaded_file(f, mode, using):
                         assert len(primary_asset_iterator) == 1 # To ensure it exists in the database.
                     except AssertionError:
                         more_results.append(f"Failed to find Asset with id == {raw_id}.")
-                        break
+                        return more_results
 
                 if 'ids_to_merge' in row:
                     # Verify that these match Assets in the database.
@@ -352,6 +352,7 @@ def handle_uploaded_file(f, mode, using):
                         assert len(assets_iterator) == len(asset_ids) # To ensure they all exist in the database.
                     except AssertionError:
                         more_results.append(f"Failed to find Asset with id == {raw_id}.")
+                        return more_results
 
         reader = csv.DictReader(decoded_file)
         for row in reader:
@@ -445,7 +446,7 @@ def handle_uploaded_file(f, mode, using):
             ### What comes out of this stage is destination_asset and raw_assets.
             destination_asset, location, organization, more_results, error = modify_destination_asset(mode, row, destination_asset, created_new_asset, more_results)
             if error:
-                break
+                return more_results
 
             if mode == 'update':
                 more_results.append(f"Updating associated Asset, RawAsset, Location, and Organization instances. (This may leave some orphaned.)\n")
