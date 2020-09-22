@@ -389,11 +389,10 @@ def handle_uploaded_file(f, mode, using):
                     asset_ids = [int(i) for i in ids_to_merge.split('+')]
                     assert destination_asset.id in asset_ids
 
-                    assets_iterator = Asset.objects.filter(id__in = raw_ids)
+                    assets_iterator = Asset.objects.filter(id__in = asset_ids)
                     assert len(assets_iterator) > 0 # To ensure some exist in the database.
-                    assets = list(assets_iterator)
 
-                    for asset in assets:
+                    for asset in assets_iterator:
                         if asset.id != destination_asset.id:
                             asset.do_not_display = True
                             asset._change_reason = f'Asset Updater: Delisting Asset'
