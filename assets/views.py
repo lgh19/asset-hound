@@ -131,11 +131,11 @@ def modify_destination_asset(mode, row, destination_asset, created_new_asset, mo
     # [ ] Oddball legacy conversion to be deleted:
     source_field_name = 'accessibility_features'
     if source_field_name in row:
-        new_value = row[source_field_name]
+        new_value = boolify(row[source_field_name])
         old_value = destination_asset.accessibility
         if new_value != old_value:
             more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
-            destination_asset.accessibility = boolify(new_value)
+            destination_asset.accessibility = new_value
 
 
     missing_organization_identifier = True
