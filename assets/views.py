@@ -323,7 +323,7 @@ def handle_uploaded_file(f, mode, using):
         decoded_file = f.read().decode('utf-8').splitlines()
 
         # Validate the file
-        if using = 'using-assets':
+        if using == 'using-assets':
             reader = csv.DictReader(decoded_file)
             for row in reader:
                 if asset_id in row:
@@ -396,8 +396,8 @@ def handle_uploaded_file(f, mode, using):
                     for asset in assets:
                         if asset.id != destination_asset.id:
                             asset.do_not_display = True
-                                asset._change_reason = f'Asset Updater: Delisting Asset'
-                                asset.save()
+                            asset._change_reason = f'Asset Updater: Delisting Asset'
+                            asset.save()
 
                             # Iterate over raw assets of this asset and point them to destination_asset.
                             for raw_asset in asset.rawasset_set.all():
