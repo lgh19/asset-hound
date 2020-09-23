@@ -314,7 +314,7 @@ def handle_uploaded_file(f, mode, using):
 
     assert using in ['using-raw-assets', 'using-assets']
 
-    if f.size > 2500000:
+    if f.size > 25000000:
         raise ValueError("handle_uploaded_file hasn't implemented saving the file for reading/parsing yet.")
         #for chunk in f.chunks(): # "Looping over chunks() instead of using read()
         #    # ensures that large files don't overwhelm your system's memory.
