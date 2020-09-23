@@ -326,7 +326,7 @@ def handle_uploaded_file(f, mode, using):
         if using == 'using-assets':
             reader = csv.DictReader(decoded_file)
             for row in reader:
-                if 'asset_id' in row:
+                if 'asset_id' in row and row['asset_id'] not in ['']:
                     try:
                         assert row['asset_id'] == ''
                     except AssertionError:
@@ -335,24 +335,26 @@ def handle_uploaded_file(f, mode, using):
 
                 if 'id' in row:
                     # Verify that this matches an Asset in the database.
-                    try:
-                        raw_id = row['id']
-                        primary_asset_iterator = Asset.objects.filter(id = raw_id)
-                        assert len(primary_asset_iterator) == 1 # To ensure it exists in the database.
-                    except AssertionError:
-                        more_results.append(f"Failed to find Asset with id == {raw_id}. ASSET UPDATER FAILURE.")
-                        return more_results
+                    raw_id = row['id']
+                    if raw_id not in ['']:
+                        try:
+                            primary_asset_iterator = Asset.objects.filter(id = raw_id)
+                            assert len(primary_asset_iterator) == 1 # To ensure it exists in the database.
+                        except AssertionError:
+                            more_results.append(f"Failed to find Asset with id == {raw_id}. ASSET UPDATER FAILURE.")
+                            return more_results
 
                 if 'ids_to_merge' in row:
                     # Verify that these match Assets in the database.
-                    try:
-                        ids_to_merge = row['ids_to_merge']
-                        asset_ids = [int(i) for i in ids_to_merge.split('+')]
-                        assets_iterator = Asset.objects.filter(id__in = asset_ids)
-                        assert len(assets_iterator) == len(asset_ids) # To ensure they all exist in the database.
-                    except AssertionError:
-                        more_results.append(f"Failed to find Assets with ids == {asset_ids}. ASSET UPDATER FAILURE.")
-                        return more_results
+                    ids_to_merge = row['ids_to_merge']
+                    if ids_to_merge not in ['']:
+                        try:
+                            asset_ids = [int(i) for i in ids_to_merge.split('+')]
+                            assets_iterator = Asset.objects.filter(id__in = asset_ids)
+                            assert len(assets_iterator) == len(asset_ids) # To ensure they all exist in the database.
+                        except AssertionError:
+                            more_results.append(f"Failed to find Assets with ids == {asset_ids}. ASSET UPDATER FAILURE.")
+                            return more_results
 
                 if 'location_id' in row and row['location_id'] not in ['', None]:
                     try:
