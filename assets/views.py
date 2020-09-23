@@ -330,7 +330,7 @@ def handle_uploaded_file(f, mode, using):
                     try:
                         assert row['asset_id'] == ''
                     except AssertionError:
-                        more_results.append(f"id should be blank but is actually {row['asset_id']}.")
+                        more_results.append(f"id should be blank but is actually {row['asset_id']}. ASSET UPDATER FAILURE.")
                         return more_results
 
                 if 'id' in row:
@@ -340,7 +340,7 @@ def handle_uploaded_file(f, mode, using):
                         primary_asset_iterator = Asset.objects.filter(id = raw_id)
                         assert len(primary_asset_iterator) == 1 # To ensure it exists in the database.
                     except AssertionError:
-                        more_results.append(f"Failed to find Asset with id == {raw_id}.")
+                        more_results.append(f"Failed to find Asset with id == {raw_id}. ASSET UPDATER FAILURE.")
                         return more_results
 
                 if 'ids_to_merge' in row:
@@ -351,7 +351,21 @@ def handle_uploaded_file(f, mode, using):
                         assets_iterator = Asset.objects.filter(id__in = asset_ids)
                         assert len(assets_iterator) == len(asset_ids) # To ensure they all exist in the database.
                     except AssertionError:
-                        more_results.append(f"Failed to find Assets with ids == {asset_ids}.")
+                        more_results.append(f"Failed to find Assets with ids == {asset_ids}. ASSET UPDATER FAILURE.")
+                        return more_results
+
+                if 'location_id' in row and row['location_id'] not in ['', None]:
+                    try:
+                        location = Location.objects.get(pk = row['location_id'])
+                    except Location.DoesNotExist:
+                        more_results.append(f"Failed to find Location with id == {row['location_id']}. ASSET UPDATER FAILURE.")
+                        return more_results
+
+                if 'organization_id' in row and row['organization_id'] not in ['', None]:
+                    try:
+                        organization = Organization.objects.get(pk = row['organization_id'])
+                    except Location.DoesNotExist:
+                        more_results.append(f"Failed to find Organization with id == {row['location_id']}. ASSET UPDATER FAILURE.")
                         return more_results
 
         reader = csv.DictReader(decoded_file)
