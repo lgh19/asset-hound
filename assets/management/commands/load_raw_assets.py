@@ -44,7 +44,7 @@ class Command(BaseCommand):
             chosen_asset_types = []
             extant_types = [a.name for a in AssetType.objects.all()]
             for arg in args:
-                if arg = 'clear_first':
+                if arg == 'clear_first':
                     clear_first = True
                 elif arg in extant_types:
                     chosen_asset_types.append(arg)
@@ -92,28 +92,47 @@ class Command(BaseCommand):
                                 print(f"No assets with type '{asset_type}' found.")
 
                     ## Upload the raw assets. ##
-                    auto_link = False # auto_link = True was used to transition to having both RawAsset and Asset tables.
-                    # Now auto_link = False because raw assets will go through a deduplication stage to match them up
-                    # with the correct Assets.
+                    keep_links = True
+
+                    mode == 'insert'
+                    if mode in ['upsert', 'update']
+                        raise ValueError(f"load_raw_assets.py does not yet support upserts/updates because the Asset changes (including reapplying old edits) needs to be coded first.")
                     for row in dr:
                         if row['asset_type'] == asset_type:
-                            if auto_link:
-                                # Try to identify which existing Asset this RawAsset should be linked to
-                                # based on the synthesized_key value.
+                            if mode == 'insert':
+                                # Verify that Asset with matching keys does not already exist.
                                 assert 'synthesized_key' in row
                                 assert row['synthesized_key'] != ''
-                                queryset = Asset.objects.filter(synthesized_key=row['synthesized_key'])
-                                if len(queryset) == 1:
-                                    asset_to_link_to = queryset[0]
-                                elif len(queryset) > 2:
-                                    raise ValueError(f"{len(queryset)} possible Asset links found for synthesized key = {row['synthesized_key']}")
-                                else:
-                                    print(f"Unable to find an Asset with synthesized_key = {row['synthesized_key']}")
-                            else:
+                                queryset = RawAsset.objects.filter(synthesized_key=row['synthesized_key'])
+                                if len(queryset) > 0:
+                                    raise ValueError(f"Unable to {mode} row with synthesized key {row['synthesized_key']} because one or more other such rows exist (with IDs {[r['id'] for r in queryset]}.")
+                                if 'primary_key_from_rocket' in row if row['primary_key_from_rocket'] not in ['', None]:
+                                    queryset = RawAsset.objects.filter(primary_key_from_rocket=row['primary_key_from_rocket'])
+                                    if len(queryset) > 0:
+                                        raise ValueError(f"Unable to {mode} row with primary_key_from_rocket {row['primary_key_from_rocket']} because one or more other such rows exist (with IDs {[r['id'] for r in queryset]}.")
                                 asset_to_link_to = None
+                            #elif mode in ['update', 'upsert']:
+                                # Try to find existing RawAssets based on primary_key_from_rocket (or failing that synthesized_key).
+                                # Or maybe find based on sythesized_key but try to validate with primary key.
+                                # asset_to_link_to =
 
-                            raise ValueError("Replace all this auto_link business with preservation of existing links to Assets.")
 
+                            #if keep_links:
+                            #    # Try to identify which existing Asset this RawAsset should be linked to
+                            #    # based on the synthesized_key value.
+                            #    assert 'synthesized_key' in row
+                            #    assert row['synthesized_key'] != ''
+                            #    queryset = Asset.objects.filter(synthesized_key=row['synthesized_key'])
+                            #    if len(queryset) == 1:
+                            #        asset_to_link_to = queryset[0]
+                            #    elif len(queryset) > 2:
+                            #        raise ValueError(f"{len(queryset)} possible Asset links found for synthesized key = {row['synthesized_key']}")
+                            #    else:
+                            #        print(f"Unable to find an Asset with synthesized_key = {row['synthesized_key']}")
+                            #else:
+                            #    asset_to_link_to = None
+
+                            print(f"asset_to_link_to = {asset_to_link_to}")
                             # Since the next line uses get_or_create, it will create new asset types, without insisting that they
                             # be manually entered (along with a Category). Without the Category, a dot representing this type
                             # of assets will not appear on the map.
