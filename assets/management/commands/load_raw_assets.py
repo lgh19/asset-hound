@@ -95,7 +95,7 @@ class Command(BaseCommand):
                     keep_links = True
 
                     mode == 'insert'
-                    if mode in ['upsert', 'update']
+                    if mode in ['upsert', 'update']:
                         raise ValueError(f"load_raw_assets.py does not yet support upserts/updates because the Asset changes (including reapplying old edits) needs to be coded first.")
                     for row in dr:
                         if row['asset_type'] == asset_type:
@@ -106,7 +106,7 @@ class Command(BaseCommand):
                                 queryset = RawAsset.objects.filter(synthesized_key=row['synthesized_key'])
                                 if len(queryset) > 0:
                                     raise ValueError(f"Unable to {mode} row with synthesized key {row['synthesized_key']} because one or more other such rows exist (with IDs {[r['id'] for r in queryset]}.")
-                                if 'primary_key_from_rocket' in row if row['primary_key_from_rocket'] not in ['', None]:
+                                if 'primary_key_from_rocket' in row and row['primary_key_from_rocket'] not in ['', None]:
                                     queryset = RawAsset.objects.filter(primary_key_from_rocket=row['primary_key_from_rocket'])
                                     if len(queryset) > 0:
                                         raise ValueError(f"Unable to {mode} row with primary_key_from_rocket {row['primary_key_from_rocket']} because one or more other such rows exist (with IDs {[r['id'] for r in queryset]}.")
