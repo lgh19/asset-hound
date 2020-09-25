@@ -94,7 +94,7 @@ class Command(BaseCommand):
                     ## Upload the raw assets. ##
                     keep_links = True
 
-                    mode == 'insert'
+                    mode = 'insert'
                     if mode in ['upsert', 'update']:
                         raise ValueError(f"load_raw_assets.py does not yet support upserts/updates because the Asset changes (including reapplying old edits) needs to be coded first.")
                     for row in dr:
