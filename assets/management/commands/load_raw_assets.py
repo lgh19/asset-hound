@@ -164,7 +164,7 @@ class Command(BaseCommand):
 
                                 url=non_blank_value_or_none(row, 'url'),
                                 email=non_blank_value_or_none(row, 'email'),
-                                phone=standardize_phone(row['phone']),
+                                phone=standardize_phone(row.get('phone', None)),
 
                                 hours_of_operation=non_blank_value_or_none(row, 'hours_of_operation'),
                                 holiday_hours_of_operation=non_blank_value_or_none(row, 'holiday_hours_of_operation'),
@@ -213,7 +213,7 @@ class Command(BaseCommand):
 
                                 organization_name = non_blank_value_or_none(row, 'organization_name'),
                                 organization_email = non_blank_value_or_none(row, 'organization_email'),
-                                organization_phone = standardize_phone(row['organization_phone']),
+                                organization_phone = standardize_phone(row.get('organization_phone', None)),
 
                                 data_source=data_source,
                                 primary_key_from_rocket=non_blank_value_or_none(row, 'primary_key_from_rocket'),
