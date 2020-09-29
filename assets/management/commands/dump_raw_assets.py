@@ -15,8 +15,8 @@ def to_dict_for_csv(asset: RawAsset):
         'asset_id': asset.asset.id if asset.asset is not None else None,
         'tags': '|'.join([t.name for t in asset.tags.all()]),
         'street_address': asset.street_address,
-        'unit': asset.unit,
-        'unit_type': asset.unit_type,
+        #'unit': asset.unit, # Not yet included in the RawAsset model.
+        #'unit_type': asset.unit_type, # Not yet included in the RawAsset model.
         'municipality': asset.municipality,
         'city': asset.city,
         'state': asset.state,
@@ -90,8 +90,8 @@ class Command(BaseCommand):
                  'asset_id',
                  'tags',
                  'street_address',
-                 'unit',
-                 'unit_type',
+                 #'unit', # Not yet included in the RawAsset model.
+                 #'unit_type', # Not yet included in the RawAsset model.
                  'municipality',
                  'city',
                  'state',
