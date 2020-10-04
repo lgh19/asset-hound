@@ -29,4 +29,5 @@ Add a 'definition' field to Tags to eventually provide clarifying hovertext (pos
 Improve map view for admin Location editor (streets + better resolution),
 Write API endpoint for streaming a CSV file of assets (for both internal use and feeding an ETL job),Done (modulo workaround for timeouts)
 Link from Farmer's Market assets to correspoding mini-maps: https://pittsburghpa.gov/events/east-liberty-market,
+E-mail addresses in DOH_NursingHome201806.csv (PASDA Nursing Home) data are truncated to 15 characters; investigate,
 "Find data sources for assets we'd like to add (e.g., bookstores, hotels)",Done
