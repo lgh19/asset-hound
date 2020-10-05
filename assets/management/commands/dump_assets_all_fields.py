@@ -113,6 +113,7 @@ class Command(BaseCommand):
                  'residence',
                  'iffy_geocoding',
                  'available_transportation',
+                 'parent_location_id',
                  'parent_location',
                  'url',
                  'email',
