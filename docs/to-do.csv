@@ -2,19 +2,21 @@ thing,status
 Automate pushing new data to Carto table on Django Asset/Location saves,
 Find and geocode ~164 ungeocoded assets,
 Delist locations/assets outside of Allegheny County,
-"Experiment with usaddress{,-scourgify} to standardize addresses",
+Automate publication of DB dump to WPRDC data portal,
+Standardize addresses with Geomancer + Addressing Dataset + Landmarks (also include parcel ID + address_id in output),
+"Experiment with usaddress{,-scourgify} to standardize addresses",Done
 Consider using OpenStreetMap tags for inspiration: https://wiki.openstreetmap.org/wiki/Category:Tag_descriptions,
 Modify map to distinguish/highlight multiple assets at the same location,
 Add a new map dot color for multi-type Assets (maybe to handle the 1500-Asset location),
 Implement solution to float precision issues on geocoordinates (probably switch to Decimal type),
 Design re-geocoding interface and worflow,
-Fix ~3500 assets geocoded by Pelias with centroids,
-Research taxonomies (e.g., https://www.census.gov/eos/www/naics/downloadables/downloadables.html),
+Fix ~3500 assets geocoded by Pelias with centroids,Done
+"Research taxonomies (e.g., https://www.census.gov/eos/www/naics/downloadables/downloadables.html)",
 Mine https://www.alltheplaces.xyz/ for assets,
 Use Geomancer Prime to add parcel IDs to assets (for subsequent by-parcel clustering and deduplication),
 Assign and actually use parent locations,
 Devise a way to check if Assets are being linked to by the Asset Explorer before allowing them to be deleted,
-"Delete 'PGH PARKING AUTHORITY' (232 BLVD OF THE ALLIES) as a laundromat",
+"Delist 'PGH PARKING AUTHORITY' (232 BLVD OF THE ALLIES) as a laundromat",Done
 Delete orphaned Location/Organization/other-non-Asset instances,
 Write upsert-capable loader,
 Identify other asset types we'd like to include,
@@ -23,9 +25,9 @@ Identify other asset types we'd like to include,
 Import 8 multitype assets excluded from v1 so far (plus 3 hotels with synthesized_key conflicts),
 The Location model is another table that we need an update strategy for (the Django loader may change the Location data after every update),Semi-resolved (by ensuring that the loader only fill in gaps)
 Add a 'definition' field to Tags to eventually provide clarifying hovertext (possibly list all Assets at that Location),
-Automate publication of DB dump to WPRDC data portal,
 "Add synthesized keys for user-edited assets (~'frontend::<Django record ID>')",
 Improve map view for admin Location editor (streets + better resolution),
 Write API endpoint for streaming a CSV file of assets (for both internal use and feeding an ETL job),Done (modulo workaround for timeouts)
 Link from Farmer's Market assets to correspoding mini-maps: https://pittsburghpa.gov/events/east-liberty-market,
+E-mail addresses in DOH_NursingHome201806.csv (PASDA Nursing Home) data are truncated to 15 characters; investigate,
 "Find data sources for assets we'd like to add (e.g., bookstores, hotels)",Done
