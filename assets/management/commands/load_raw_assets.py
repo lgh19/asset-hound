@@ -200,7 +200,7 @@ class Command(BaseCommand):
                                 # parent_location values, so doing it semimanually seems viable.
                                 # It's pretty much the same deal with the organization having a
                                 # Location instance. It might eventually make sense to make this
-                                # association, but there's no data or wiring or front end features
+                                # association, but there's no data or wiring or front-end features
                                 # to support it at this point.
                                 latitude = non_blank_type_or_none(row, 'latitude', float),
                                 longitude = non_blank_type_or_none(row, 'longitude', float),
