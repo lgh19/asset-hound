@@ -211,7 +211,21 @@ def modify_destination_asset(mode, row, destination_asset, created_new_asset, mo
 
     location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'available_transportation', field_type=str)
     location, more_results = check_or_update_value(location, row, mode, more_results, source_field_name = 'geocoding_properties', field_type=str)
-    # Ignore parent location for now.
+
+    # BEGIN Handle parent_location and parent_location_id
+    source_field_name = 'parent_location_id'
+    new_value = non_blank_type_or_none(row, source_field_name, field_type)
+    old_value = getattr(getattr(location, 'parent_location', None), 'id', None)
+
+    if new_value != old_value:
+        more_results.append(f"{source_field_name} {'will be ' if mode == 'validate' else ''}changed from {old_value} to {new_value}.")
+        new_parent_location = Location.objects.get(pk = new_value)
+        setattr(location, 'parent_location', new_parent_location)
+
+    if 'parent_location' in row:
+        parent_location_name = getattr(getattr(location, 'parent_location', None), 'name', None)
+        more_results.append(f"The parent_location name (after any parent_location_id updates) {'would be' if mode == 'validate' else 'is'} {parent_location_name}. [The 'parent_location' value in the merge-instructions file is not used to make updates.]")
+    # END Handle parent_location and parent_location_id
 
     destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'url', field_type=str)
     destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'email', field_type=str)
