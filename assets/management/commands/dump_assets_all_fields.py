@@ -27,6 +27,7 @@ def to_dict_for_csv(asset: Asset):
         'residence': getattr(asset.location, 'residence', None),
         'iffy_geocoding': getattr(asset.location, 'iffy_geocoding', None),
         'available_transportation': getattr(asset.location, 'available_transportation', None),
+        'parent_location_id': getattr(getattr(asset.location, 'parent_location', None), 'id', None),
         'parent_location': getattr(asset.location, 'parent_location', None),
         'url': asset.url,
         'email': asset.email,
