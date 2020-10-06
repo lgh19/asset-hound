@@ -214,7 +214,7 @@ def modify_destination_asset(mode, row, destination_asset, created_new_asset, mo
 
     # BEGIN Handle parent_location and parent_location_id
     source_field_name = 'parent_location_id'
-    new_value = non_blank_type_or_none(row, source_field_name, field_type)
+    new_value = non_blank_type_or_none(row, source_field_name, str)
     old_value = getattr(getattr(location, 'parent_location', None), 'id', None)
 
     if new_value != old_value:
