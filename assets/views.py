@@ -425,9 +425,17 @@ def handle_uploaded_file(f, mode, using):
                     raw_asset.asset = destination_asset
 
                 if len(raw_assets) == 1:
-                    summary = f"{'Validating this process: ' if mode == 'validate' else ''}Editing the Asset with id = {asset_id}, previously named {destination_asset.name}, and linking it to RawAsset with id = {raw_assets[0].id} and name = {raw_assets[0].name}."
+                    if created_new_asset:
+                        summary = f"{'Validating this process: ' if mode == 'validate' else ''}Creating a new Asset, "
+                    else:
+                        summary = f"{'Validating this process: ' if mode == 'validate' else ''}Editing the Asset with id = {asset_id}, previously named {destination_asset.name}, "
+                    summary += "and linking it to RawAsset with id = {raw_assets[0].id} and name = {raw_assets[0].name}."
                 else:
-                    summary = f"{'Validating this process: ' if mode == 'validate' else ''}Merging RawAssets with ids = {', '.join([str(r.id) for r in raw_assets])} and names = {', '.join([r.name for r in raw_assets])} to Asset with id = {asset_id}, previously named {destination_asset.name}."
+                    summary = f"{'Validating this process: ' if mode == 'validate' else ''}Merging RawAssets with ids = {', '.join([str(r.id) for r in raw_assets])} and names = {', '.join([r.name for r in raw_assets])} "
+                    if created_new_asset:
+                        summary += " to a new Asset with name {row.get('name', '(No name given)')}."
+                    else:
+                        summary += " to Asset with id = {asset_id}, previously named {destination_asset.name}."
                 more_results.append(summary)
 
             elif using == 'using-assets':
