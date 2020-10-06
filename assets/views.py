@@ -446,6 +446,8 @@ def handle_uploaded_file(f, mode, using):
 
                     assets_iterator = Asset.objects.filter(id__in = asset_ids)
                     assert len(assets_iterator) == len(asset_ids) # To ensure they all exist in the database.
+                    s = f"{'Validating this process: ' if mode == 'validate' else ''}Editing the Asset with id = {destination_asset.id}, previously named {destination_asset.name}."
+                    more_results.append(s)
                     if len(assets_iterator) > 1:
                         s = f"Delisting extra Assets (from the list {ids_to_merge}) and assigning corresponding RawAssets to the destination Asset."
                         more_results.append(s)
