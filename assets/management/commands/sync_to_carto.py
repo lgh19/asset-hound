@@ -13,12 +13,16 @@ USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
 DEFAULT_CARTO_FIELDS = ['id', 'name', 'asset_type', 'asset_type_title',
                         'category', 'category_title', 'sensitive',
                         'do_not_display', 'latitude', 'longitude']
-
+TABLE_NAME = 'assets_v1'
 
 def delete_assets_by_type(sql, table_name, asset_type):
     results = sql.send(f"DELETE from {table_name} WHERE asset_type='{asset_type}'")
     return results
 
+def delete_from_carto_by_id(asset_id):
+    sql = SQLClient(auth_client)
+    results = sql.send(f"DELETE from {TABLE_NAME} WHERE id ='{asset_id}'")
+    return results
 
 def values_string(row, fields):
     values = []

@@ -7,6 +7,7 @@ from pprint import pprint
 USERNAME = "wprdc"
 USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
 auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
+table_name = 'assets_v1'
 
 def basic_query(sql):
     try:
