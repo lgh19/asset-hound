@@ -15,9 +15,15 @@ The source files can be found in [this private repository](https://github.com/WP
 The job codes defined in the `job_dicts` list can be supplied as command-line arguments to generate a file containing just those assets. For instance, the `job_code` value for the public-art dataset is `public_art`, so running
 
 ```> python launchpad.py engine/payload/asset_map/_facet_hound.py mute public_art```
-will only process the public_art job. If `one_file == False`, the generated file will be called `public-art-pgh.csv`. All files will be saved to the directory given in the variable `ASSET_MAP_PROCESSED_DIR`, as specified by the `destination_file` parameter in the jobs (though this could be changed).
+will only process the public_art job. If `one_file == False`, the generated file will be called `public-art-pgh.csv` and will only contain the fields defined by the corresponding schema (wherease when `one_file == True`, all fields in the asset schema are included in the file). All converted files will be saved to the directory given in the variable `ASSET_MAP_PROCESSED_DIR`, as specified by the `destination_file` parameter in the jobs (though this could be changed).
 
-### Editing assets
+The contents of these files are considered to be raw assets.
+
+### Uploading raw assets to the asset database
+
+The asset database (defined in [this Django models.py file](https://github.com/WPRDC/asset-hound/blob/master/assets/models.py)) has a RawAsset model which is compatible with the schema produced by the `_facet_hound.py` ETL job. To upload a file of raw assets, converted by `_facet_hound.py`, move the file to the assets server (`> sftp all_assets.csv <username>@assets.wprdc.org:<path-to-asset_hound>/raw_assets_to_add.csv`), shell into the Django server, change directories to the Django directory, activate the Django virtual environment (`source env/bin/activate`), and run the RawAsset-loading management command (`> python manage.py load_raw_assets raw_assets_to_add.csv`).
+
+### Creating and editing assets
 
 
 ### The workflow for adding a new file containing assets to the assets database
