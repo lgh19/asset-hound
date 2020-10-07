@@ -20,6 +20,7 @@ def delete_assets_by_type(sql, table_name, asset_type):
     return results
 
 def delete_from_carto_by_id(asset_id):
+    auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
     sql = SQLClient(auth_client)
     results = sql.send(f"DELETE from {TABLE_NAME} WHERE id ='{asset_id}'")
     return results
