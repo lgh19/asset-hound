@@ -29,13 +29,25 @@ The contents of the raw-asset table can then be exported from the database by ru
 ### Creating and editing assets
 The resulting `raw_asset_dump.csv` file is then exported to another computer, where a subset of raw assets may be selected (for instance, all raw assets of a given asset-type (like `restaurants`)). This filtered file is run through a Python script that facilitates finding and merging raw assets. When the script finds sufficiently similar raw assets, it proposes them as duplicates to merge and the lets the user select among conflicting values on a field-by-field basis. The output of this process is what we call a merge-instructions file.
 
-(The format of the merge-instructions file)
+#### The format of the merge-instructions file
 
-(How the Asset updater works)
-(Asset-based vs. Raw-Asset-based updates)
+#### Some details about how the deduplication is done
 
+### Updating Assets
+Records in the Assets table can be modified in three ways: 1) Using the Django admin interface allows record-level modifications. This is fine for handling a few changes, but inefficient for bulk changes. 2) Making changes through the Django shell. This requires shelling into the assets server and making changes with Python commands. This can be powerful and fast but also tricky and unforgiving, requiring the user to manually take care of many things, and it only leaves documentation in the form of the history-tracking model. 3) The Asset updater, a web service that accepts merge-instructions files, allows them to be validated, automates much of the process, and tags any Asset edits with an identifiable "change_reason" field.
 
-### The workflow for adding a new file containing assets to the assets database
+There are two different versions of the Asset updater. The original version uses merge instructions generated from a raw-asset dump file. 
+
+[https://assets.wprdc.org/edit/update-assets/using-raw-assets/](https://assets.wprdc.org/edit/update-assets/using-raw-assets/)
+
+This can be used to link one or more RawAssets to a new or existing Asset (where the Asset table is what is used to generate the asset map and to give details about the asset when the corresponding dot in the map is clicked) and to set the field values of that Asset. New Location and Organization instances can also be created through this process, as described on the [Asset updater page](https://assets.wprdc.org/edit/update-assets/using-raw-assets/).
+
+The [Asset-based Asset updater](https://assets.wprdc.org/edit/update-assets/using-assets/) has similar functionality, but its merge-instructions file is generated from an asset dump file, which tells the updater which Assets how to edit Assets and how to merge existing Assets into existing Asset instances. When multiple Assets are merged into one, the others are "delisted", which means that their `do_not_display` value is set to `True`. The delisted Assets have their RawAssets reassigned to the single Asset that the others are merged into.
+
+#### More about delisting
+It is also the case that whenever an Asset is saved with no RawAssets pointing to it, it is automatically considered an unsupported Asset and therefore delisted. Delisting prevents an Asset from appearing on the map, but still allows it to persist in the database. Delisted Assets fall into two categories: 1) Those that have been delisted because they are not supported by links to any RawAssets. (These could in principle be deleted at some point, as could any orphaned Location or Organization instances that are not linked to any Assets.) 2) Those that are being hidden because we don't currently wish to show them (such as Assets outside of Allegheny County), but which we may wish to revive at some point (if we expand the map beyond Allegheny County). 
+
+### Example workflow for adding a new file containing assets to the assets database (coming soon)
 
 ### Exporting data
 Accessing the URL [https://assets.wprdc.org/edit/dump_assets/](https://assets.wprdc.org/edit/dump_assets/) triggers a dump of the assets which will show up `(# of records)/(4000/minute)` later at
