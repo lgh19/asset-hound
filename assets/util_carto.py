@@ -8,6 +8,10 @@ USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
 
 TABLE_NAME = 'assets_v1'
 
+def sql_escape(s):
+    s = re.sub("'", '"', s)
+    return s
+
 def extract_values_from_model(asset, fields):
     values = []
 
@@ -47,6 +51,7 @@ def extract_values_from_model(asset, fields):
         elif field in ['id', 'latitude', 'longitude']:
             values.append(str(value)) # Coerce to string for the join function below.
         else:
+            value = sql_escape(value)
             values.append(f"'{value}'")
     return values
 
@@ -108,6 +113,7 @@ def update_asset_on_carto(asset_dict, fields):
     other_fields.remove('id')
     q = f"UPDATE {TABLE_NAME} SET {set_string_from_model(asset_dict, other_fields)} WHERE id = {asset_dict['asset'].id};"
     assert len(q) < 16384
+    print(q)
     results = sql.send(q)
 
 def insert_new_assets_into_carto(asset_dicts, fields):
@@ -136,7 +142,7 @@ def insert_new_assets_into_carto(asset_dicts, fields):
         f"VALUES {', '.join(values_tuple_strings)};"
 
     assert len(q) < 16384
-    pprint(q)
+    print(q)
     raise ValueError("Halting here (insert_new_assets_into_carto) to catch our breath.")
     results = sql.send(q)
 
