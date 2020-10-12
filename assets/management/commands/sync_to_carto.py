@@ -298,26 +298,26 @@ class Command(BaseCommand):
             number_of_overlapping_assets = len(overlapping_assets)
             n = [a['asset_id'] for a in sorted_asset_types_and_names].index(a.id)
             if number_of_overlapping_assets > 1:
-                a.latitude  += radius_offset*math.cos(n*2*math.pi/number_of_overlapping_assets)
-                a.longitude += radius_offset*math.sin(n*2*math.pi/number_of_overlapping_assets)
-                # This is fine because these Assets are not being saved to the database with different geocoordinates.
+                print(f" ** Offsetting the marker for the asset named '{a.name}' with address {a.location.street_address}. **"
+                new_latitude  = a.location.latitude  + radius_offset*math.cos(n*2*math.pi/number_of_overlapping_assets)
+                new_longitude = a.location.longitude + radius_offset*math.sin(n*2*math.pi/number_of_overlapping_assets)
 
             if a.id in existing_ids:
-                update_asset_on_carto(a, DEFAULT_CARTO_FIELDS)
+                update_asset_on_carto({'asset': a, 'latitude': new_latitude, 'longitude': new_longitude}, DEFAULT_CARTO_FIELDS)
             else:
-                insert_list.append(a)
+                insert_list.append({'asset': a, 'latitude': new_latitude, 'longitude': new_longitude})
 
             if len(insert_list) == records_per_request:
                 # push records
                 print(f"Pushing {len(insert_list)} assets.")
                 pushed += len(insert_list)
-                insert_new_assets_into_carto(sql, table_name, insert_list, DEFAULT_CARTO_FIELDS)
+                insert_new_assets_into_carto(insert_list, DEFAULT_CARTO_FIELDS)
                 time.sleep(0.01)
                 insert_list = []
 
         if len(insert_list) > 0:
             print(f"Pushing {len(insert_list)} assets.")
-            insert_new_assets_into_carto(sql, table_name, insert_list, DEFAULT_CARTO_FIELDS)
+            insert_new_assets_into_carto(insert_list, DEFAULT_CARTO_FIELDS)
             pushed += len(insert_list)
 
         # Fix all those Carto geofields

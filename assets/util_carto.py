@@ -50,13 +50,25 @@ def extract_values_from_model(asset, fields):
             values.append(f"'{value}'")
     return values
 
-def batch_values_string_from_model(asset, fields):
+def batch_values_string_from_model(asset_dict, fields):
+    asset = asset_dict['asset']
     values = extract_values_from_model(asset, fields)
+    # Handle geocoordinates overrides
+    for f, v in zip(fields, values):
+        if f == 'latitude':
+            v = a['latitude']
+        elif f == 'longitude':
+            v = a['longitude']
     return f"({', '.join(values)})"
 
-def set_string_from_model(asset, fields):
+def set_string_from_model(asset_dict, fields):
+    asset = asset_dict['asset']
     values = extract_values_from_model(asset, fields)
-    definitions = [f"{f} = {v}" for f, v in zip(fields, values)]
+    # Handle geocoordinates overrides
+    fields_values = {f: v for for f, v in zip(fields, values)}
+    fields_values['latitude'] = asset_dict['latitude']
+    fields_values['longitude'] = asset_dict['longitude']
+    definitions = [f"{f} = {v}" for f, v in fields_values]
     return f"{', '.join(definitions)}"
 
 ### BEGIN Functions for modifying individual records on Carto
@@ -73,7 +85,7 @@ def delete_from_carto_by_id(asset_id):
     results = sql.send(f"DELETE from {TABLE_NAME} WHERE id ='{asset_id}'")
     return results
 
-def update_asset_on_carto(asset, fields):
+def update_asset_on_carto(asset_dict, fields):
     auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
     sql = SQLClient(auth_client)
     #values_tuple_strings = [make_values_tuple_string_from_model(r, fields) for r in [asset]]
@@ -94,12 +106,12 @@ def update_asset_on_carto(asset, fields):
 
     other_fields = copy.deepcopy(fields)
     other_fields.remove('id')
-    q = f"UPDATE {TABLE_NAME} SET {set_string_from_model(asset, other_fields)} WHERE id = {asset.id};"
+    q = f"UPDATE {TABLE_NAME} SET {set_string_from_model(asset_dict, other_fields)} WHERE id = {asset_dict['asset'].id};"
     print(q)
     assert len(q) < 16384
     results = sql.send(q)
 
-def insert_new_assets_into_carto(sql, table_name, assets, fields):
+def insert_new_assets_into_carto(asset_dicts, fields):
     # q = f"INSERT INTO {table_name} (id, name, asset_type, asset_type_title, category, category_title, latitude, longitude) VALUES (202020, 'Zyzzlvaria Zoo', 'zoo', 'animal places', 'cool_stuff', 'Cool Stuff', 40.5195849005734, -80.0445997570883 );"
     # results = sql.send(q)
 
@@ -115,10 +127,14 @@ def insert_new_assets_into_carto(sql, table_name, assets, fields):
     # map set of records into value tuple strings
     #values_tuple_strings = [make_values_tuple_string(r, fields) for r in records]
 
-    values_tuple_strings = [values_string_from_model(a, fields) for a in assets]
+    values_tuple_strings = [batch_values_string_from_model(a_dict, fields) for a_dict in asset_dicts]
+    values_tuple_strings += ['NULL', 'NULL']
 
-    q = f"INSERT INTO {table_name} ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
-        f"VALUES {', '.join(map(lambda x: x + 1, values_tuple_strings))};"
+    #q = f"INSERT INTO {TABLE_NAME} ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
+    #    f"VALUES {', '.join(map(lambda x: x + 1, values_tuple_strings))};"
+
+    q = f"INSERT INTO {TABLE_NAME} ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
+        f"VALUES {', '.join(values_tuple_strings))};"
 
     assert len(q) < 16384
     pprint(q)
