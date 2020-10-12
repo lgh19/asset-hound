@@ -134,7 +134,7 @@ def insert_new_assets_into_carto(asset_dicts, fields):
     #    f"VALUES {', '.join(map(lambda x: x + 1, values_tuple_strings))};"
 
     q = f"INSERT INTO {TABLE_NAME} ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
-        f"VALUES {', '.join(values_tuple_strings))};"
+        f"VALUES {', '.join(values_tuple_strings)};"
 
     assert len(q) < 16384
     pprint(q)

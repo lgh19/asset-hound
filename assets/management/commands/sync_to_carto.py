@@ -308,6 +308,7 @@ class Command(BaseCommand):
 
             if a.id in existing_ids:
                 update_asset_on_carto({'asset': a, 'latitude': new_latitude, 'longitude': new_longitude}, DEFAULT_CARTO_FIELDS)
+                pushed += 1
             else:
                 insert_list.append({'asset': a, 'latitude': new_latitude, 'longitude': new_longitude})
 
