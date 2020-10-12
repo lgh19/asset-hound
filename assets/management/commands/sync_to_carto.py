@@ -25,8 +25,26 @@ def values_string_from_model(asset, fields):
     values = []
 
     for field in fields:
-        if field in ['sensitive', 'do_not_display']:
+        if field == 'asset_type':
+            value = a.asset_types.all()[0].name # Here, we are explicitly ignoring
+            # asset types beyond the first (because the new policy is one
+            # asset type per Asset), though this could be rectified by
+            # returning a list of values strings and modifying the code on the
+            # other end.
+        elif field == 'asset_type_title':
+            value = a.asset_types.all()[0].title
+        elif field == 'category':
+            value = a.asset_types.all()[0].category.name
+        elif field == 'category_title':
+            value = a.asset_types.all()[0].category.title
+        elif field in ['latitude', 'longitude']:
+            value = getattr(getattr(a, 'location', None), field, None)
+        elif field == 'location_id':
+            value = getattr(getattr(a, 'location', None), 'id', None)
+        else:
             value = getattr(asset, field)
+
+        if field in ['sensitive', 'do_not_display']:
             if field in row:
                 if type(value) == bool:
                     values.append(boolean_to_string(value))
