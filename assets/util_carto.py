@@ -2,6 +2,9 @@ from carto.auth import APIKeyAuthClient
 from carto.sql import SQLClient
 from parameters.credentials import CARTO_API_KEY
 
+USERNAME = "wprdc"
+USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
+
 TABLE_NAME = 'assets_v1'
 
 ### BEGIN Functions for modifying individual records on Carto
