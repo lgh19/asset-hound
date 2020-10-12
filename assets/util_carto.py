@@ -12,39 +12,37 @@ def values_string_from_model(asset, fields):
 
     for field in fields:
         if field == 'asset_type':
-            value = a.asset_types.all()[0].name # Here, we are explicitly ignoring
+            value = asset.asset_types.all()[0].name # Here, we are explicitly ignoring
             # asset types beyond the first (because the new policy is one
             # asset type per Asset), though this could be rectified by
             # returning a list of values strings and modifying the code on the
             # other end.
         elif field == 'asset_type_title':
-            value = a.asset_types.all()[0].title
+            value = asset.asset_types.all()[0].title
         elif field == 'category':
-            value = a.asset_types.all()[0].category.name
+            value = asset.asset_types.all()[0].category.name
         elif field == 'category_title':
-            value = a.asset_types.all()[0].category.title
+            value = asset.asset_types.all()[0].category.title
         elif field in ['latitude', 'longitude']:
-            value = getattr(getattr(a, 'location', None), field, None)
+            value = getattr(getattr(asset, 'location', None), field, None)
         elif field == 'location_id':
-            value = getattr(getattr(a, 'location', None), 'id', None)
+            value = getattr(getattr(asset, 'location', None), 'id', None)
         else:
-            value = getattr(asset, field)
+            value = getattr(asset, field, None)
 
         if field in ['sensitive', 'do_not_display']:
-            if field in row:
-                if type(value) == bool:
-                    values.append(boolean_to_string(value))
-                elif value in ['True', 'False']:
-                    values.append(value.upper())
-                elif value in ['', None]:
-                    values.append("NULL")
-                else:
-                    raise ValueError(f"It's unclear what to do with a boolean value of {value}.")
-            else:  # I theorized that there needed to be values for these fields because I thought null values
-                # caused them to not make it from the Carto dataset to the assets.wprdc.org map.
-                # This was wrong. There are records already on the map that have values of "null" for
-                # the 'sensitive' field and "" for the do_not_display field.
-                values.append("FALSE")
+            if type(value) == bool:
+                values.append(boolean_to_string(value))
+            elif value in ['True', 'False']:
+                values.append(value.upper())
+            elif value in ['', None]:
+                values.append("NULL")
+            else:
+                raise ValueError(f"It's unclear what to do with a boolean value of {value}.")
+            # I theorized that there needed to be values for these fields because I thought null values
+            # caused them to not make it from the Carto dataset to the assets.wprdc.org map.
+            # This was wrong. There are records already on the map that have values of "null" for
+            # the 'sensitive' field and "" for the do_not_display field.
         elif field in ['id', 'latitude', 'longitude']:
             values.append(value)
         else:
