@@ -7,12 +7,42 @@ USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
 
 TABLE_NAME = 'assets_v1'
 
+
+def values_string_from_model(asset, fields):
+    values = []
+
+    for field in fields:
+        if field in ['sensitive', 'do_not_display']:
+            value = getattr(asset, field)
+            if field in row:
+                if type(value) == bool:
+                    values.append(boolean_to_string(value))
+                elif value in ['True', 'False']:
+                    values.append(value.upper())
+                elif value in ['', None]:
+                    values.append("NULL")
+                else:
+                    raise ValueError(f"It's unclear what to do with a boolean value of {value}.")
+            else:  # I theorized that there needed to be values for these fields because I thought null values
+                # caused them to not make it from the Carto dataset to the assets.wprdc.org map.
+                # This was wrong. There are records already on the map that have values of "null" for
+                # the 'sensitive' field and "" for the do_not_display field.
+                values.append("FALSE")
+        elif field in ['id', 'latitude', 'longitude']:
+            values.append(value)
+        else:
+            values.append(f"'{value}'")
+
+    return f"({', '.join(values)})"
+
+
 ### BEGIN Functions for modifying individual records on Carto
 def get_carto_asset_ids():
     auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
     sql = SQLClient(auth_client)
     results = sql.send(f"SELECT id from {TABLE_NAME}")
-    return results
+    ids = [r['id'] for r in results['rows']]
+    return ids
 
 def delete_from_carto_by_id(asset_id):
     auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
@@ -55,7 +85,7 @@ def insert_new_assets_into_carto(sql, table_name, assets, fields):
     # map set of records into value tuple strings
     #values_tuple_strings = [make_values_tuple_string(r, fields) for r in records]
 
-    values_tuple_strings = [values_string(a, fields) for a in assets]
+    values_tuple_strings = [values_string_from_model(a, fields) for a in assets]
 
     q = f"INSERT INTO {table_name} ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
         f"VALUES {', '.join(map(lambda x: x + 1, values_tuple_strings))};"
