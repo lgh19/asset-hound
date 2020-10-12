@@ -1,3 +1,4 @@
+import copy
 from carto.auth import APIKeyAuthClient
 from carto.sql import SQLClient
 from parameters.credentials import CARTO_API_KEY
