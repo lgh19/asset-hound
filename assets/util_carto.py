@@ -7,7 +7,7 @@ USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
 
 TABLE_NAME = 'assets_v1'
 
-def values_string_from_model(asset, fields):
+def extract_values_from_model(asset, fields):
     values = []
 
     for field in fields:
@@ -47,8 +47,16 @@ def values_string_from_model(asset, fields):
             values.append(str(value)) # Coerce to string for the join function below.
         else:
             values.append(f"'{value}'")
+    return values
 
+def batch_values_string_from_model(asset, fields):
+    values = extract_values_from_model(asset, fields)
     return f"({', '.join(values)})"
+
+def set_string_from_model(asset, fields):
+    values = extract_values_from_model(asset, fields)
+    definitions = [f"{f} = {v}" for f, v in zip(fields, values)]
+    return f"{', '.join(definitions)}"
 
 ### BEGIN Functions for modifying individual records on Carto
 def get_carto_asset_ids():
