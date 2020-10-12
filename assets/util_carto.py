@@ -44,7 +44,7 @@ def values_string_from_model(asset, fields):
             # This was wrong. There are records already on the map that have values of "null" for
             # the 'sensitive' field and "" for the do_not_display field.
         elif field in ['id', 'latitude', 'longitude']:
-            values.append(value)
+            values.append(str(value)) # Coerce to string for the join function below.
         else:
             values.append(f"'{value}'")
 
@@ -75,13 +75,15 @@ def update_asset_on_carto(asset, fields):
     #q = f"UPDATE {TABLE_NAME} SET {values_tuple_strings} WHERE asset_id = {asset.id};"
 
     values_tuple_strings = [values_string_from_model(asset, fields)]
-    q = f"UPDATE {TABLE_NAME} SET ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
-        f"VALUES {', '.join(map(lambda x: x + 1, values_tuple_strings))};"
+    #q = f"UPDATE {TABLE_NAME} SET ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
+    #    f"VALUES {', '.join(map(lambda x: x + 1, values_tuple_strings))};" # This is throwing an 
+    # error, and it's really not clear why it's trying to map a math function over strings.
+    # Let's ignore the the_geom* fields for now and do the update the simple way:
 
+    q = f"UPDATE {table_name} SET  ({', '.join(fields)}) VALUES {', '.join(value_tuple_strings)};"
     print(q)
     assert len(q) < 16384
-    raise ValueError("Halting here (update_asset_on_carto) to catch our breath.")
-    #####results = sql.send(q)
+    results = sql.send(q)
 
 def insert_new_assets_into_carto(sql, table_name, assets, fields):
     # q = f"INSERT INTO {table_name} (id, name, asset_type, asset_type_title, category, category_title, latitude, longitude) VALUES (202020, 'Zyzzlvaria Zoo', 'zoo', 'animal places', 'cool_stuff', 'Cool Stuff', 40.5195849005734, -80.0445997570883 );"
