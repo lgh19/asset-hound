@@ -299,9 +299,9 @@ class Command(BaseCommand):
             number_of_overlapping_assets = len(overlapping_assets)
             n = [a['asset_id'] for a in sorted_asset_types_and_names].index(a.id)
             if number_of_overlapping_assets > 1:
-                print(f" ** Offsetting the marker for the asset named '{a.name}' with address {a.location.street_address}. **")
                 new_latitude  = a.location.latitude  + radius_offset*math.cos(n*2*math.pi/number_of_overlapping_assets)
                 new_longitude = a.location.longitude + radius_offset*math.sin(n*2*math.pi/number_of_overlapping_assets)
+                print(f"    ** Offsetting the marker for the asset named '{a.name}' with address {a.location.street_address} to ({new_latitude}, {new_longitude}). **   ")
             else:
                 new_latitude = a.location.latitude
                 new_longitude = a.location.longitude

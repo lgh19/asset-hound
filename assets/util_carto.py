@@ -107,7 +107,6 @@ def update_asset_on_carto(asset_dict, fields):
     other_fields = copy.deepcopy(fields)
     other_fields.remove('id')
     q = f"UPDATE {TABLE_NAME} SET {set_string_from_model(asset_dict, other_fields)} WHERE id = {asset_dict['asset'].id};"
-    print(q)
     assert len(q) < 16384
     results = sql.send(q)
 
