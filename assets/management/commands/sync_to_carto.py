@@ -9,7 +9,9 @@ from operator import itemgetter
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+from assets.models import Asset, AssetType
 from parameters.credentials import CARTO_API_KEY
+from assets.util_carto import delete_from_carto_by_id, update_asset_on_carto, insert_new_assets_into_carto
 
 USERNAME = "wprdc"
 USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
@@ -64,60 +66,6 @@ def make_values_tuple_string_from_model(asset, fields):
     return [format_value_by_field(getattr(asset, field, None), field) for field in fields]
 
 
-### BEGIN Functions for modifying individual records on Carto
-def delete_from_carto_by_id(asset_id):
-    auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
-    sql = SQLClient(auth_client)
-    results = sql.send(f"DELETE from {TABLE_NAME} WHERE id ='{asset_id}'")
-    return results
-
-def update_asset_on_carto(asset, fields):
-    auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
-    sql = SQLClient(auth_client)
-    #values_tuple_strings = [make_values_tuple_string_from_model(r, fields) for r in [asset]]
-    # OR POSSIBLY
-    #values_tuple_strings = [make_values_tuple_string_from_model(asset, fields)]
-
-
-    #q = f"UPDATE {TABLE_NAME} SET {values_tuple_strings} WHERE asset_id = {asset.id};"
-
-    values_tuple_strings = [values_string_from_model(asset, fields)]
-    q = f"UPDATE {TABLE_NAME} SET ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
-        f"VALUES {', '.join(map(lambda x: x + 1, values_tuple_strings))};"
-
-    print(q)
-    assert len(q) < 16384
-    raise ValueError("Halting here (update_asset_on_carto) to catch our breath.")
-    #####results = sql.send(q)
-
-def insert_new_assets_into_carto(sql, table_name, assets, fields):
-    # q = f"INSERT INTO {table_name} (id, name, asset_type, asset_type_title, category, category_title, latitude, longitude) VALUES (202020, 'Zyzzlvaria Zoo', 'zoo', 'animal places', 'cool_stuff', 'Cool Stuff', 40.5195849005734, -80.0445997570883 );"
-    # results = sql.send(q)
-
-    # Example of how to insert a single record:
-    # q = f"INSERT INTO {table_name} (id, name, asset_type, asset_type_title, category, category_title, latitude, longitude) VALUES (112644, 'Ormsby Pool and Recreation Center', 'rec_centers', 'Rec Centers', 'civic', 'Civic', 40.4290817, -79.97429357);"
-
-    # Batch inserts can be done like this:
-    # INSERT INTO election_results (county_id,voters,pro)
-    # VALUES  (1, 11,8),
-    #        (12,21,10),
-    #        (78,31,27);
-
-    # map set of records into value tuple strings
-    #values_tuple_strings = [make_values_tuple_string(r, fields) for r in records]
-
-    values_tuple_strings = [values_string(a, fields) for a in assets]
-
-    q = f"INSERT INTO {table_name} ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
-        f"VALUES {', '.join(map(lambda x: x + 1, values_tuple_strings))};"
-
-    assert len(q) < 16384
-    pprint(q)
-    raise ValueError("Halting here (insert_new_assets_into_carto) to catch our breath.")
-    results = sql.send(q)
-
-
-### END Functions for modifying individual records on Carto
 def validate_asset(asset):
     """ Checks that a record has geocoordinates and belongs on Carto."""
     if asset.get('latitude', None) not in [None, 0] and asset.get('latitude', None) not in [None, 0]:
@@ -349,11 +297,11 @@ class Command(BaseCommand):
 
         if chosen_asset_types == []:
             print(f"Preparing to sync all Assets to Carto.")
-            chosen_assets = Assets.objects.all()
+            chosen_assets = Asset.objects.all()
             raise ValueError("Not ready to sync all Assets to Carto yet.")
         else:
             print(f"Preparing to sync all Assets in these types: {chosen_asset_types}")
-            chosen_assets = Assets.objects.filter(asset_type__name__in = chosen_asset_types)
+            chosen_assets = Asset.objects.filter(asset_type__name__in = chosen_asset_types)
 
         records_per_request = 100
         insert_list = []
