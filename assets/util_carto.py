@@ -65,10 +65,10 @@ def set_string_from_model(asset_dict, fields):
     asset = asset_dict['asset']
     values = extract_values_from_model(asset, fields)
     # Handle geocoordinates overrides
-    fields_values = {f: v for for f, v in zip(fields, values)}
+    fields_values = {f: v for f, v in zip(fields, values)}
     fields_values['latitude'] = asset_dict['latitude']
     fields_values['longitude'] = asset_dict['longitude']
-    definitions = [f"{f} = {v}" for f, v in fields_values]
+    definitions = [f"{f} = {v}" for f, v in fields_values.items()]
     return f"{', '.join(definitions)}"
 
 ### BEGIN Functions for modifying individual records on Carto

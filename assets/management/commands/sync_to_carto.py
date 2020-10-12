@@ -2,6 +2,7 @@ import sys
 import os
 import csv
 import time
+import math
 from carto.auth import APIKeyAuthClient
 from carto.sql import SQLClient
 from operator import itemgetter
@@ -298,9 +299,12 @@ class Command(BaseCommand):
             number_of_overlapping_assets = len(overlapping_assets)
             n = [a['asset_id'] for a in sorted_asset_types_and_names].index(a.id)
             if number_of_overlapping_assets > 1:
-                print(f" ** Offsetting the marker for the asset named '{a.name}' with address {a.location.street_address}. **"
+                print(f" ** Offsetting the marker for the asset named '{a.name}' with address {a.location.street_address}. **")
                 new_latitude  = a.location.latitude  + radius_offset*math.cos(n*2*math.pi/number_of_overlapping_assets)
                 new_longitude = a.location.longitude + radius_offset*math.sin(n*2*math.pi/number_of_overlapping_assets)
+            else:
+                new_latitude = a.location.latitude
+                new_longitude = a.location.longitude
 
             if a.id in existing_ids:
                 update_asset_on_carto({'asset': a, 'latitude': new_latitude, 'longitude': new_longitude}, DEFAULT_CARTO_FIELDS)
@@ -322,6 +326,8 @@ class Command(BaseCommand):
 
         # Fix all those Carto geofields
         if pushed > 0:
+            auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
+            sql = SQLClient(auth_client)
             fix_carto_geofields(sql, TABLE_NAME)
 
 
