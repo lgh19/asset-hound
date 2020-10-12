@@ -11,7 +11,7 @@ from django.core.management.base import BaseCommand
 
 from assets.models import Asset, AssetType
 from parameters.credentials import CARTO_API_KEY
-from assets.util_carto import delete_from_carto_by_id, update_asset_on_carto, insert_new_assets_into_carto
+from assets.util_carto import delete_from_carto_by_id, update_asset_on_carto, insert_new_assets_into_carto, get_carto_asset_ids, TABLE_NAME
 
 USERNAME = "wprdc"
 USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
@@ -20,8 +20,6 @@ DEFAULT_CARTO_FIELDS = ['id', 'name', 'asset_type', 'asset_type_title',
                         'category', 'category_title', 'sensitive',
                         'do_not_display', 'latitude', 'longitude', 'location_id']
 # Other Carto fields that it doesn't seem important to update: primary_key_from_rocket
-
-TABLE_NAME = 'assets_v1'
 
 def values_string_from_model(asset, fields):
     values = []
@@ -247,7 +245,7 @@ def upsert_by_id(local_filepath, table_name='assets', just_fix=False):
             print("Halting after attempting to fix geofields.")
             exit(0)
 
-        existing_ids = get_carto_asset_ids(sql, table_name)
+        existing_ids = get_carto_asset_ids()
 
         reader = csv.DictReader(open(local_filepath))
         records_per_request = 100
@@ -306,7 +304,9 @@ class Command(BaseCommand):
         records_per_request = 100
         insert_list = []
         pushed = 0
-
+        existing_ids = get_carto_asset_ids()
+        print(f"existing_ids[0:10] == {existing_ids[0:10]}")
+        print(f"len(existing_ids) == {len(existing_ids)}")
         radius_offset = 0.0001 # This will be about 36 feet north/south and 29 feet east/west.
         for a in chosen_assets:
             if a.do_not_display == False:

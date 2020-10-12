@@ -2,7 +2,15 @@ from carto.auth import APIKeyAuthClient
 from carto.sql import SQLClient
 from parameters.credentials import CARTO_API_KEY
 
+TABLE_NAME = 'assets_v1'
+
 ### BEGIN Functions for modifying individual records on Carto
+def get_carto_asset_ids():
+    auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
+    sql = SQLClient(auth_client)
+    results = sql.send(f"SELECT id from {TABLE_NAME}")
+    return results
+
 def delete_from_carto_by_id(asset_id):
     auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
     sql = SQLClient(auth_client)
