@@ -67,8 +67,8 @@ def make_values_tuple_string_from_model(asset, fields):
 
 
 def validate_asset(asset):
-    """ Checks that a record has geocoordinates and belongs on Carto."""
-    if asset.get('latitude', None) not in [None, 0] and asset.get('latitude', None) not in [None, 0]:
+    """ Checks that an Asset has geocoordinates and (therefore) belongs on Carto."""
+    if getattr(getattr(asset, 'location', None), 'latitude', None) not in [None, 0] and getattr(getattr(asset, 'location', None), 'latitude', None) not in [None, 0]:
         return True
     return False
 
@@ -301,7 +301,7 @@ class Command(BaseCommand):
             raise ValueError("Not ready to sync all Assets to Carto yet.")
         else:
             print(f"Preparing to sync all Assets in these types: {chosen_asset_types}")
-            chosen_assets = Asset.objects.filter(asset_type__name__in = chosen_asset_types)
+            chosen_assets = Asset.objects.filter(asset_types__name__in = chosen_asset_types)
 
         records_per_request = 100
         insert_list = []
