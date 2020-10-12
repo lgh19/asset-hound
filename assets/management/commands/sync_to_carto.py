@@ -13,58 +13,13 @@ from assets.models import Asset, AssetType
 from parameters.credentials import CARTO_API_KEY
 from assets.util_carto import delete_from_carto_by_id, update_asset_on_carto, insert_new_assets_into_carto, get_carto_asset_ids, TABLE_NAME
 
-USERNAME = "wprdc"
-USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
+USERNAME = "wprdc" # Replicated in 
+USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)  # util_carto.py
 
 DEFAULT_CARTO_FIELDS = ['id', 'name', 'asset_type', 'asset_type_title',
                         'category', 'category_title', 'sensitive',
                         'do_not_display', 'latitude', 'longitude', 'location_id']
 # Other Carto fields that it doesn't seem important to update: primary_key_from_rocket
-
-def values_string_from_model(asset, fields):
-    values = []
-
-    for field in fields:
-        if field == 'asset_type':
-            value = a.asset_types.all()[0].name # Here, we are explicitly ignoring
-            # asset types beyond the first (because the new policy is one
-            # asset type per Asset), though this could be rectified by
-            # returning a list of values strings and modifying the code on the
-            # other end.
-        elif field == 'asset_type_title':
-            value = a.asset_types.all()[0].title
-        elif field == 'category':
-            value = a.asset_types.all()[0].category.name
-        elif field == 'category_title':
-            value = a.asset_types.all()[0].category.title
-        elif field in ['latitude', 'longitude']:
-            value = getattr(getattr(a, 'location', None), field, None)
-        elif field == 'location_id':
-            value = getattr(getattr(a, 'location', None), 'id', None)
-        else:
-            value = getattr(asset, field)
-
-        if field in ['sensitive', 'do_not_display']:
-            if field in row:
-                if type(value) == bool:
-                    values.append(boolean_to_string(value))
-                elif value in ['True', 'False']:
-                    values.append(value.upper())
-                elif value in ['', None]:
-                    values.append("NULL")
-                else:
-                    raise ValueError(f"It's unclear what to do with a boolean value of {value}.")
-            else:  # I theorized that there needed to be values for these fields because I thought null values
-                # caused them to not make it from the Carto dataset to the assets.wprdc.org map.
-                # This was wrong. There are records already on the map that have values of "null" for
-                # the 'sensitive' field and "" for the do_not_display field.
-                values.append("FALSE")
-        elif field in ['id', 'latitude', 'longitude']:
-            values.append(value)
-        else:
-            values.append(f"'{value}'")
-
-    return f"({', '.join(values)})"
 
 
 def format_value_by_field(value, field):
