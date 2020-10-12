@@ -4,7 +4,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from simple_history.models import HistoricalRecords
 
 from assets.utils import geocode_address
-from assets.management.commands.sync_to_carto import delete_from_carto_by_id
+from assets.util_carto import delete_from_carto_by_id
 
 from pprint import pprint
 
