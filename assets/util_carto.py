@@ -82,13 +82,18 @@ def update_asset_on_carto(asset, fields):
 
     #q = f"UPDATE {TABLE_NAME} SET {values_tuple_strings} WHERE asset_id = {asset.id};"
 
-    values_tuple_strings = [values_string_from_model(asset, fields)]
+    #values_tuple_strings = [values_string_from_model(asset, fields)]
     #q = f"UPDATE {TABLE_NAME} SET ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
-    #    f"VALUES {', '.join(map(lambda x: x + 1, values_tuple_strings))};" # This is throwing an 
+    #    f"VALUES {', '.join(map(lambda x: x + 1, values_tuple_strings))};" # This is throwing an
     # error, and it's really not clear why it's trying to map a math function over strings.
     # Let's ignore the the_geom* fields for now and do the update the simple way:
 
-    q = f"UPDATE {table_name} SET  ({', '.join(fields)}) VALUES {', '.join(value_tuple_strings)};"
+    # Single updates can be done like this:
+    # UPDATE election_results SET votes=52, pro=24 WHERE county_id = 1;
+
+    other_fields = copy.deepcopy(fields)
+    other_fields.remove('id')
+    q = f"UPDATE {TABLE_NAME} SET {set_string_from_model(asset, other_fields)} WHERE id = {asset.id};"
     print(q)
     assert len(q) < 16384
     results = sql.send(q)
