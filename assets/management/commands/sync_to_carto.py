@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand
 
 from assets.models import Asset, AssetType
 from parameters.credentials import CARTO_API_KEY
-from assets.util_carto import delete_from_carto_by_id, update_asset_on_carto, insert_new_assets_into_carto, get_carto_asset_ids, boolean_to_string, TABLE_NAME
+from assets.util_carto import sync_asset_to_carto, insert_new_assets_into_carto, get_carto_asset_ids, boolean_to_string, TABLE_NAME
 
 USERNAME = "wprdc" # Replicated in 
 USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)  # util_carto.py
@@ -251,51 +251,6 @@ def upsert_by_id(local_filepath, table_name='assets', just_fix=False):
         if pushed > 0:
             fix_carto_geofields(sql, table_name)
 
-def sync_asset_to_carto(a, existing_ids, pushed, insert_list):
-    records_per_request = 100
-    radius_offset = 0.00005 # This will be about 18 feet north/south and 15 feet east/west.
-
-    if a.do_not_display == True:
-        print(f"Deleting the record with ID {a.id} from Carto.")
-        delete_from_carto_by_id(a.id)
-        return
-
-    if not validate_asset(a):
-        return
-
-    # Compute and apply geocoordinate offsets to distinguish overlapping assets
-    overlapping_assets = a.location.asset_set.all()
-    asset_types_and_names = [{'name': a.name, 'type': a.asset_types.all()[0].name, 'asset_id': a.id} for a in overlapping_assets]
-        # This assumes that there is only one asset type per asset, which is not enforced by the model,
-        # but which we have decided should be the case generally becausing mixing asset types may make
-        # things like operating hours poorly defined.
-    sorted_asset_types_and_names = sorted(asset_types_and_names, key=itemgetter('type', 'name'))
-    number_of_overlapping_assets = len(overlapping_assets)
-    n = [a['asset_id'] for a in sorted_asset_types_and_names].index(a.id)
-    if number_of_overlapping_assets > 1:
-        new_latitude  = a.location.latitude  + radius_offset*math.cos(n*2*math.pi/number_of_overlapping_assets)
-        new_longitude = a.location.longitude + radius_offset*math.sin(n*2*math.pi/number_of_overlapping_assets)
-        print(f"    ** Offsetting the marker for the asset named '{a.name}' with address {a.location.street_address} to ({new_latitude}, {new_longitude}). **   ")
-    else:
-        new_latitude = a.location.latitude
-        new_longitude = a.location.longitude
-
-    if a.id in existing_ids:
-        update_asset_on_carto({'asset': a, 'latitude': new_latitude, 'longitude': new_longitude}, DEFAULT_CARTO_FIELDS)
-        pushed += 1
-    else:
-        insert_list.append({'asset': a, 'latitude': new_latitude, 'longitude': new_longitude})
-
-    if len(insert_list) == records_per_request:
-        # Push records
-        print(f"Pushing {len(insert_list)} assets.")
-        pushed += len(insert_list)
-        insert_new_assets_into_carto(insert_list, DEFAULT_CARTO_FIELDS)
-        time.sleep(0.01)
-        insert_list = []
-    return pushed, insert_list
-
-
 class Command(BaseCommand):
     help = 'Sync some assets to the Carto table.'
 
@@ -310,7 +265,6 @@ class Command(BaseCommand):
                 chosen_asset_types.append(arg)
             else:
                 raise ValueError(f"It is not clear what to with this argument: '{arg}'.")
-
 
         if chosen_asset_types == []:
             print(f"Preparing to sync all Assets to Carto.")
