@@ -68,9 +68,9 @@ def batch_values_string_from_model(asset_dict, fields):
     # Handle geocoordinates overrides
     for f, v in zip(fields, values):
         if f == 'latitude':
-            v = a['latitude']
+            v = asset_dict['latitude']
         elif f == 'longitude':
-            v = a['longitude']
+            v = asset_dict['longitude']
     return f"({', '.join(values)})"
 
 def set_string_from_model(asset_dict, fields):
