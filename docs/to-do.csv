@@ -2,7 +2,7 @@ thing,status
 Automate pushing new data to Carto table on Django Asset/Location saves,
 Find and geocode ~164 ungeocoded assets,
 Delist locations/assets outside of Allegheny County,
-Automate publication of DB dump to WPRDC data portal,
+Automate publication of DB dump to WPRDC data portal,Done
 Standardize addresses with Geomancer + Addressing Dataset + Landmarks (also include parcel ID + address_id in output),
 "Experiment with usaddress{,-scourgify} to standardize addresses",Done
 Consider using OpenStreetMap tags for inspiration: https://wiki.openstreetmap.org/wiki/Category:Tag_descriptions,
@@ -14,9 +14,8 @@ Fix ~3500 assets geocoded by Pelias with centroids,Done
 "Research taxonomies (e.g., https://www.census.gov/eos/www/naics/downloadables/downloadables.html)",
 Mine https://www.alltheplaces.xyz/ for assets,
 Use Geomancer Prime to add parcel IDs to assets (for subsequent by-parcel clustering and deduplication),
-Assign and actually use parent locations,
+Assign and actually use parent locations,(Assignment has been tested)
 Devise a way to check if Assets are being linked to by the Asset Explorer before allowing them to be deleted,
-"Delist 'PGH PARKING AUTHORITY' (232 BLVD OF THE ALLIES) as a laundromat",Done
 Delete orphaned Location/Organization/other-non-Asset instances,
 Write upsert-capable loader,
 Identify other asset types we'd like to include,
@@ -31,3 +30,4 @@ Write API endpoint for streaming a CSV file of assets (for both internal use and
 Link from Farmer's Market assets to correspoding mini-maps: https://pittsburghpa.gov/events/east-liberty-market,
 E-mail addresses in DOH_NursingHome201806.csv (PASDA Nursing Home) data are truncated to 15 characters; investigate,
 "Find data sources for assets we'd like to add (e.g., bookstores, hotels)",Done
+"Delist 'PGH PARKING AUTHORITY' (232 BLVD OF THE ALLIES) as a laundromat",Done
