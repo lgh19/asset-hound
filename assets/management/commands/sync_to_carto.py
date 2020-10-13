@@ -12,16 +12,10 @@ from django.core.management.base import BaseCommand
 
 from assets.models import Asset, AssetType
 from parameters.credentials import CARTO_API_KEY
-from assets.util_carto import sync_asset_to_carto, insert_new_assets_into_carto, get_carto_asset_ids, boolean_to_string, TABLE_NAME
+from assets.util_carto import sync_asset_to_carto, insert_new_assets_into_carto, get_carto_asset_ids, boolean_to_string, fix_carto_geofields, TABLE_NAME, USERNAME, USR_BASE_URL, DEFAULT_CARTO_FIELDS
 
 USERNAME = "wprdc" # Replicated in 
 USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)  # util_carto.py
-
-DEFAULT_CARTO_FIELDS = ['id', 'name', 'asset_type', 'asset_type_title',
-                        'category', 'category_title', 'sensitive',
-                        'do_not_display', 'latitude', 'longitude', 'location_id']
-# Other Carto fields that it doesn't seem important to update: primary_key_from_rocket
-
 
 def format_value_by_field(value, field):
     """ [Convert to string,] and format values to work with Carto API"""
@@ -119,26 +113,6 @@ def check_geom_webmercator(table_name):
     print(results)
 
 
-def fix_carto_geofields(sql, table_name):
-    # Now the problem with pushing this data through SQL calls is that Carto does not rerun the
-    # processes that add values for the_geom and the_geom_webmercator. So it kind of seems like
-    # we have to do this ourselves as documented at
-    # https://gis.stackexchange.com/a/201908
-
-    q = f"UPDATE {table_name} SET the_geom = ST_SetSRID(st_makepoint(longitude, latitude),4326)"
-    # This works because 'longitude' and 'latitude' are the names of the corresponding fields in the CSV file.
-    results1 = sql.send(q)  # This takes 12 seconds to run for 100,000 rows.
-    # Exporting the data immediately after this is run oddly leads to the same CSV file as exporting before
-    # it is run, but waiting a minute and exporting again gives something with the_geom values in the same
-    # rows as the table on the Carto site. Basically, the exported CSV file can lag the view on the Carto
-    # web site by a minute or two.
-    q = f"SELECT ST_Transform(ST_SetSRID(st_makepoint(longitude, latitude),4326),3857) as the_geom_webmercator FROM {table_name}"
-    results2 = sql.send(q)  # This one ran much faster.
-    # One improvement is that you can replace ST_SetSRID(st_makepoint(lon, lat)) with CDB_LatLng(lat, lon)
-    # though I don't know if it leads to any performance improvement.
-    print(f"Tried to add values for the the_geom and the_geom_webmercator fields in {table_name}. The requests completed in {results1['time']} s and {results2['time']} s.")
-
-
 def get_carto_asset_types(sql, table_name):
     q = f"SELECT count(asset_type), asset_type FROM {table_name} GROUP BY asset_type"
     results = sql.send(q)
@@ -161,7 +135,7 @@ def replace_by_type(local_filepath, asset_types=('homeless_shelters',), table_na
         print("Please specify the filename from which to load assets.")
     else:
         if just_fix:
-            fix_carto_geofields(sql, table_name)
+            fix_carto_geofields()
             print("Halting after attempting to fix geofields.")
             exit(0)
 
@@ -197,7 +171,7 @@ def replace_by_type(local_filepath, asset_types=('homeless_shelters',), table_na
             pushed += len(batch_list)
 
         if pushed > 0:
-            fix_carto_geofields(sql, table_name)
+            fix_carto_geofields()
 
 # Actually upsert_by_id and update_asset may not really be needed as they're
 # already in extra/push_record_to_carto.py.
@@ -209,7 +183,7 @@ def upsert_by_id(local_filepath, table_name='assets', just_fix=False):
         print("Please specify the filename from which to load assets.")
     else:
         if just_fix:
-            fix_carto_geofields(sql, table_name)
+            fix_carto_geofields()
             print("Halting after attempting to fix geofields.")
             exit(0)
 
@@ -243,7 +217,7 @@ def upsert_by_id(local_filepath, table_name='assets', just_fix=False):
             pushed += len(insert_list)
 
         if pushed > 0:
-            fix_carto_geofields(sql, table_name)
+            fix_carto_geofields()
 
 class Command(BaseCommand):
     help = 'Sync some assets to the Carto table.'
@@ -281,9 +255,7 @@ class Command(BaseCommand):
 
         # Fix all those Carto geofields
         if pushed > 0:
-            auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
-            sql = SQLClient(auth_client)
-            fix_carto_geofields(sql, TABLE_NAME)
+            fix_carto_geofields()
 
 
 #if __name__ == '__main__':

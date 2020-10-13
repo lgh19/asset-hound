@@ -6,6 +6,10 @@ from parameters.credentials import CARTO_API_KEY
 
 USERNAME = "wprdc"
 USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
+DEFAULT_CARTO_FIELDS = ['id', 'name', 'asset_type', 'asset_type_title',
+                        'category', 'category_title', 'sensitive',
+                        'do_not_display', 'latitude', 'longitude', 'location_id']
+# Other Carto fields that it doesn't seem important to update: primary_key_from_rocket
 
 TABLE_NAME = 'assets_v1'
 
@@ -212,3 +216,24 @@ def sync_asset_to_carto(a, existing_ids, pushed, insert_list):
     return pushed, insert_list
 
 ### END Functions for modifying individual records on Carto
+
+def fix_carto_geofields():
+    auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
+    sql = SQLClient(auth_client)
+    # Now the problem with pushing this data through SQL calls is that Carto does not rerun the
+    # processes that add values for the_geom and the_geom_webmercator. So it kind of seems like
+    # we have to do this ourselves as documented at
+    # https://gis.stackexchange.com/a/201908
+
+    q = f"UPDATE {TABLE_NAME} SET the_geom = ST_SetSRID(st_makepoint(longitude, latitude),4326)"
+    # This works because 'longitude' and 'latitude' are the names of the corresponding fields in the CSV file.
+    results1 = sql.send(q)  # This takes 12 seconds to run for 100,000 rows.
+    # Exporting the data immediately after this is run oddly leads to the same CSV file as exporting before
+    # it is run, but waiting a minute and exporting again gives something with the_geom values in the same
+    # rows as the table on the Carto site. Basically, the exported CSV file can lag the view on the Carto
+    # web site by a minute or two.
+    q = f"SELECT ST_Transform(ST_SetSRID(st_makepoint(longitude, latitude),4326),3857) as the_geom_webmercator FROM {TABLE_NAME}"
+    results2 = sql.send(q)  # This one ran much faster.
+    # One improvement is that you can replace ST_SetSRID(st_makepoint(lon, lat)) with CDB_LatLng(lat, lon)
+    # though I don't know if it leads to any performance improvement.
+    print(f"Tried to add values for the the_geom and the_geom_webmercator fields in {TABLE_NAME}. The requests completed in {results1['time']} s and {results2['time']} s.")
