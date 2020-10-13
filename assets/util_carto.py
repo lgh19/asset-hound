@@ -8,6 +8,12 @@ USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
 
 TABLE_NAME = 'assets_v1'
 
+def validate_asset(asset):
+    """ Checks that an Asset has geocoordinates and (therefore) belongs on Carto."""
+    if getattr(getattr(asset, 'location', None), 'latitude', None) not in [None, 0] and getattr(getattr(asset, 'location', None), 'latitude', None) not in [None, 0]:
+        return True
+    return False
+
 def boolean_to_string(b):
     if b is True:
         return "TRUE" # Valid Postgres values for a boolean true value : TRUE, 't', 'true', 'y', 'yes', 'on', '1'

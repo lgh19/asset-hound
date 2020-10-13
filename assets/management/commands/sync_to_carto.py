@@ -38,12 +38,6 @@ def make_values_tuple_string_from_model(asset, fields):
     return [format_value_by_field(getattr(asset, field, None), field) for field in fields]
 
 
-def validate_asset(asset):
-    """ Checks that an Asset has geocoordinates and (therefore) belongs on Carto."""
-    if getattr(getattr(asset, 'location', None), 'latitude', None) not in [None, 0] and getattr(getattr(asset, 'location', None), 'latitude', None) not in [None, 0]:
-        return True
-    return False
-
 def delete_assets_by_type(sql, table_name, asset_type):
     results = sql.send(f"DELETE from {table_name} WHERE asset_type='{asset_type}'")
     return results
