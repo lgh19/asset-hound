@@ -139,13 +139,14 @@ def insert_new_assets_into_carto(asset_dicts, fields):
     # map set of records into value tuple strings
     #values_tuple_strings = [make_values_tuple_string(r, fields) for r in records]
 
+    extra_fields = ['the_geom', 'the_geom_webmercator']
+    fields_extended = fields + extra_fields
+    for f in extra_fields:
+        a_dict[f] = 'NULL'
+
     values_tuple_strings = [batch_values_string_from_model(a_dict, fields) for a_dict in asset_dicts]
-    values_tuple_strings += ['NULL', 'NULL']
 
-    #q = f"INSERT INTO {TABLE_NAME} ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
-    #    f"VALUES {', '.join(map(lambda x: x + 1, values_tuple_strings))};"
-
-    q = f"INSERT INTO {TABLE_NAME} ({', '.join(fields + ['the_geom', 'the_geom_webmercator'])}) " \
+    q = f"INSERT INTO {TABLE_NAME} ({', '.join(fields)}) " \
         f"VALUES {', '.join(values_tuple_strings)};"
 
     assert len(q) < 16384
