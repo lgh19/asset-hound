@@ -1,4 +1,4 @@
-import copy
+import copy, re
 from carto.auth import APIKeyAuthClient
 from carto.sql import SQLClient
 from parameters.credentials import CARTO_API_KEY
@@ -7,6 +7,13 @@ USERNAME = "wprdc"
 USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
 
 TABLE_NAME = 'assets_v1'
+
+def boolean_to_string(b):
+    if b is True:
+        return "TRUE" # Valid Postgres values for a boolean true value : TRUE, 't', 'true', 'y', 'yes', 'on', '1'
+    if b is False:
+        return "FALSE"
+    raise ValueError(f"It's unclear what to do with a boolean value of {b}.")
 
 def sql_escape(s):
     s = re.sub("'", '"', s)
@@ -51,7 +58,7 @@ def extract_values_from_model(asset, fields):
         elif field in ['id', 'latitude', 'longitude']:
             values.append(str(value)) # Coerce to string for the join function below.
         else:
-            value = sql_escape(value)
+            value = sql_escape(str(value))
             values.append(f"'{value}'")
     return values
 

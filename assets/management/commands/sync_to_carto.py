@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand
 
 from assets.models import Asset, AssetType
 from parameters.credentials import CARTO_API_KEY
-from assets.util_carto import delete_from_carto_by_id, update_asset_on_carto, insert_new_assets_into_carto, get_carto_asset_ids, TABLE_NAME
+from assets.util_carto import delete_from_carto_by_id, update_asset_on_carto, insert_new_assets_into_carto, get_carto_asset_ids, boolean_to_string, TABLE_NAME
 
 USERNAME = "wprdc" # Replicated in 
 USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)  # util_carto.py

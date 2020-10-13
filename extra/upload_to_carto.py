@@ -21,7 +21,12 @@ def delete_assets_by_type(sql, table_name, asset_type):
      results = sql.send(f"DELETE from {table_name} WHERE asset_type='{asset_type}'")
      return results
 
-def boolean_string(b):
+def delete_from_carto_by_id(asset_id):
+    sql = SQLClient(auth_client)
+    results = sql.send(f"DELETE from {table_name} WHERE id ='{asset_id}'")
+    return results
+
+def boolean_to_string(b):
     if b is True:
         return "TRUE" # Valid Postgres values for a boolean true value : TRUE, 't', 'true', 'y', 'yes', 'on', '1'
     if b is False:
@@ -35,7 +40,7 @@ def values_string(row, fields):
         if field in ['sensitive', 'do_not_display']:
             if field in row:
                 if type(row[field]) == bool:
-                    values.append(boolean_string(row[field]))
+                    values.append(boolean_to_string(row[field]))
                 elif row[field] in ['True', 'False']:
                     values.append(row[field].upper())
                 elif row[field] in ['', None]:
