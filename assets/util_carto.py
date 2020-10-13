@@ -84,10 +84,13 @@ def set_string_from_model(asset_dict, fields):
     return f"{', '.join(definitions)}"
 
 ### BEGIN Functions for modifying individual records on Carto
-def get_carto_asset_ids():
+def get_carto_asset_ids(id_to_check=None):
     auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
     sql = SQLClient(auth_client)
-    results = sql.send(f"SELECT id from {TABLE_NAME}")
+    if id_to_check is None:
+        results = sql.send(f"SELECT id FROM {TABLE_NAME}")
+    else:
+        results = sql.send(f"SELECT id FROM {TABLE_NAME} WHERE id = {id_to_check}")
     ids = [r['id'] for r in results['rows']]
     return ids
 
