@@ -2,7 +2,6 @@ import sys
 import os
 import csv
 import time
-import math
 from carto.auth import APIKeyAuthClient
 from carto.sql import SQLClient
 from operator import itemgetter

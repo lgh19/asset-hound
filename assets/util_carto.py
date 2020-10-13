@@ -1,4 +1,4 @@
-import copy, re
+import copy, re, math
 from operator import itemgetter
 from carto.auth import APIKeyAuthClient
 from carto.sql import SQLClient
@@ -216,7 +216,7 @@ def sync_asset_to_carto(a, existing_ids, pushed, insert_list, records_per_reques
 
 ### END Functions for modifying individual records on Carto
 
-def fix_carto_geofields():
+def fix_carto_geofields(asset_id=None):
     auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
     sql = SQLClient(auth_client)
     # Now the problem with pushing this data through SQL calls is that Carto does not rerun the
@@ -225,6 +225,10 @@ def fix_carto_geofields():
     # https://gis.stackexchange.com/a/201908
 
     q = f"UPDATE {TABLE_NAME} SET the_geom = ST_SetSRID(st_makepoint(longitude, latitude),4326)"
+    if asset_id is not None:
+        q += f" WHERE id = {asset_id}" # This can significantly speed up Carto geofield updates
+        # when saving a single model instance.
+
     # This works because 'longitude' and 'latitude' are the names of the corresponding fields in the CSV file.
     results1 = sql.send(q)  # This takes 12 seconds to run for 100,000 rows.
     # Exporting the data immediately after this is run oddly leads to the same CSV file as exporting before
