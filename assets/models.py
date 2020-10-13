@@ -4,7 +4,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from simple_history.models import HistoricalRecords
 
 from assets.utils import geocode_address
-from assets.util_carto import sync_asset_to_carto, get_carto_asset_ids
+from assets.util_carto import sync_asset_to_carto, get_carto_asset_ids, fix_carto_geofields
 
 from pprint import pprint
 
@@ -354,8 +354,23 @@ class Asset(models.Model):
     def save(self, *args, **kwargs):
         if len(self.rawasset_set.all()) == 0: # Hide Assets that are
             self.do_not_display = True # not linked to by RawAssets.
-        super(Asset, self).save(*args, **kwargs)
-        # [ ] When saving Assets, if do_not_display changes to False, the Asset should be
+        # When saving Assets, if do_not_display changes to True, the Asset should be
         # deleted from the Carto table.
-        if self.do_not_display == True:
-            pprint(delete_from_carto_by_id(self.id))
+        existing_ids = get_carto_asset_ids(self.id)
+        print(f"existing_ids = {existing_ids}")
+        raise ValueError("Just checking.")
+
+        pushed, insert_list = sync_asset_to_carto(self, existing_ids, 0, [], records_per_request=1)
+        if pushed > 0:
+            fix_carto_geofields()
+
+        # [ ] If a few other fields change (like asset_types, location, tags, url, email, phone),
+        # it's important to update the Carto table.
+
+        # Note that while the geocoordinates of this Asset will be offset from the Location coordinates
+        # when there are multiple Assets at that Location, the other offsets are not being updated,
+        # so accidental overlaps are not inconceivable without more thorough checks, randomized offsets,
+        # or periodic bulk updates.
+
+        # The Carto SQL connector would be an alternative to this sync_asset_to_carto approach.
+        super(Asset, self).save(*args, **kwargs)

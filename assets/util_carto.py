@@ -171,8 +171,7 @@ def insert_new_assets_into_carto(asset_dicts, fields):
     results = sql.send(q)
 
 
-def sync_asset_to_carto(a, existing_ids, pushed, insert_list):
-    records_per_request = 100
+def sync_asset_to_carto(a, existing_ids, pushed, insert_list, records_per_request=100):
     radius_offset = 0.00005 # This will be about 18 feet north/south and 15 feet east/west.
 
     if a.do_not_display == True:
@@ -206,7 +205,7 @@ def sync_asset_to_carto(a, existing_ids, pushed, insert_list):
     else:
         insert_list.append({'asset': a, 'latitude': new_latitude, 'longitude': new_longitude})
 
-    if len(insert_list) == records_per_request:
+    if len(insert_list) >= records_per_request:
         # Push records
         print(f"Pushing {len(insert_list)} assets.")
         pushed += len(insert_list)
