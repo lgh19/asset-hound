@@ -279,7 +279,7 @@ class Command(BaseCommand):
         insert_list = []
         pushed = 0
         existing_ids = get_carto_asset_ids()
-        radius_offset = 0.0001 # This will be about 36 feet north/south and 29 feet east/west.
+        radius_offset = 0.00005 # This will be about 18 feet north/south and 15 feet east/west.
         for a in chosen_assets:
             if a.do_not_display == False:
                 print(f"Deleting the record with ID {a.id} from Carto.")
