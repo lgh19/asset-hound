@@ -42,7 +42,7 @@ def extract_values_from_model(asset, fields):
         else:
             value = getattr(asset, field, None)
 
-        if field in ['sensitive', 'do_not_display']:
+        if field in ['sensitive', 'do_not_display', 'the_geom', 'the_geom_webmercator']:
             if type(value) == bool:
                 values.append(boolean_to_string(value))
             elif value in ['True', 'False']:
@@ -143,11 +143,11 @@ def insert_new_assets_into_carto(asset_dicts, fields):
     fields_extended = fields + extra_fields
     for a_dict in asset_dicts:
         for f in extra_fields:
-            a_dict[f] = 'NULL'
+            a_dict[f] = None
 
-    values_tuple_strings = [batch_values_string_from_model(a_dict, fields) for a_dict in asset_dicts]
+    values_tuple_strings = [batch_values_string_from_model(a_dict, fields_extended) for a_dict in asset_dicts]
 
-    q = f"INSERT INTO {TABLE_NAME} ({', '.join(fields)}) " \
+    q = f"INSERT INTO {TABLE_NAME} ({', '.join(fields_extended)}) " \
         f"VALUES {', '.join(values_tuple_strings)};"
 
     assert len(q) < 16384
