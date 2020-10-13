@@ -141,8 +141,9 @@ def insert_new_assets_into_carto(asset_dicts, fields):
 
     extra_fields = ['the_geom', 'the_geom_webmercator']
     fields_extended = fields + extra_fields
-    for f in extra_fields:
-        a_dict[f] = 'NULL'
+    for a_dict in asset_dicts:
+        for f in extra_fields:
+            a_dict[f] = 'NULL'
 
     values_tuple_strings = [batch_values_string_from_model(a_dict, fields) for a_dict in asset_dicts]
 
