@@ -358,5 +358,5 @@ class Asset(models.Model):
         super(Asset, self).save(*args, **kwargs)
         # [ ] When saving Assets, if do_not_display changes to False, the Asset should be
         # deleted from the Carto table.
-        if self.do_not_display:
+        if self.do_not_display == True:
             pprint(delete_from_carto_by_id(self.id))

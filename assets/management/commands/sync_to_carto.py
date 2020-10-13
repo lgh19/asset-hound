@@ -281,7 +281,7 @@ class Command(BaseCommand):
         existing_ids = get_carto_asset_ids()
         radius_offset = 0.00005 # This will be about 18 feet north/south and 15 feet east/west.
         for a in chosen_assets:
-            if a.do_not_display == False:
+            if a.do_not_display == True:
                 print(f"Deleting the record with ID {a.id} from Carto.")
                 delete_from_carto_by_id(a.id)
                 continue
