@@ -124,6 +124,8 @@ def update_asset_on_carto(asset_dict, fields):
     results = sql.send(q)
 
 def insert_new_assets_into_carto(asset_dicts, fields):
+    auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
+    sql = SQLClient(auth_client)
     # q = f"INSERT INTO {table_name} (id, name, asset_type, asset_type_title, category, category_title, latitude, longitude) VALUES (202020, 'Zyzzlvaria Zoo', 'zoo', 'animal places', 'cool_stuff', 'Cool Stuff', 40.5195849005734, -80.0445997570883 );"
     # results = sql.send(q)
 
@@ -152,7 +154,6 @@ def insert_new_assets_into_carto(asset_dicts, fields):
 
     assert len(q) < 16384
     print(q)
-    raise ValueError("Halting here (insert_new_assets_into_carto) to catch our breath.")
     results = sql.send(q)
 
 
