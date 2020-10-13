@@ -4,7 +4,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from simple_history.models import HistoricalRecords
 
 from assets.utils import geocode_address
-from assets.util_carto import sync_asset_to_carto
+from assets.util_carto import sync_asset_to_carto, get_carto_asset_ids
 
 from pprint import pprint
 
@@ -304,7 +304,6 @@ class RawAsset(BaseAsset):
 #    @property
 #    def category(self):
 #        return self.asset_types.all()[0].category
-
 
 class Asset(models.Model):
     name = models.CharField(max_length=255)
