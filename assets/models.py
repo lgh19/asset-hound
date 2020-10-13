@@ -4,6 +4,9 @@ from phonenumber_field.modelfields import PhoneNumberField
 from simple_history.models import HistoricalRecords
 
 from assets.utils import geocode_address
+from assets.util_carto import delete_from_carto_by_id
+
+from pprint import pprint
 
 FIXED_LOCALE = 'FIX'
 MOBILE_LOCALE = 'MOB'
@@ -353,3 +356,7 @@ class Asset(models.Model):
         if len(self.rawasset_set.all()) == 0: # Hide Assets that are
             self.do_not_display = True # not linked to by RawAssets.
         super(Asset, self).save(*args, **kwargs)
+        # [ ] When saving Assets, if do_not_display changes to False, the Asset should be
+        # deleted from the Carto table.
+        if self.do_not_display:
+            pprint(delete_from_carto_by_id(self.id))
