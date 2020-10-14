@@ -67,3 +67,21 @@ Accessing the URL [https://assets.wprdc.org/edit/dump_assets/](https://assets.wp
 [https://assets.wprdc.org/asset_dump.csv](https://assets.wprdc.org/asset_dump.csv).
 
 There is also a cronjob which periodically dumps the full set of assets to this file. This file is used as the source for the ETL job controlled by [this script](https://github.com/WPRDC/rocket-etl/blob/master/engine/payload/wprdc/assets_to_ckan.py), which runs nightly on the tools server.
+
+### Carto integration
+While there are REST API endpoints provided by the Django REST Framework, the server/database/API combination takes too long to pull the data for all assets to be used to supply data to the map on the frontend. Our current solution is to keep a narrow version of the assets table on Carto (with the important fields being asset name, asset type, category, latitude, longitude, `the_geom`, and `the_geom_webmercator`). This table is just a cache that fuels the map part of the frontend. When a user clicks on an asset marker on the front end, the assets database is queried to fill in the grey box with further details about the asset (like street address).
+
+The entire assets database can be pushed to the Carto database by running a management command:
+
+```python manage.py sync_to_carto```
+
+Individual asset types may be specified as command-line arguments to update just those asset types:
+
+```python manage.py sync_to_carto restaurants coffee_shops```
+
+Also, the Asset save function has been modified to include a step wherein the corresponding row in the Carto table is updated/inserted/deleted, as appropriate. This involves four API calls (one to check whether the Asset ID already exists in the Carto table), one to do the updating/inserting/deleting, and two to update the geofields (since Carto does not automatically update the `the_geom` and `the_geom_webmercator` fields, but doing so is essential for updating the location of the map point. While this slows down Asset saves, it keeps the Carto map up-to-date and facilitates edits.
+
+While this covers all Asset saves (and therefore all changes made through the Asset updater), changes made to a Location instance through the Django admin interface or Django shell will not currently trigger an updating of the Carto table. To cover these cases, the `sync_to_carto` management command is set to run daily at 1am, to entirely refresh the Carto table.
+
+*Possible performance improvements:* Carto inserts are being done in batches as large as 100. Carto updates are being performed singly, but they could be rewritten to also be done in batches. Possibly experiment with adding Carto integration to Location saves.
+
