@@ -362,10 +362,7 @@ class Asset(models.Model):
         # whether a change is necessary.
         pushed, insert_list = sync_asset_to_carto(self, existing_ids, 0, [], records_per_request=1)
         if pushed > 0:
-            fix_carto_geofields()
-
-        # [ ] If a few other fields change (like asset_types, location, tags, url, email, phone),
-        # it's important to update the Carto table.
+            fix_carto_geofields(self.id)
 
         # Note that while the geocoordinates of this Asset will be offset from the Location coordinates
         # when there are multiple Assets at that Location, the other offsets are not being updated,
