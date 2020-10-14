@@ -84,5 +84,7 @@ While this covers all Asset saves (and therefore all changes made through the As
 
 Since maybe Assets share Locations and would otherwise overlap, rendering all but one normally hidden on the map, one step in the Carto integration is to spatially distinguish these Assets by offsetting their markers slightly (~20 feet) in different directions.
 
+A useful endpoint for testing Carto integration is this kind of record-level query: [https://wprdc.carto.com/api/v2/sql?q=select%20*%20from%20wprdc.assets_v1%20where%20id%20=%20206603](https://wprdc.carto.com/api/v2/sql?q=select%20*%20from%20wprdc.assets_v1%20where%20id%20=%20206603)
+
 *Possible performance improvements:* Carto inserts are being done in batches as large as 100. Carto updates are being performed singly, but they could be rewritten to also be done in batches. Possibly experiment with adding Carto integration to Location saves.
 
