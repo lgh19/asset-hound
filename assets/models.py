@@ -4,7 +4,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from simple_history.models import HistoricalRecords
 
 from assets.utils import geocode_address
-from assets.util_carto import delete_from_carto_by_id
+from assets.util_carto import sync_asset_to_carto, get_carto_asset_ids, fix_carto_geofields
 
 from pprint import pprint
 
@@ -305,7 +305,6 @@ class RawAsset(BaseAsset):
 #    def category(self):
 #        return self.asset_types.all()[0].category
 
-
 class Asset(models.Model):
     name = models.CharField(max_length=255)
     localizability = models.CharField(max_length=3, choices=LOCALIZABILITY_CHOICES, null=True, blank=True)
@@ -355,8 +354,26 @@ class Asset(models.Model):
     def save(self, *args, **kwargs):
         if len(self.rawasset_set.all()) == 0: # Hide Assets that are
             self.do_not_display = True # not linked to by RawAssets.
-        super(Asset, self).save(*args, **kwargs)
-        # [ ] When saving Assets, if do_not_display changes to False, the Asset should be
+        # When saving Assets, if do_not_display changes to True, the Asset should be
         # deleted from the Carto table.
-        if self.do_not_display:
-            pprint(delete_from_carto_by_id(self.id))
+        existing_ids = get_carto_asset_ids(self.id) # This has been tested.
+
+        # Currently, this is just blindly updating the Carto table without checking
+        # whether a change is necessary (that is, whether one of a few fields
+        # [name, do_not_display, latitude, longitude, asset type, category] has
+        # been altered).
+        pushed, insert_list = sync_asset_to_carto(self, existing_ids, 0, [], records_per_request=1)
+        if pushed > 0:
+            fix_carto_geofields(self.id)
+
+        # Note that while the geocoordinates of this Asset will be offset from the Location coordinates
+        # when there are multiple Assets at that Location, the other offsets are not being updated,
+        # so accidental overlaps are not inconceivable without more thorough checks, randomized offsets,
+        # or periodic bulk updates.
+
+        # The Carto SQL connector would be an alternative to this sync_asset_to_carto approach.
+        super(Asset, self).save(*args, **kwargs)
+
+        # Similar syncing could be done when changing Location instances in a way
+        # that would affect Asset locations, but all the affected Assets would need
+        # to be collected and updated. For now, a daily cronjob will catch these changes.

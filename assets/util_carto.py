@@ -1,12 +1,23 @@
-import copy, re
+import copy, re, math
+from operator import itemgetter
 from carto.auth import APIKeyAuthClient
 from carto.sql import SQLClient
 from parameters.credentials import CARTO_API_KEY
 
 USERNAME = "wprdc"
 USR_BASE_URL = "https://{user}.carto.com/".format(user=USERNAME)
+DEFAULT_CARTO_FIELDS = ['id', 'name', 'asset_type', 'asset_type_title',
+                        'category', 'category_title', 'sensitive',
+                        'do_not_display', 'latitude', 'longitude', 'location_id']
+# Other Carto fields that it doesn't seem important to update: primary_key_from_rocket
 
 TABLE_NAME = 'assets_v1'
+
+def validate_asset(asset):
+    """ Checks that an Asset has geocoordinates and (therefore) belongs on Carto."""
+    if getattr(getattr(asset, 'location', None), 'latitude', None) not in [None, 0] and getattr(getattr(asset, 'location', None), 'latitude', None) not in [None, 0]:
+        return True
+    return False
 
 def boolean_to_string(b):
     if b is True:
@@ -84,10 +95,13 @@ def set_string_from_model(asset_dict, fields):
     return f"{', '.join(definitions)}"
 
 ### BEGIN Functions for modifying individual records on Carto
-def get_carto_asset_ids():
+def get_carto_asset_ids(id_to_check=None):
     auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
     sql = SQLClient(auth_client)
-    results = sql.send(f"SELECT id from {TABLE_NAME}")
+    if id_to_check is None:
+        results = sql.send(f"SELECT id FROM {TABLE_NAME}")
+    else:
+        results = sql.send(f"SELECT id FROM {TABLE_NAME} WHERE id = {id_to_check}")
     ids = [r['id'] for r in results['rows']]
     return ids
 
@@ -157,4 +171,72 @@ def insert_new_assets_into_carto(asset_dicts, fields):
     results = sql.send(q)
 
 
+def sync_asset_to_carto(a, existing_ids, pushed, insert_list, records_per_request=100):
+    radius_offset = 0.00005 # This will be about 18 feet north/south and 15 feet east/west.
+
+    if a.do_not_display == True:
+        print(f"Deleting the record with ID {a.id} from Carto.")
+        delete_from_carto_by_id(a.id)
+        return pushed, insert_list
+
+    if not validate_asset(a):
+        return pushed, insert_list
+
+    # Compute and apply geocoordinate offsets to distinguish overlapping assets
+    overlapping_assets = a.location.asset_set.all()
+    asset_types_and_names = [{'name': a.name, 'type': a.asset_types.all()[0].name, 'asset_id': a.id} for a in overlapping_assets]
+        # This assumes that there is only one asset type per asset, which is not enforced by the model,
+        # but which we have decided should be the case generally becausing mixing asset types may make
+        # things like operating hours poorly defined.
+    sorted_asset_types_and_names = sorted(asset_types_and_names, key=itemgetter('type', 'name'))
+    number_of_overlapping_assets = len(overlapping_assets)
+    n = [a['asset_id'] for a in sorted_asset_types_and_names].index(a.id)
+    if number_of_overlapping_assets > 1:
+        new_latitude  = a.location.latitude  + radius_offset*math.cos(n*2*math.pi/number_of_overlapping_assets)
+        new_longitude = a.location.longitude + radius_offset*math.sin(n*2*math.pi/number_of_overlapping_assets)
+        print(f"    ** Offsetting the marker for the asset named '{a.name}' with address {a.location.street_address} to ({new_latitude}, {new_longitude}). **   ")
+    else:
+        new_latitude = a.location.latitude
+        new_longitude = a.location.longitude
+
+    if a.id in existing_ids:
+        update_asset_on_carto({'asset': a, 'latitude': new_latitude, 'longitude': new_longitude}, DEFAULT_CARTO_FIELDS)
+        pushed += 1
+    else:
+        insert_list.append({'asset': a, 'latitude': new_latitude, 'longitude': new_longitude})
+
+    if len(insert_list) >= records_per_request:
+        # Push records
+        print(f"Pushing {len(insert_list)} assets.")
+        pushed += len(insert_list)
+        insert_new_assets_into_carto(insert_list, DEFAULT_CARTO_FIELDS)
+        time.sleep(0.01)
+        insert_list = []
+    return pushed, insert_list
+
 ### END Functions for modifying individual records on Carto
+
+def fix_carto_geofields(asset_id=None):
+    auth_client = APIKeyAuthClient(api_key=CARTO_API_KEY, base_url=USR_BASE_URL)
+    sql = SQLClient(auth_client)
+    # Now the problem with pushing this data through SQL calls is that Carto does not rerun the
+    # processes that add values for the_geom and the_geom_webmercator. So it kind of seems like
+    # we have to do this ourselves as documented at
+    # https://gis.stackexchange.com/a/201908
+
+    q = f"UPDATE {TABLE_NAME} SET the_geom = ST_SetSRID(st_makepoint(longitude, latitude),4326)"
+    if asset_id is not None:
+        q += f" WHERE id = {asset_id}" # This can significantly speed up Carto geofield updates
+        # when saving a single model instance.
+
+    # This works because 'longitude' and 'latitude' are the names of the corresponding fields in the CSV file.
+    results1 = sql.send(q)  # This takes 12 seconds to run for 100,000 rows.
+    # Exporting the data immediately after this is run oddly leads to the same CSV file as exporting before
+    # it is run, but waiting a minute and exporting again gives something with the_geom values in the same
+    # rows as the table on the Carto site. Basically, the exported CSV file can lag the view on the Carto
+    # web site by a minute or two.
+    q = f"SELECT ST_Transform(ST_SetSRID(st_makepoint(longitude, latitude),4326),3857) as the_geom_webmercator FROM {TABLE_NAME}"
+    results2 = sql.send(q)  # This one ran much faster.
+    # One improvement is that you can replace ST_SetSRID(st_makepoint(lon, lat)) with CDB_LatLng(lat, lon)
+    # though I don't know if it leads to any performance improvement.
+    print(f"Tried to add values for the the_geom and the_geom_webmercator fields in {TABLE_NAME}. The requests completed in {results1['time']} s and {results2['time']} s.")
