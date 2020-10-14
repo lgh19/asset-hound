@@ -352,7 +352,7 @@ class Asset(models.Model):
         return self.name or '<MISSING NAME>'
 
     def save(self, *args, **kwargs):
-        creating_new_asset = kwargs.get('creating_new_asset', False)
+        creating_new_asset = kwargs.pop('creating_new_asset', False)
         if not creating_new_asset:
             if len(self.rawasset_set.all()) == 0: # Hide Assets that are
                 self.do_not_display = True # not linked to by RawAssets.
