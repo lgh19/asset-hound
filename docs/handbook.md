@@ -61,6 +61,11 @@ In contrast with Assets, RawAssets should normally not be deleted (or mutated) s
 9) Run `> python manage.py load_raw_assets new_raw_assets.csv` to load the raw assets into the database.
 10) Run `> python manage.py dump_raw_assets` to dump the raw assets to a `raw_asset_dump.csv` file suitable for generating merge-instructions from.
 
+### Adding new asset types
+Each asset should be associated with exactly one asset type. (The model supports multiple asset types per asset, but we've set as a policy limiting each asset to one type. One reason for this is that the map does not have a way of representing a multi-type asset. Another reason is that, in practice, multi-type assets may have conflicts between the details for each type (e.g., a day-care center and a school in the same building, under the same organization, but with different operating hours and phone numbers).)
+
+When new assets are added (through a management command or the Asset updater) that are coded with a previously unused type, a corresponding new AssetType instance will be created in the database. However, this AssetType has two fields which need to be set manually through the Django admin interface: title (usually just a readable, capitalized version of the AssetType name) and category (which can be picked from a drop-down list of Category instances). If these fields are specified after the creation of Assets, the Assets will need to be re-synced to Carto so that they appear on the map correctly. This may be done by running the `sync_to_carto` management command or by resaving the Assets (e.g. through the Django admin interface or by rerunning the Asset updater).
+
 ### Exporting data
 Accessing the URL [https://assets.wprdc.org/edit/dump_assets/](https://assets.wprdc.org/edit/dump_assets/) triggers a dump of the assets which will show up `(# of records)/(4000/minute)` later at
 [https://assets.wprdc.org/asset_dump.csv](https://assets.wprdc.org/asset_dump.csv).
