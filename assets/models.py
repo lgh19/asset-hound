@@ -359,7 +359,9 @@ class Asset(models.Model):
         existing_ids = get_carto_asset_ids(self.id) # This has been tested.
 
         # Currently, this is just blindly updating the Carto table without checking
-        # whether a change is necessary.
+        # whether a change is necessary (that is, whether one of a few fields
+        # [name, do_not_display, latitude, longitude, asset type, category] has
+        # been altered).
         pushed, insert_list = sync_asset_to_carto(self, existing_ids, 0, [], records_per_request=1)
         if pushed > 0:
             fix_carto_geofields(self.id)
@@ -371,3 +373,7 @@ class Asset(models.Model):
 
         # The Carto SQL connector would be an alternative to this sync_asset_to_carto approach.
         super(Asset, self).save(*args, **kwargs)
+
+        # Similar syncing could be done when changing Location instances in a way
+        # that would affect Asset locations, but all the affected Assets would need
+        # to be collected and updated. For now, a daily cronjob will catch these changes.

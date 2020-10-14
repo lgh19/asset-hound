@@ -258,7 +258,7 @@ def modify_destination_asset(mode, row, destination_asset, created_new_asset, mo
         destination_asset._change_reason = "Asset Updater: Initial save of Asset to allow many-to-many relationships"
         destination_asset.save()
     destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'do_not_display', field_type=bool)
-    # do_not_display must be set after the destination aset is initially saved since if
+    # do_not_display must be set after the destination asset is initially saved since if
     # a new asset is created, it could be initially locationless and therefore have
     # do_not_display auto-set to True.
 
@@ -462,7 +462,8 @@ def handle_uploaded_file(f, mode, using):
 
                     for asset in assets_iterator:
                         if asset.id != destination_asset.id:
-                            asset.do_not_display = True
+                            asset.do_not_display = True # These Assets could be deleted (rather than delisted)
+                            # AFTER reassinging their RawAssets.
                             asset._change_reason = f'Asset Updater: Delisting Asset'
                             asset.save()
 
