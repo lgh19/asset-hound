@@ -82,5 +82,7 @@ Also, the Asset save function has been modified to include a step wherein the co
 
 While this covers all Asset saves (and therefore all changes made through the Asset updater), changes made to a Location instance through the Django admin interface or Django shell will not currently trigger an updating of the Carto table. To cover these cases, the `sync_to_carto` management command is set to run daily at 1am, to entirely refresh the Carto table.
 
+Since maybe Assets share Locations and would otherwise overlap, rendering all but one normally hidden on the map, one step in the Carto integration is to spatially distinguish these Assets by offsetting their markers slightly (~20 feet) in different directions.
+
 *Possible performance improvements:* Carto inserts are being done in batches as large as 100. Carto updates are being performed singly, but they could be rewritten to also be done in batches. Possibly experiment with adding Carto integration to Location saves.
 
