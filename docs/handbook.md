@@ -51,10 +51,7 @@ It is also the case that whenever an Asset is saved with no RawAssets pointing t
 1) Convert the source file to a CSV file.
 2) Edit a copy of [this ETL script](https://github.com/WPRDC/rocket-etl/blob/master/engine/payload/asset_map/_facet_hound.py) to add a schema and a `job_dict` entry in the `job_dicts` list. These specify how the fields in the source file map to the common asset-map schema. A `job_code` value should be given in the schema to allow the job (that is, the particular task of transforming the source file into another CSV file representing a particular set of assets) to be named from the command-line.
 3) Set `one_file` to be `False` in the script.
-4) Run the job like this:
-
-```> python ../../../launchpad.py asset_map/_facet_hound.py mute <job_code>```
-
+4) Run the job like this: `> python ../../../launchpad.py asset_map/_facet_hound.py mute <job_code>`
 5) A generated file with a name you provide (we'll suppose it's `new_assets.csv`) in the `job_dicts` entry should show up in the `processed` directory.
 6) Transfer this file to the asset-map server (e.g., `> scp new_raw_assets.csv <your_username>@assets.wprdc.org:<path-where-you're-trying-to-put-the-file>`
 7) Change to the asset-map backend directory and move the `new_raw_assets.csv` file there.
@@ -73,11 +70,11 @@ While there are REST API endpoints provided by the Django REST Framework, the se
 
 The entire assets database can be pushed to the Carto database by running a management command:
 
-```python manage.py sync_to_carto```
+```> python manage.py sync_to_carto```
 
 Individual asset types may be specified as command-line arguments to update just those asset types:
 
-```python manage.py sync_to_carto restaurants coffee_shops```
+```> python manage.py sync_to_carto restaurants coffee_shops```
 
 Also, the Asset save function has been modified to include a step wherein the corresponding row in the Carto table is updated/inserted/deleted, as appropriate. This involves four API calls (one to check whether the Asset ID already exists in the Carto table), one to do the updating/inserting/deleting, and two to update the geofields (since Carto does not automatically update the `the_geom` and `the_geom_webmercator` fields, but doing so is essential for updating the location of the map point. While this slows down Asset saves, it keeps the Carto map up-to-date and facilitates edits.
 
