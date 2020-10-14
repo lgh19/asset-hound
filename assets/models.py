@@ -356,10 +356,10 @@ class Asset(models.Model):
             self.do_not_display = True # not linked to by RawAssets.
         # When saving Assets, if do_not_display changes to True, the Asset should be
         # deleted from the Carto table.
-        existing_ids = get_carto_asset_ids(self.id)
-        print(f"existing_ids = {existing_ids}")
-        raise ValueError("Just checking.")
+        existing_ids = get_carto_asset_ids(self.id) # This has been tested.
 
+        # Currently, this is just blindly updating the Carto table without checking
+        # whether a change is necessary.
         pushed, insert_list = sync_asset_to_carto(self, existing_ids, 0, [], records_per_request=1)
         if pushed > 0:
             fix_carto_geofields()
