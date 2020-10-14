@@ -256,7 +256,7 @@ def modify_destination_asset(mode, row, destination_asset, created_new_asset, mo
     # id value.
     if created_new_asset and mode == 'update':
         destination_asset._change_reason = "Asset Updater: Initial save of Asset to allow many-to-many relationships"
-        destination_asset.save()
+        destination_asset.save(creating_new_asset = created_new_asset)
     destination_asset, more_results = check_or_update_value(destination_asset, row, mode, more_results, source_field_name = 'do_not_display', field_type=bool)
     # do_not_display must be set after the destination asset is initially saved since if
     # a new asset is created, it could be initially locationless and therefore have
