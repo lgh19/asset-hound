@@ -512,7 +512,7 @@ def handle_uploaded_file(f, mode, using):
                 destination_asset.location = location
                 destination_asset.organization = organization
                 destination_asset._change_reason = change_reason
-                destination_asset.save()
+                destination_asset.save(override_carto_sync = True)
             else:
                 more_results.append(f"\n<hr>")
 
