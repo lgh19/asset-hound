@@ -93,3 +93,8 @@ A useful endpoint for testing Carto integration is this kind of record-level que
 
 *Possible performance improvements:* Carto inserts are being done in batches as large as 100. Carto updates are being performed singly, but they could be rewritten to also be done in batches. Possibly experiment with adding Carto integration to Location saves.
 
+#### Task queue
+Because all the web requests needed to process the Carto integration add up when the Asset updater is asked to process many edits, handling these requests synchronously can cause the Asset updater web requests to time out. To avoid this, the Asset saves are done with a flag that overrides immediate Carto synchronization, and the modified IDs are processed asynchronously, by sending them to [Huey](https://huey.readthedocs.io/en/latest/) (a minimal task queue with built-in Django support).
+
+To actiate the Huey consumer (the process that watches for the addition of tasks to the queue and executes them), run the `start_huey.sh` script in the Django project directory as root (`> sudo start_huey.sh`). At present, this is just running in a tmux session, but eventually it will be configured to run automatically under `supervisor`, using the configuring given [here](https://www.untangled.dev/2020/07/01/huey-minimal-task-queue-django/).
+
