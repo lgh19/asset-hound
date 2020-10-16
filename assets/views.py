@@ -19,6 +19,7 @@ from assets.utils import distance
 
 import os, pytz
 from datetime import datetime, timedelta
+from tasks import sync_assets_to_carto_eventually
 
 def there_is_a_field_to_update(row, fields_to_check):
     """Scan record for certain fields and see if any exist
@@ -384,6 +385,7 @@ def handle_uploaded_file(f, mode, using):
                         more_results.append(f"Failed to find Organization with id == {row['location_id']}. ASSET UPDATER FAILURE.")
                         return more_results
 
+        asset_ids_to_sync_to_carto = []
         reader = csv.DictReader(decoded_file)
         for row in reader:
 
@@ -466,6 +468,7 @@ def handle_uploaded_file(f, mode, using):
                             # AFTER reassinging their RawAssets.
                             asset._change_reason = f'Asset Updater: Delisting Asset'
                             asset.save()
+                            asset_ids_to_sync_to_carto.append(asset.id)
 
                             # Iterate over raw assets of this asset and point them to destination_asset.
                             for raw_asset in asset.rawasset_set.all():
@@ -516,6 +519,7 @@ def handle_uploaded_file(f, mode, using):
             else:
                 more_results.append(f"\n<hr>")
 
+    sync_assets_to_carto_eventually(asset_ids_to_sync_to_carto)
     return more_results
 
 @staff_member_required

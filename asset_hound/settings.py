@@ -23,6 +23,8 @@ from asset_hound.local_settings import (
     DEV_APPS,
 )
 
+from huey import SqliteHuey
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -56,6 +58,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'ckeditor',
     'simple_history',
+    'huey.contrib.djhuey',
 
     # asset-hound apps
     'geo',
@@ -196,3 +199,6 @@ CKEDITOR_CONFIGS = {
 }
 
 PHONENUMBER_DEFAULT_REGION = 'US'
+
+HUEY = SqliteHuey(filename="/tmp/huey-db.sqlite3")
+HUEY.immediate_use_memory = False
