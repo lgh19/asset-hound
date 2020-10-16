@@ -200,5 +200,5 @@ CKEDITOR_CONFIGS = {
 
 PHONENUMBER_DEFAULT_REGION = 'US'
 
-HUEY = SqliteHuey(filename="/tmp/huey-db.sqlite3")
+HUEY = SqliteHuey(filename="/var/www/backend/tmp/huey-db.sqlite3")
 HUEY.immediate_use_memory = False

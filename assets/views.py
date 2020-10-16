@@ -19,7 +19,7 @@ from assets.utils import distance
 
 import os, pytz
 from datetime import datetime, timedelta
-from tasks import sync_assets_to_carto_eventually
+from assets.tasks import sync_assets_to_carto_eventually
 
 def there_is_a_field_to_update(row, fields_to_check):
     """Scan record for certain fields and see if any exist
@@ -448,6 +448,7 @@ def handle_uploaded_file(f, mode, using):
                         destination_asset.do_not_display = True
                         destination_asset._change_reason = f'Asset Updater: Delisting Asset'
                         destination_asset.save(override_carto_sync = True)
+                        asset_ids_to_sync_to_carto.append(destination_asset.id)
                         s = f"Delisting {destination_asset.name}."
                         more_results.append(s)
                         continue # Skip rows with no ids to merge.
@@ -516,10 +517,13 @@ def handle_uploaded_file(f, mode, using):
                 destination_asset.organization = organization
                 destination_asset._change_reason = change_reason
                 destination_asset.save(override_carto_sync = True)
+                asset_ids_to_sync_to_carto.append(destination_asset.id)
             else:
                 more_results.append(f"\n<hr>")
 
-    sync_assets_to_carto_eventually(asset_ids_to_sync_to_carto)
+    if mode == 'update' and len(asset_ids_to_sync_to_carto) > 0:
+        sync_assets_to_carto_eventually(asset_ids_to_sync_to_carto)
+    more_results.append(f"\nasset_ids_to_sync_to_carto = {asset_ids_to_sync_to_carto}")
     return more_results
 
 @staff_member_required
