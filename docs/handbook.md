@@ -61,6 +61,11 @@ In contrast with Assets, RawAssets should normally not be deleted (or mutated) s
 9) Run `> python manage.py load_raw_assets new_raw_assets.csv` to load the raw assets into the database.
 10) Run `> python manage.py dump_raw_assets` to dump the raw assets to a `raw_asset_dump.csv` file suitable for generating merge-instructions from.
 
+### Adding new asset types
+Each asset should be associated with exactly one asset type. (The model supports multiple asset types per asset, but we've set as a policy limiting each asset to one type. One reason for this is that the map does not have a way of representing a multi-type asset. Another reason is that, in practice, multi-type assets may have conflicts between the details for each type (e.g., a day-care center and a school in the same building, under the same organization, but with different operating hours and phone numbers).)
+
+When new assets are added (through a management command or the Asset updater) that are coded with a previously unused type, a corresponding new AssetType instance will be created in the database. However, this AssetType has two fields which need to be set manually through the Django admin interface: title (usually just a readable, capitalized version of the AssetType name) and category (which can be picked from a drop-down list of Category instances). If these fields are specified after the creation of Assets, the Assets will need to be re-synced to Carto so that they appear on the map correctly. This may be done by running the `sync_to_carto` management command or by resaving the Assets (e.g. through the Django admin interface or by rerunning the Asset updater).
+
 ### Exporting data
 Accessing the URL [https://assets.wprdc.org/edit/dump_assets/](https://assets.wprdc.org/edit/dump_assets/) triggers a dump of the assets which will show up `(# of records)/(4000/minute)` later at
 [https://assets.wprdc.org/asset_dump.csv](https://assets.wprdc.org/asset_dump.csv).
@@ -83,6 +88,8 @@ Also, the Asset save function has been modified to include a step wherein the co
 While this covers all Asset saves (and therefore all changes made through the Asset updater), changes made to a Location instance through the Django admin interface or Django shell will not currently trigger an updating of the Carto table. To cover these cases, the `sync_to_carto` management command is set to run daily at 1am, to entirely refresh the Carto table.
 
 Since maybe Assets share Locations and would otherwise overlap, rendering all but one normally hidden on the map, one step in the Carto integration is to spatially distinguish these Assets by offsetting their markers slightly (~20 feet) in different directions.
+
+A useful endpoint for testing Carto integration is this kind of record-level query: [https://wprdc.carto.com/api/v2/sql?q=select%20*%20from%20wprdc.assets_v1%20where%20id%20=%20206603](https://wprdc.carto.com/api/v2/sql?q=select%20*%20from%20wprdc.assets_v1%20where%20id%20=%20206603)
 
 *Possible performance improvements:* Carto inserts are being done in batches as large as 100. Carto updates are being performed singly, but they could be rewritten to also be done in batches. Possibly experiment with adding Carto integration to Location saves.
 
