@@ -151,7 +151,7 @@ class Command(BaseCommand):
 
                             data_source = DataSource.objects.get_or_create(
                                 name=non_blank_value_or_none(row, 'data_source_name'),
-                                defaults={'url': row['data_source_url']})[0] if row['data_source_name'] else None
+                                defaults={'url': non_blank_value_or_none(row, 'data_source_url')})[0] if row['data_source_name'] else None
 
 
                             print("See: All this currently does is create new RawAssets not update existing ones.")
