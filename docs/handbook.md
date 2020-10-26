@@ -26,6 +26,8 @@ The asset database (defined in [this Django models.py file](https://github.com/W
 The contents of the raw-asset table can then be exported from the database by running
 ```> python manage.py dump_raw_assets```
 
+(Note that load_raw_assets.py currently supports inserts but not yet upserts/updates because the required Asset changes (including reapplying old edits) need to be coded first.)
+
 ### Creating and editing assets
 The resulting `raw_asset_dump.csv` file is then exported to another computer, where a subset of raw assets may be selected (for instance, all raw assets of a given asset-type (like `restaurants`)). This filtered file is run through a Python script that facilitates finding and merging raw assets. When the script finds sufficiently similar raw assets, it proposes them as duplicates to merge and the lets the user select among conflicting values on a field-by-field basis. The output of this process is what we call a merge-instructions file.
 
@@ -92,4 +94,9 @@ Since maybe Assets share Locations and would otherwise overlap, rendering all bu
 A useful endpoint for testing Carto integration is this kind of record-level query: [https://wprdc.carto.com/api/v2/sql?q=select%20*%20from%20wprdc.assets_v1%20where%20id%20=%20206603](https://wprdc.carto.com/api/v2/sql?q=select%20*%20from%20wprdc.assets_v1%20where%20id%20=%20206603)
 
 *Possible performance improvements:* Carto inserts are being done in batches as large as 100. Carto updates are being performed singly, but they could be rewritten to also be done in batches. Possibly experiment with adding Carto integration to Location saves.
+
+#### Task queue
+Because all the web requests needed to process the Carto integration add up when the Asset updater is asked to process many edits, handling these requests synchronously can cause the Asset updater web requests to time out. To avoid this, the Asset saves are done with a flag that overrides immediate Carto synchronization, and the modified IDs are processed asynchronously, by sending them to [Huey](https://huey.readthedocs.io/en/latest/) (a minimal task queue with built-in Django support).
+
+To actiate the Huey consumer (the process that watches for the addition of tasks to the queue and executes them), run the `start_huey.sh` script in the Django project directory as root (`> sudo start_huey.sh`). At present, this is just running in a tmux session, but eventually it will be configured to run automatically under `supervisor`, using the configuring given [here](https://www.untangled.dev/2020/07/01/huey-minimal-task-queue-django/).
 
